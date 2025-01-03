@@ -6,9 +6,9 @@
     },
     "favicon": "/favicon.svg",
     "colors": {
-      "primary": "#16A34A",
-      "light": "#4ADE80",
-      "dark": "#166534"
+      "primary": "#ff4d00",
+      "light": "#ff6700",
+      "dark": "#ff4d00"
     },
     "topbarLinks": [
       {
@@ -26,12 +26,6 @@
         "icon": "rectangle-terminal",
         "color": "#f59f0b",
         "url": "api-components"
-      },
-      {
-        "name": "Community",
-        "icon": "comments",
-        "color": "#2564eb",
-        "url": "https://www.svahnar.com/community"
       }
     ],
     "navigation": [
@@ -47,9 +41,5 @@
       "github": "https://github.com/svahnar",
       "slack": "https://www.svahnar.com/community",
       "x": "https://x.com/svahnar"
-    },
-    "integrations": {
-      "intercom": "APP_ID",
-      "frontchat": "CHAT_ID"
     }
   }
