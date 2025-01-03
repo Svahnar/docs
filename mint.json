@@ -13,12 +13,12 @@
     "topbarLinks": [
       {
         "name": "Contact Us",
-        "url": "mailto:scontact@svahnar.com"
+        "url": "mailto:contact@svahnar.com"
       }
     ],
     "topbarCtaButton": {
       "name": "Get Started",
-      "url": "https://www.svahnar.com/start"
+      "url": "https://www.svahnar.com/contact"
     },
     "anchors": [
       {
@@ -37,7 +37,10 @@
     "navigation": [
       {
         "group": "Getting Started",
-        "pages": ["introduction", "quickstart"]
+        "pages": [
+        "introduction",
+        "quickstart"
+        ]
       }
     ],
     "footerSocials": {
@@ -50,4 +53,3 @@
       "frontchat": "CHAT_ID"
     }
   }
-  
