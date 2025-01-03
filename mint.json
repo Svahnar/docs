@@ -1,0 +1,53 @@
+{
+    "name": "SVAHNAR",
+    "logo": {
+      "light": "/logo/light.svg",
+      "dark": "/logo/dark.svg"
+    },
+    "favicon": "/favicon.svg",
+    "colors": {
+      "primary": "#16A34A",
+      "light": "#4ADE80",
+      "dark": "#166534"
+    },
+    "topbarLinks": [
+      {
+        "name": "Contact Us",
+        "url": "mailto:scontact@svahnar.com"
+      }
+    ],
+    "topbarCtaButton": {
+      "name": "Get Started",
+      "url": "https://www.svahnar.com/start"
+    },
+    "anchors": [
+      {
+        "name": "API Components",
+        "icon": "rectangle-terminal",
+        "color": "#f59f0b",
+        "url": "api-components"
+      },
+      {
+        "name": "Community",
+        "icon": "comments",
+        "color": "#2564eb",
+        "url": "https://www.svahnar.com/community"
+      }
+    ],
+    "navigation": [
+      {
+        "group": "Getting Started",
+        "pages": ["introduction", "quickstart"]
+      }
+    ],
+    "footerSocials": {
+      "github": "https://github.com/svahnar",
+      "slack": "https://www.svahnar.com/community",
+      "x": "https://x.com/svahnar"
+    },
+    "integrations": {
+      "intercom": "APP_ID",
+      "frontchat": "CHAT_ID"
+    }
+  }
+  

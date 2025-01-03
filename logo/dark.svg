@@ -1,0 +1,28 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 800.78 90"
+  width="300"
+  height="80"
+>
+  <defs>
+    <style>
+      .cls-1 {
+        font-size: 144px;
+        fill: #231f20; /* Default text color */
+        font-family: 'Palanquin', sans-serif;
+        font-weight: 700;
+      }
+      .cls-2 {
+        fill: #ff6700;
+      }
+    </style>
+    <symbol id="LOGO_2" viewBox="0 0 890.78 450">
+      <text class="cls-1" transform="translate(233 120.96)">SVAHNAR</text>
+      <g>
+        <rect class="cls-2" x="68" y="23.04" width="144" height="21" />
+        <rect class="cls-2" x="34" y="61.91" width="144" height="21" />
+        <rect class="cls-2" x="0" y="99.96" width="144" height="21" />
+      </g>
+    </symbol>
+  </defs>
+</svg>
