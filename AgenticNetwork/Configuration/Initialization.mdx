@@ -1,0 +1,124 @@
+---
+title: "Agentic Network Initialization"
+---
+
+To start building your **Agentic Network** using the Svahnar Agentic AI Framework, begin by defining the top-level key `create_svahnar_agentic_network` in your YAML configuration file. Under this key, define each agent with a unique identifier and specify their properties, including roles.
+
+## Defining Agents and Roles
+
+Here's how you can initialize your Agentic Network by defining agents:
+
+```yaml example.yaml
+create_svahnar_agentic_network:
+  agent-1:
+    agent_name: "stock_news_searcher"
+  agent-2:
+    agent_name: "sms_sender"
+  agent-3:
+    agent_name: "my_supervisor"
+    Role: "supervisor"
+```
+
+### Explanation:
+
+- **`create_svahnar_agentic_network`**: The top-level key that initializes the Agentic Network. This acts as a strict container for all agents in the network to function cohesively. Ensure this key is always present in your YAML configuration.
+- **`agent-1`, `agent-2`, `agent-3`**: Unique identifiers for each agent within the network. These must follow the format `agent-[number]` and should always be in order without any duplications.
+- **`agent_name`**: A descriptive name for the agent. This name should be both human-readable and agent-readable, meaning other agents or supervisor agents can easily identify and remember this agent using its name. It is recommended to use descriptive names in snake_case format (e.g., `stock_news_searcher`).
+- **`Role`**: Specifies the role of the agent. The `my_supervisor` agent is assigned the role `"supervisor"`, indicating that this agent oversees and coordinates other agents. The `Role` field defaults to `normal` if not specified.
+
+### Detailed Explanation of `Role`
+
+The `Role` field defines the purpose and behavior of an agent within the network. There are two allowed values for `Role`:
+
+| Role         | Description                                                                                     | Required in YAML Configuration? | Example       |
+|--------------|-------------------------------------------------------------------------------------------------|----------------------------------|---------------|
+| `normal`     | A standard agent that performs specific tasks as defined in the configuration.                  | No                               | `"normal"`    |
+| `supervisor` | An agent responsible for overseeing and coordinating other agents. Supervisors make decisions and ensure proper functioning of agents under their hierarchy. | Yes (for supervisors)            | `"supervisor"` |
+
+#### Key Differences Between `supervisor` and `normal` Agents
+
+| Feature                  | `normal` Agent                              | `supervisor` Agent                                                                 |
+|--------------------------|---------------------------------------------|-----------------------------------------------------------------------------------|
+| Primary Function         | Executes tasks assigned to it.             | Oversees and coordinates other agents.                                           |
+| Tools Provided           | Yes, requires tools to perform tasks.      | No, supervisors do not perform tasks directly but ensure other agents do.        |
+| Hierarchical Limitations | Not applicable.                            | Should manage a limited number of agents to maintain efficiency.                 |
+
+#### Recommendations for Supervisors
+
+- **Hierarchy Management**: Avoid attaching too many agents to a single supervisor. Test and determine the optimal number of agents a supervisor can efficiently manage.
+- **Role Specification**: Always specify the `Role` for supervisor agents.
+- **Task Delegation**: Supervisors do not perform tasks directly. Ensure all tools and resources are provided to the `normal` agents under their supervision.
+
+### Agent Fields
+
+| Field         | Type   | Description                                                                             | Required | Example              |
+|---------------|--------|-----------------------------------------------------------------------------------------|----------|----------------------|
+| `agent_name`  | String | Unique name for the agent. Must be human-readable and agent-readable.                    | Yes      | `"stock_news_searcher"` |
+| `Role`        | String | Role of the agent. Allowed values: `normal`, `supervisor`. Defaults to `normal`.        | No       | `"supervisor"`         |
+
+*Note*: If no `Role` is specified, the agent defaults to a `normal` agent.
+
+---
+
+## Network Flow Examples
+
+<Tabs>
+  <Tab title="Hierarchical Network Flow">
+    In a **Hierarchical Network Flow**, there is a supervisor agent that oversees the work of other agents. The supervisor ensures that tasks are completed properly and, if necessary, intervenes to either reassign tasks or escalate them to another supervisor.
+
+    ### Example Use Case:
+    - **Supervisor Role**: The supervisor checks the work of `agent-1` and `agent-2`. If the work is incomplete or incorrect, the supervisor either:
+      - Sends the task back to the same agent for corrections.
+      - Passes the task to another agent for further processing.
+      - Escalates the task to its own supervisor for additional decision-making.
+
+    ```yaml example_hierarchical.yaml
+    create_svahnar_agentic_network:
+      agent-1:
+        agent_name: "data_collector"
+      agent-2:
+        agent_name: "data_analyzer"
+      agent-3:
+        agent_name: "task_supervisor"
+        Role: "supervisor"
+    ```
+
+    ### Key Points:
+    - Supervisors are critical in hierarchical flows to ensure quality and coordination.
+    - Supervisors do not perform tasks directly but manage the workflow between agents.
+    - Limit the number of agents under a single supervisor to maintain efficiency.
+  </Tab>
+
+  <Tab title="Sequential Network Flow">
+    In a **Sequential Network Flow**, there is no supervisor. Instead, agents work in a linear sequence, passing their output to the next agent in the chain. This flow is configured using **incoming** and **outgoing edges**.
+
+    ### Example Use Case:
+    - **Sequential Workflow**: `agent-1` collects data, passes it to `agent-2` for analysis, and then `agent-2` passes the results to `agent-3` for reporting.
+
+    ```yaml example_sequential.yaml
+    create_svahnar_agentic_network:
+      agent-1:
+        agent_name: "data_collector"
+        incoming_edge: "Start"
+        outgoing_edge: "agent-2"
+      agent-2:
+        agent_name: "data_analyzer"
+        incoming_edge: "agent-1"
+        outgoing_edge: "agent-3"
+      agent-3:
+        agent_name: "report_generator"
+        incoming_edge: "agent-2"
+    ```
+
+    ### Key Points:
+    - Sequential flows are simpler and do not require a supervisor.
+    - Each agent is responsible for completing its task and passing the output to the next agent.
+    - Use **incoming_edge** and **outgoing_edge** to define the flow between agents.
+  </Tab>
+</Tabs>
+
+---
+
+### Next Steps
+
+To enable an agent to perform its tasks, it requires an LLM (Large Language Model). Explore more about configuring LLMs in the next page.

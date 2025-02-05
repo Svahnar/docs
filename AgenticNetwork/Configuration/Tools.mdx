@@ -1,0 +1,82 @@
+---
+title: "Tools Configuration"
+---
+
+# Tools Configuration
+
+Tools enhance the functionality of agents by allowing them to interact with external services, APIs, or data sources. This section explains how to assign tools to agents and why they are essential.
+
+## Why are Tools Important?
+
+- **Extended Functionality**: Tools enable agents to perform specific operations like fetching data, sending messages, or interacting with third-party services.
+- **Customization**: Agents can be equipped with different tools based on their roles.
+- **Integration**: Facilitates the connection between your agent and external systems.
+
+## YAML Configuration for Tools
+
+Each agent can be assigned tools using the `tools` field in the configuration.
+
+```yaml
+tools:
+  tool_assigned:
+    - name: "<Tool Name>"
+      config:
+        # Tool-specific configurations
+```
+
+### Example: Assigning Tools to Agents
+
+- **Stock_news_searcher** uses the `YahooFinanceNewsTool`:
+
+  ```yaml
+  tools:
+    tool_assigned:
+      - name: "YahooFinanceNewsTool"
+  ```
+
+- **sms_sender** uses the `Twilio_sms` tool:
+
+  ```yaml
+  tools:
+    tool_assigned:
+      - name: "Twilio_sms"
+        config:
+          to: "<recipient_phone_number>"
+          from_: "<twilio_phone_number>"
+  ```
+
+  **Note**: Replace `<recipient_phone_number>` and `<twilio_phone_number>` with actual phone numbers in international format (e.g., "+1234567890").
+
+## Explanation:
+
+- **name**: Specifies the tool name.
+- **config**: Contains tool-specific parameters.
+
+## Where to Find Tool Configurations?
+
+Detailed explanations of each tool and their configuration parameters are available in the **Tools Documentation** section ([link to Tools Documentation](/AgenticNetwork/configuration/tools)). This separate document provides in-depth information on:
+
+- Available tools.
+- Required and optional configuration parameters.
+- Examples and usage guidelines.
+
+## Why Explain Tools Separately?
+
+- **Detailed Information**: Tools may have complex configurations that require dedicated explanations.
+- **Modularity**: Keeping tool documentation separate makes it easier to maintain and update.
+- **User Focused**: Users can directly access the tools they are interested in without sifting through unrelated content.
+
+## Visualization Suggestion
+
+Include a **flowchart** or **sequence diagram** showing how agents interact with their assigned tools.
+
+- **Diagram Type**: Sequence Diagram.
+- **Description**: Illustrate the communication between an agent, its tools, and external services.
+
+### Example:
+
+- **Agent** (`sms_sender`) → **Tool** (`Twilio_sms`) → **Service** (Twilio API)
+
+---
+
+By assigning the appropriate tools to your agents, you enable them to perform their designated tasks effectively within the Agentic Network.

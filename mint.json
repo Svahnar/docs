@@ -7,8 +7,15 @@
     "favicon": "/favicon.svg",
     "colors": {
       "primary": "#ff4d00",
-      "light": "#ff6700",
-      "dark": "#ff4d00"
+      "light": "#ff4d00",
+      "dark": "#ff4d00",
+      "background": {
+        "light": "#FFFFFF",
+        "dark": "#111113"
+      }
+    },
+    "sidebar": {
+      "items": "undecorated"
     },
     "topbarLinks": [
       {
@@ -20,26 +27,62 @@
       "name": "Get Started",
       "url": "https://www.svahnar.com/contact"
     },
-    "anchors": [
-      {
-        "name": "API Components",
-        "icon": "rectangle-terminal",
-        "color": "#f59f0b",
-        "url": "api-components"
-      }
-    ],
+    "feedback": {
+      "thumbsRating": true,
+      "suggestEdit": true
+    },
+    "tabs": [
+    {
+      "name": "Examples",
+      "url": "examples"
+    },
+    {
+      "name": "Templates",
+      "url": "templates"
+    },
+    {
+      "name": "Changelog",
+      "url": "changelog"
+    },
+    {
+      "name": "Product Updates",
+      "url": "changelog/overview"
+    },
+    {
+      "name": "Reference",
+      "url": "reference"
+    },
+    {
+      "name": "Console",
+      "url": "faq"
+    }
+  ],
     "navigation": [
       {
         "group": "Getting Started",
         "pages": [
-        "introduction",
-        "quickstart"
+        "introduction"
+        ]
+      },
+      {
+        "group": "Agentic Network",
+        "pages": [
+        "AgenticNetwork/introduction",
+
+        "AgenticNetwork/Create_simple_agent",
+        "AgenticNetwork/Create_agentic_network",
+        
+        "AgenticNetwork/Configuration/Initialization",
+        "AgenticNetwork/Configuration/LLM",
+        "AgenticNetwork/Configuration/Tools",
+        "AgenticNetwork/Configuration/Agent_function",
+        "AgenticNetwork/Configuration/Edges",
+        "AgenticNetwork/Agent_configuration"
         ]
       }
     ],
     "footerSocials": {
       "github": "https://github.com/svahnar",
-      "slack": "https://www.svahnar.com/community",
       "x": "https://x.com/svahnar"
     }
   }

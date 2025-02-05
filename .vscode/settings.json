@@ -1,0 +1,25 @@
+{
+    "cSpell.words": [
+        "Agentic"
+    ],
+    "workbench.colorCustomizations": {
+        "activityBar.activeBackground": "#ac91b0",
+        "activityBar.background": "#ac91b0",
+        "activityBar.foreground": "#15202b",
+        "activityBar.inactiveForeground": "#15202b99",
+        "activityBarBadge.background": "#e4e3da",
+        "activityBarBadge.foreground": "#15202b",
+        "commandCenter.border": "#15202b99",
+        "sash.hoverBorder": "#ac91b0",
+        "statusBar.background": "#95739b",
+        "statusBar.foreground": "#15202b",
+        "statusBarItem.hoverBackground": "#7a5b80",
+        "statusBarItem.remoteBackground": "#95739b",
+        "statusBarItem.remoteForeground": "#15202b",
+        "titleBar.activeBackground": "#95739b",
+        "titleBar.activeForeground": "#15202b",
+        "titleBar.inactiveBackground": "#95739b99",
+        "titleBar.inactiveForeground": "#15202b99"
+    },
+    "peacock.color": "#95739b"
+}
