@@ -1,0 +1,69 @@
+:root {
+    --number-bg: #eef2f1;   /* Light mode number background */
+    --line-color: #eef2f1;  /* Light mode line color */
+}
+
+[data-theme="dark"] {
+    --number-bg: #26292e;      /* Dark mode number background */
+    --line-color: #26292e;     /* Dark mode line color */
+}
+
+.steps {
+    counter-reset: step;
+}
+
+.step {
+    position: relative;
+    padding: 20px 15px 20px 60px;
+}
+
+.step::before {
+    content: counter(step);
+    counter-increment: step;
+    position: absolute;
+    left: 15px;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background-color: var(--number-bg);
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.step-header {
+    display: flex;
+    align-items: center;
+}
+
+.step-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.step-content {
+    font-size: 1rem;
+    line-height: 1.6;
+    align-items: center;
+}
+
+.step::after {
+    content: "";
+    position: absolute;
+    left: 30px;
+    top: 70px;
+    width: 1px;
+    display: flex;
+}
+
+.step:not(:last-child)::after {
+    height: calc((100% - 40px) / 1.2);
+    background-color: var(--line-color);
+}
+
+.step:last-child::after {
+    height: calc((100% - 70px) / 1.1);
+    background: linear-gradient(to bottom, var(--line-color), transparent);
+}

@@ -1,0 +1,88 @@
+---
+title: "Incoming and Outgoing Edges"
+---
+
+
+In the Agentic Network, **edges** define the communication pathways and data flow between agents. They determine how agents are triggered and interact with one another.
+
+## Defining Edges
+
+Each agent specifies edges using the `incoming_edge` and `outgoing_edge` fields:
+
+### Incoming Edge (`incoming_edge`)
+
+- Specifies agents or signals that trigger the agent.
+- Can include the special signal `"Start"` to signify the network's entry point.
+
+### Outgoing Edge (`outgoing_edge`)
+
+- Specifies agents that receive data or are triggered by the current agent.
+- Must reference valid agent names defined in the network.
+
+## Example Edges Configuration
+
+### For `my_supervisor`
+
+```yaml
+incoming_edge:
+  - "Start"
+  - "Stock_news_searcher"
+  - "sms_sender"
+outgoing_edge:
+  - "Stock_news_searcher"
+  - "sms_sender"
+```
+
+### For `Stock_news_searcher`
+
+```yaml
+incoming_edge:
+  - "my_supervisor"
+outgoing_edge:
+  - "my_supervisor"
+```
+
+### For `sms_sender`
+
+```yaml
+incoming_edge:
+  - "my_supervisor"
+outgoing_edge:
+  - "my_supervisor"
+```
+
+## Understanding the Workflow
+
+- **`my_supervisor` Agent**:
+  - Triggered by the `"Start"` signal.
+  - Sends tasks to `Stock_news_searcher` and `sms_sender`.
+  - Receives inputs from `Stock_news_searcher` and `sms_sender`.
+- **`Stock_news_searcher` and `sms_sender` Agents**:
+  - Triggered by `my_supervisor`.
+  - Perform their functions and send results back to `my_supervisor`.
+
+## Importance of Edges
+
+- **Controls Execution Flow**: Manages the sequence of agent operations.
+- **Enables Communication**: Facilitates data exchange between agents.
+- **Defines Network Topology**: Establishes how agents are connected.
+
+## Edge Configuration Rules
+
+- **Valid References**: Edges must reference existing agents or the `"Start"` signal.
+- **Single Start**: Only one agent should have `"Start"` in its `incoming_edge`.
+- **Supervisor Constraints**: Supervisor agents must only connect to agents defined earlier in the YAML file.
+
+## Visual Representation
+
+Create a network diagram:
+
+- **Nodes**: Represent agents.
+- **Edges**: Directed arrows indicating `outgoing_edge` connections.
+- **Start Signal**: Denote the starting point.
+
+*(Diagram illustrating agent connections and data flow based on edges.)*
+
+---
+
+By carefully configuring edges, you orchestrate the flow of tasks and data within the Agentic Network, ensuring agents interact seamlessly to achieve your objectives.
