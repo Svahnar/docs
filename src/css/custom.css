@@ -39,13 +39,14 @@
   --ifm-color-primary-lightest: #fafafa; /* Pure White */
   --docusaurus-highlighted-code-line-bg: rgba(255, 255, 255, 0.1); /* Subtle highlight */
 }
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap');
 
 .theme-doc-sidebar-item-link,
 .theme-doc-sidebar-item-category {
   color: var(--ifm-color-primary);
   font-weight: 400;
   font-size: 0.9rem;
-  font-family: 'Palanquin', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   padding-left: 12px;
   padding-right: 12px;
 }
@@ -57,7 +58,9 @@
   font-weight: 5100;
 }
 
-
+body {
+  font-family: 'Open Sans', sans-serif;
+}
 
 
 /* Navbar styles */
