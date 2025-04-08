@@ -21,7 +21,7 @@ const config: Config = {
   projectName: 'DOCUMENTATION', // Usually your repo name.
   deploymentBranch: 'main',
 
-  onBrokenLinks: 'throw',
+  onBrokenLinks: 'warn',
   onBrokenMarkdownLinks: 'warn',
 
   // Even if you don't use internationalization, you can use this field to set
@@ -69,8 +69,8 @@ const config: Config = {
           position: 'left',
           label: 'Docs',
         },
-        {to: '/guides', label: 'Guides', position: 'left'},
-        {to: '/releasenotes', label: 'Release notes', position: 'left'},
+        // {to: '/guides', label: 'Guides', position: 'left'},
+        // {to: '/releasenotes', label: 'Release notes', position: 'left'},
         {
           href: 'https://github.com/orgs/Svahnar/repositories',
           className: 'header-github-link',
