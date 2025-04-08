@@ -2,6 +2,9 @@
 title: "Agentic Network Initialization"
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 To start building your **Agentic Network** using the Svahnar Agentic AI Framework, begin by defining the top-level key `create_svahnar_agentic_network` in your YAML configuration file. Under this key, define each agent with a unique identifier and specify their properties, including roles.
 
 ## Defining Agents and Roles
@@ -63,7 +66,7 @@ The `Role` field defines the purpose and behavior of an agent within the network
 ## Network Flow Examples
 
 <Tabs>
-  <Tab title="Hierarchical Network Flow">
+  <TabItem  value="Hierarchical Network Flow" label="Hierarchical Network Flow" default>
     In a **Hierarchical Network Flow**, there is a supervisor agent that oversees the work of other agents. The supervisor ensures that tasks are completed properly and, if necessary, intervenes to either reassign tasks or escalate them to another supervisor.
 
     ### Example Use Case:
@@ -87,9 +90,9 @@ The `Role` field defines the purpose and behavior of an agent within the network
     - Supervisors are critical in hierarchical flows to ensure quality and coordination.
     - Supervisors do not perform tasks directly but manage the workflow between agents.
     - Limit the number of agents under a single supervisor to maintain efficiency.
-  </Tab>
+  </TabItem>
 
-  <Tab title="Sequential Network Flow">
+  <TabItem value="Sequential Network Flow" label='Sequential Network Flow'>
     In a **Sequential Network Flow**, there is no supervisor. Instead, agents work in a linear sequence, passing their output to the next agent in the chain. This flow is configured using **incoming** and **outgoing edges**.
 
     ### Example Use Case:
@@ -114,7 +117,7 @@ The `Role` field defines the purpose and behavior of an agent within the network
     - Sequential flows are simpler and do not require a supervisor.
     - Each agent is responsible for completing its task and passing the output to the next agent.
     - Use **incoming_edge** and **outgoing_edge** to define the flow between agents.
-  </Tab>
+  </TabItem>
 </Tabs>
 
 ---
