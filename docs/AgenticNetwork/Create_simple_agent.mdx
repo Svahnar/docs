@@ -1,0 +1,171 @@
+---
+title: "Create Simple Agent"
+sidebarTitle: "Create Simple Agent"
+sidebar_position: 2
+---
+import React from 'react';
+
+import { Steps, Step } from '../../src/components/Steps/Steps.tsx';
+
+In this guide, we will learn how to create a simple agent using the Svahnar Agentic AI Framework. This example walks through configuring a basic `Web_search` agent using YAML configuration. The agent will use a large language model (LLM), integrated tools, and predefined tasks to search the internet for information.
+
+## Creating web search agent
+
+Below is an example YAML configuration for the `Web_search` agent:
+
+```yaml create_first_agent.yaml
+create_svahnar_agentic_network:
+  agent-1:
+    agent_name: "Web_search"
+    LLM_config:
+      - provider: "ChatOpenAI"
+        params:
+          model: "gpt-4o"
+          temperature: 0.0
+          max_tokens: 1000
+          request_timeout: 600
+    tools:
+      tool_assigned:
+        - name: "Tavily"
+          config:
+            max_results: 5
+    agent_function:
+      - "Your function is to search the web or internet for information"
+    incoming_edge:
+      - "Start"
+    outgoing_edge: []
+```
+
+This configuration creates a simple agent named `Web_search`, which performs a specific function—searching the web for information—using the specified configurations. Let’s go through the steps below to understand how to implement this.
+
+
+
+
+<Steps titleSize="h2">
+
+<Step title="Initialize the Agent Network">
+To begin, initialize the **Agentic Network** by defining the top-level key `create_svahnar_agentic_network`. This key acts as a container for all agents in your network.
+
+Next, define your first agent. Use a unique identifier (e.g., `agent-1`) and specify the agent name. For this example, the agent is called `Web_search`.
+
+```yaml
+create_svahnar_agentic_network:
+  agent-1:
+    agent_name: "Web_search"
+```
+
+This creates the foundational structure of your network. The `agent_name` provides a human-readable unique identifier for the agent.
+
+For detailed information, refer to [Initialization Documentation](/AgenticNetwork/configuration/initialization).
+
+
+</Step>
+<Step title="Configure the LLM for Reasoning">
+The next step is to configure the **Large Language Model (LLM)** that powers your agent. Configure the model provider, specific variant, temperature, and other hyperparameters. For example:
+
+```yaml
+LLM_config:
+  - provider: "ChatOpenAI"
+    params:
+      model: "gpt-4o"
+      temperature: 0.0
+      max_tokens: 1000
+      request_timeout: 600
+```
+
+Here’s what these parameters mean:
+- **provider**: The provider of the model (e.g., ChatOpenAI).
+- **model**: Specifies the model variant (`gpt-4o` in this case).
+- **temperature**: Controls randomness in the output. A value of `0.0` ensures deterministic and factual results.
+- **max_tokens**: Sets the maximum response length.
+- **request_timeout**: Defines the maximum duration (in seconds) for requests to the LLM.
+
+This configuration ensures that your agent generates concise, factual results for web searches.
+
+For more details, visit [LLM Configuration Documentation](/AgenticNetwork/configuration/llm).
+
+
+</Step>
+<Step title="Integrate Tools with the Agent">
+You can enhance the agent's functionality by assigning external tools. In this case, we integrate the `Tavily` tool for web searches and configure it to limit the number of results to 5:
+
+```yaml
+tools:
+  tool_assigned:
+    - name: "Tavily"
+      config:
+        max_results: 5
+```
+
+These settings allow the agent to retrieve and process search results efficiently within defined limits.
+
+For additional information, check out [Tools Documentation](/AgenticNetwork/configuration/tools).
+
+
+</Step>
+<Step title="Define the Agent's Function">
+Define the agent's purpose using the `agent_function` property. For the `Web_search` agent example:
+
+```yaml
+agent_function:
+  - "Your function is to search the web or internet for information"
+```
+
+This directive clearly communicates the intended role of the agent within the network, enabling it to specialize in retrieving information.
+
+Explore more about defining agent functions at [Agent Function Documentation](/AgenticNetwork/configuration/agent-function).
+
+
+</Step>
+<Step title="Specify Incoming and Outgoing Edges">
+Configure the data flow in your network by specifying **incoming edges** (triggers) and **outgoing edges** (connections to other agents or systems). For this agent:
+
+```yaml
+incoming_edge:
+  - "Start"
+outgoing_edge: []
+```
+
+- The `incoming_edge` defines that the agent’s activity is triggered by the `"Start"` signal.
+- The `outgoing_edge` is left empty here, meaning the agent doesn’t send data to other network nodes.
+
+This configuration ensures that the agent operates as a stand-alone node triggered at the network’s beginning.
+
+Learn more about edges at [Incoming and Outgoing Edges Documentation](/AgenticNetwork/configuration/incoming-outgoing-edges).
+
+
+</Step>
+<Step title="Final YAML Configuration">
+Combine all the steps to finalize the YAML configuration for your simple `Web_search` agent:
+
+```yaml create_first_agent.yaml
+create_svahnar_agentic_network:
+  agent-1:
+    agent_name: "Web_search"
+    LLM_config:
+      - provider: "ChatOpenAI"
+        params:
+          model: "gpt-4o"
+          temperature: 0.0
+          max_tokens: 1000
+          request_timeout: 600
+    tools:
+      tool_assigned:
+        - name: "Tavily"
+          config:
+            max_results: 5
+    agent_function:
+      - "Your function is to search the web or internet for information"
+    incoming_edge:
+      - "Start"
+    outgoing_edge: []
+```
+
+This configuration is now complete and ready to deploy. By using the Svahnar framework, your agent can seamlessly interact with the LLM, tools, and task structure defined in this YAML file.
+</Step>
+
+</Steps>
+
+---
+
+Once these steps are completed, you will have successfully created a simple agent named `Web_search` that utilizes a language model, an external web search tool, and pre-defined functions to gather information autonomously.

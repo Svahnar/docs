@@ -1,0 +1,52 @@
+---
+title: "Understand Agent Fields and Validation Rules"
+sidebarTitle: "YAML Validation"
+---
+Here's a table summarizing the main fields for each agent:
+
+### Agent Fields
+
+| Field            | Type    | Description                                                                   | Required | Example                   |
+|------------------|---------|-------------------------------------------------------------------------------|----------|---------------------------|
+| agent_name       | string  | Unique name for the agent                                                     | Yes      | "example_agent"           |
+| LLM_config       | array   | Configuration of the LLM(s) used by the agent                                 | Yes      | See LLM Configurations    |
+| Role             | string  | Role of the agent (`normal` or `supervisor`)                                  | No       | "supervisor"              |
+| agent_function   | array   | List of functions the agent performs                                          | Yes      | ["process_data"]          |
+| incoming_edge    | array   | List of agents or `Start` connected to this agent                             | Yes      | ["Start"]                 |
+| outgoing_edge    | array   | List of agents connected from this agent                                      | Yes      | ["agent-2"]               |
+| tools            | object  | Tools assigned to the agent                                                   | No       | See Tool Configuration    |
+
+### LLM Configurations
+
+Each entry in `LLM_config` includes:
+
+| Field    | Type   | Description                                   | Required | Example           |
+|----------|--------|-----------------------------------------------|----------|-------------------|
+| provider | string | LLM provider (`ChatOpenAI`, `ChatNvidia`)     | Yes      | "ChatOpenAI"      |
+| params   | object | Provider-specific parameters                  | Yes      | See below         |
+
+**ChatOpenAI Parameters**:
+
+| Field           | Type    | Allowed Values                      | Required | Example           |
+|-----------------|---------|-------------------------------------|----------|-------------------|
+| model           | string  | "gpt-4o", "gpt-4o-mini"             | Yes      | "gpt-4o-mini"     |
+| temperature     | number  | 0.0 to 1.0                          | No       | 0.7               |
+| max_tokens      | integer | Minimum: 1                          | No       | 500               |
+| request_timeout | integer | Minimum: 1                          | No       | 30                |
+
+### Validation Rules
+
+- **Top-Level Key**: Must only contain `create_svahnar_agentic_network`.
+- **Agent Names**: Each agent's `agent_name` must be unique.
+- **Edges**:
+  - `incoming_edge` can contain `Start` (only once across all agents).
+  - `outgoing_edge` must not contain `Start`.
+  - Edges must reference valid agent names.
+- **Supervisor Limitations**:
+  - `supervisor` agents can only connect to agents defined earlier in the YAML file.
+- **LLM Providers and Models**:
+  - Ensure `provider` is valid, and `params.model` matches the allowed models.
+- **Start Node**:
+  - Exactly one agent must have `Start` in its `incoming_edge`.
+
+

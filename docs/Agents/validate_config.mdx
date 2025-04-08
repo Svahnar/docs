@@ -1,0 +1,31 @@
+---
+title: "Validate Agent Configuration"
+sidebarTitle: "Validate Agent Configuration"
+description: "Validate the configuration of an agent to ensure it is set up correctly."
+---
+
+# Validate Agent Configuration
+
+Validate the configuration of an agent to ensure it is set up correctly. you can check for any potential issues in the agent's configuration and provides feedback on what needs to be corrected.
+
+### Upload YAML Configuration
+
+
+You can upload a YAML file containing the agent's configuration. The system will validate the configuration and provide feedback on any issues found.
+```python title="Python" showLineNumbers
+from svahnar import Svahnar
+
+client = Svahnar()
+response = client.agents.validate(
+    body="body",
+)
+print(response.message)
+```
+
+```python title="Response" showLineNumbers
+{
+  "message": "Validation successful: No issues found!",
+  "status": "success",
+  "suggestion": "suggestion"
+}
+```

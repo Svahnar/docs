@@ -1,0 +1,65 @@
+---
+title: "Agent Functions"
+---
+
+The `agent_function` field defines the purpose and behavior of each agent within the network. It specifies what tasks the agent is responsible for and guides its operations.
+
+## Why are Agent Functions Important?
+
+- **Clarity of Purpose**: Clearly defines what an agent does.
+- **Behavioral Guidance**: Instructs the agent on how to perform its tasks.
+- **Coordination**: Helps other agents understand the capabilities of their peers.
+
+## Defining Agent Functions
+
+Agent functions are defined using the `agent_function` field, which takes an array of strings describing the functions.
+
+### Example:
+
+- **Stock_news_searcher**:
+
+  ```yaml
+  agent_function:
+    - "Your function is to search the web or the internet for the latest news about given companies and the stock market, including all relevant news articles and official filings."
+  ```
+
+- **sms_sender**:
+
+  ```yaml
+  agent_function:
+    - "You can send SMS messages to the user using Twilio."
+  ```
+
+- **my_supervisor**:
+
+  ```yaml title="index.js"
+  agent_function:
+    - "You are the supervisor of the agents defined in outgoing edges."
+  ```
+
+## Explanation:
+
+- Descriptive statements that instruct the agent on its role.
+- Helps in tailoring the agent's behavior during execution.
+
+## Best Practices:
+
+- **Be Specific**: Clearly state what the agent should do.
+- **Use Action Verbs**: Start functions with verbs like "Search", "Send", "Process".
+- **Limit Scope**: Keep functions focused on a single responsibility.
+
+## Visualization Suggestion
+
+Include a **use case diagram** or **activity diagram** that shows the functions of each agent.
+
+- **Diagram Type**: Activity Diagram.
+- **Description**: Visual representation of the agent's tasks and decision points.
+
+### Example:
+
+- **Stock_news_searcher**:
+  - Start → Search for news → Compile results → End
+
+---
+
+Defining clear agent functions ensures that each agent operates as intended, contributing effectively to the overall network.
