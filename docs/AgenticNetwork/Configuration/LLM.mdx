@@ -2,6 +2,9 @@
 title: "LLM Configuration"
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 # LLM Configuration
 
 Configuring the **Large Language Models (LLMs)** is crucial for defining how agents reason and process information. This section explains how to specify LLM providers and models for your agents using tabs for better organization.
@@ -32,7 +35,7 @@ We organize the LLM providers and their available models using tabs for clarity.
 
 <Tabs>
 
-<Tab title="ChatOpenAI">
+<TabItem label='ChatOpenAI' value='ChatOpenAI' default>
 
 ### ChatOpenAI
 
@@ -59,9 +62,9 @@ LLM_config:
       request_timeout: 600
 ```
 
-</Tab>
+</TabItem>
 
-<Tab title="ChatNvidia">
+<TabItem title="ChatNvidia" label="ChatNvidia" value='ChatNvidia'>
 
 ### ChatNvidia
 
@@ -88,7 +91,7 @@ LLM_config:
       request_timeout: 30
 ```
 
-</Tab>
+</TabItem>
 
 </Tabs>
 
