@@ -12,20 +12,69 @@ Validate the configuration of an agent to ensure it is set up correctly. you can
 
 
 You can upload a YAML file containing the agent's configuration. The system will validate the configuration and provide feedback on any issues found.
+
 ```python title="Python" showLineNumbers
 from svahnar import Svahnar
+from pathlib import Path
+
 
 client = Svahnar()
 response = client.agents.validate(
-    body="body",
+  yaml_file=Path("agent.yaml")
 )
-print(response.message)
-```
 
-```python title="Response" showLineNumbers
+print(response)
+``` 
+### Validate YAML Configuration String
+Alternatively, you can provide the YAML configuration as a string. This is useful for quick tests or when you don't want to create a separate file.
+
+
+```python title="Python" showLineNumbers
+from svahnar import Svahnar
+from pathlib import Path
+
+client = Svahnar()
+response = client.agents.validate(
+  yaml_string="""
+  create_vertical_agent_network:
+  agent-1:
+    agent_name: information search agent
+    agent_function:
+      - It is used to search for the information on web or internet and provide the result
+    LLM_config:
+      params:
+        model: gpt-4o-mini
+        temperature: 0.5
+        max_tokens: 1000
+        request_timeout: 600
+    tools:
+      tool_assigned:
+        - name: Tavily
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+"""
+)
+print(response)
+```
+### Response
+
+You will receive a clear response indicating:
+1. Whether the configuration is valid
+2. Any issues that need to be addressed
+
+In the Suggestions section, you will find recommendations to resolve any identified issues.
+
+
+```json title="Response" showLineNumbers
 {
   "message": "Validation successful: No issues found!",
   "status": "success",
-  "suggestion": "suggestion"
+  "suggestion": None
 }
 ```
+### Response Parameters
+- **`message`**: A message indicating the result of the validation process.
+- **`status`**: The status of the validation process, indicating whether it was successful or if there were issues.
+- **`suggestion`**: Any suggestions or recommendations for improving the configuration. This may include specific changes to make or best practices to follow.
+

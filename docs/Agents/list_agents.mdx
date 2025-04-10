@@ -3,3 +3,64 @@ title: "List All Agents"
 sidebarTitle: "List All Agents"
 description: "Retrieve a list of all agents."
 ---
+
+This API allows you to retrieve a list of all agents that have been created and deployed. You can use this API to get an overview of the agents available in your organization or agent store **(only shared with you)**.
+
+``` python title="Python" showLineNumbers
+from svahnar import Svahnar
+import json
+
+client = Svahnar()
+
+response = client.agents.list()
+
+# print(response)
+response_formatted = json.dumps(response, indent=4)
+print(response_formatted)
+```
+
+### Response
+
+``` json title="response" showLineNumbers
+{
+    "agents": [
+        {
+            "agent_id": "agent_id",
+            "name": "Search Agent",
+            "description": "This agent will search for information on internet and provide the result to the user",
+            "hosted_to": "AgentStore",
+            "uploaded_by": {
+                "user_id": "user_id",
+                "user_email": "user_email"
+            }
+        },
+        {
+            "agent_id": "agent_id",
+            "name": "testing agent",
+            "description": "string",
+            "hosted_to": "Organization",
+            "uploaded_by": {
+                "user_id": "user_id",
+                "user_email": "user_email"
+            }
+        }
+    ]
+}
+```
+
+### Response Parameters
+- **`agents`**: A list of agents available in your organization or agent store.
+  - **`agent_id`**: The unique identifier of the agent.
+  - **`name`**: The name of the agent.
+  - **`description`**: A brief description of the agent's purpose or functionality.
+  - **`hosted_to`**: The deployment type, either `organization` or `agent_store`. This indicates where the agent is hosted.
+    - **`organization`**: The agent is hosted within your organization.
+    - **`agent_store`**: The agent is hosted in the agent store, making it publicly available.
+  - **`uploaded_by`**: Information about the user who uploaded the agent.
+    - **`user_id`**: The unique identifier of the user who uploaded the agent.
+    - **`user_email`**: The email address of the user who uploaded the agent.
+
+:::note
+
+You can download agent configuration using the [Get Agent Configuration API](./get_agent_details#get-agent-configuration-yaml-file).
+:::

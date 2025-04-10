@@ -3,3 +3,73 @@ title: "Update Agent Information"
 sidebarTitle: "Update Agent Information"
 description: "Update the information of an existing agent to reflect changes in its configuration or status."
 ---
+
+Using this API you can update the agent's name, description, and other relevant details to ensure that the information is current and accurate. You can also modify the agent's configuration if necessary.
+
+- You can get the agent's configuration using the [Get Agent Configuration API](./get_agent_details#get-agent-configuration-yaml-file).
+- You can get agent details using the [Get Agent Details API](./get_agent_details#get-agent-details-by-agent-id).
+
+## Update Agent - Details
+
+You can update the agent's details using the following code. This API allows you to modify the agent's name, description, and other relevant information.
+
+```python title="Python" showLineNumbers
+from svahnar import Svahnar
+
+client = Svahnar()
+
+response = client.agents.update_info(
+    agent_id="8bd57aa1-a982-49ba-b6f6-91e84e5dfe9c",
+    name="Updated Agent Name",
+    description="Updated description for the agent.",
+    hosted_to="Organization",  # or "AgentStore"
+)
+
+print(response)
+```
+
+### Request Parameters
+- **`agent_id`**: The unique identifier of the agent whose details you want to update. This ID is assigned when you create the agent.
+- **`name`**: The new name for the agent. This is an optional parameter.
+- **`description`**: The new description for the agent. This is an optional parameter.
+- **`hosted_to`**: The new deployment type, either `Organization` or `AgentStore`. This indicates where the agent is hosted. This is an optional parameter.
+  - **`Organization`**: The agent is hosted within your organization.
+  - **`AgentStore`**: The agent is hosted in the agent store, making it publicly available.
+
+### Response
+    
+``` json title="json" showLineNumbers
+{
+    "message": "Agent information updated successfully."
+}
+```
+
+## Update Agent - Configuration
+
+You can update the agent's configuration using the following code. This API allows you to modify the agent's configuration YAML file.
+
+```python title="Python" showLineNumbers
+from svahnar import Svahnar
+from pathlib import Path
+
+client = Svahnar()
+
+response = client.agents.reconfigure(
+    agent_id="320d2eac-b7bd-464d-832b-2a65db3d6dd4",
+    yaml_file=Path("agent.yaml"),
+
+)
+print(response)
+```
+### Request Parameters
+
+- **`agent_id`**: The unique identifier of the agent whose configuration you want to update. This ID is assigned when you create the agent.
+- **`yaml_file`**: The path to the new YAML configuration file that defines the agent's behavior and settings.
+
+### Response
+
+``` json title="json" showLineNumbers
+{
+    "message": "Agent reconfigured successfully."
+}
+```

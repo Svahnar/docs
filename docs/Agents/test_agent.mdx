@@ -1,0 +1,77 @@
+---
+title: "Test Agent"
+sidebarTitle: "Test Agent"
+description: "Test the functionality of an agent to ensure it is working as expected."
+---
+
+You can tempororily test the functionality of an agent using the following code. This API allows you to run a specific agent and perform its designated tasks. You can also specify the input data for the agent to process.
+
+:::info
+When working with complex agent configurations:
+- The process of building and responding may require additional time
+- Use the timeout parameter to accommodate longer processing times
+- Adjust the timeout value as needed based on your configuration complexity
+:::
+
+{/* ## With YAML file
+
+You can test the agent using a YAML file. This is useful for testing complex agents in a single YAML file.
+
+```python title="Python" showLineNumbers
+from svahnar import Svahnar
+from pathlib import Path
+
+client = Svahnar()
+
+response = client.agents.test(
+    yaml_file=Path("agent.yaml"),
+    message="Tell me about the Stargate Project",
+    timeout=600     # 5 minutes
+)
+
+print(response)
+``` */}
+## With YAML string
+
+You can use a YAML string to test the agent. This is useful for quick tests or when you don't want to create a separate YAML file.
+
+```python title="Python" showLineNumbers
+from svahnar import Svahnar
+from pathlib import Path
+
+client = Svahnar()
+
+response = client.agents.test(
+    yaml_string="""create_vertical_agent_network:
+  agent-1:
+    agent_name: information search agent
+    agent_function:
+      - It is used to search for the information on web or internet and provide the result
+    LLM_config:
+      params:
+        model: gpt-4o-mini
+        temperature: 0.5
+        max_tokens: 1000
+        request_timeout: 600
+    tools:
+      tool_assigned:
+        - name: Tavily
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+    """,
+    message="Tell me about the Stargate Project",
+    timeout=600  # Adjusted timeout for processing
+)
+
+print(response)
+```
+## Request Parameters
+
+- **`yaml_string`**: The YAML configuration string that defines the agent's context and settings.
+- **`message`**: The input data or message you want to send to the agent for processing. Currently it only supports string input.
+- **`timeout`**: The maximum time (in seconds) to wait for the agent to respond. This is useful for complex agents that may take longer to process.
+
+### Response
+
+You get same response as [executing the agent](./run_agent#response).

@@ -36,6 +36,7 @@ const sidebars: SidebarsConfig = {
       defaultStyle: true,
     },
     'Agents/validate_config',
+    'Agents/test_agent',
     'Agents/create_agent',
     'Agents/run_agent',
     'Agents/get_agent_details',
