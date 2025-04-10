@@ -2,3 +2,56 @@
 title: Delete Agent
 sidebarTitle: Delete Agent
 ---
+
+Delete an agent that is no longer needed or to remove it permanently. This API allows you to delete an agent by its unique identifier (agent ID).
+
+## Delete single agent
+
+```python title="Python" showLineNumbers
+from svahnar import Svahnar
+
+client = Svahnar()
+
+response = client.agents.delete(
+    agent_id="8bd57aa1-a982-49ba-b6f6-91e84e5dfe9c",
+)
+print(response)
+```
+
+### Request Parameters
+- **`agent_id`**: The unique identifier of the agent you want to delete. This ID is assigned when you create the agent.
+
+### Response
+```json title="json" showLineNumbers
+{
+    "message": "Agent with ID '8bd57aa1-a982-49ba-b6f6-91e84e5dfe9c' has been successfully deleted."
+}
+
+```
+
+## Delete multiple agents
+
+You can delete multiple agents at once by providing a list of agent IDs. This is useful for bulk deletion of agents that are no longer needed.
+
+```python title="Python" showLineNumbers
+from svahnar import Svahnar
+
+client = Svahnar()
+
+response = client.agents.delete_multiple(
+    agent_ids=["f8a204bc-f118-404d-b7c4-6e930fb7c154", "e416f278-8d38-4096-9daa-f75de4134c48"],
+)
+print(response)
+```
+### Request Parameters
+- **`agent_ids`**: A list of unique identifiers of the agents you want to delete. Each ID is assigned when you create the agent.
+
+
+
+### Response
+
+``` json title="json" showLineNumbers
+{
+    "message": "The following agents have been successfully deleted: f8a204bc-f118-404d-b7c4-6e930fb7c154, e416f278-8d38-4096-9daa-f75de4134c48"
+}
+```

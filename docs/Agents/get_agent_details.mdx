@@ -3,3 +3,98 @@ title: Get Agent Details
 sidebarTitle: Get Agent Details
 description: Retrieve detailed information about a specific agent, including its configuration.
 ---
+
+Throughout the documentation, with Agents you will be using Agent ID which will be a UUID. It is a 36-character string that uniquely identifies the agent. It is generated when you create an agent and can be found in the response while you're creating the agent or by listing all agents.
+
+You can use the agent ID to retrieve detailed information about a specific agent, including its configuration.
+
+## Get Agent Details by Agent ID
+To retrieve the details of a specific agent, you can use the following code. This API allows you to fetch detailed information about the agent.
+
+
+
+```python title="Python" showLineNumbers
+from svahnar import Svahnar
+
+client = Svahnar()
+
+response = client.agents.retrieve(
+    agent_id="8bd57aa1-a982-49ba-b6f6-91e84e5dfe9c",
+)
+print(response)
+```
+
+### Request Parameters
+- **`agent_id`**: The unique identifier of the agent whose details you want to retrieve. This ID is assigned when you create the agent.
+
+### Response
+
+``` json title="json" showLineNumbers
+# You might have to use `json.dumps` to print the response in a readable format 
+# print(json.dumps(response, indent=4))
+{
+    "agent_id": "8bd57aa1-a982-49ba-b6f6-91e84e5dfe9c",
+    "name": "testing the agent",
+    "description": "description",
+    "hosted_to": "Organization",
+    "uploaded_by": {
+        "user_id": "8bd57aa1-a982-49ba-b6f6-91e84e5dfe9c",
+        "user_email": "ABC@ABC.COM"
+    },
+    "yaml_configuration": "Please refer to the docs at https://docs.svahnar.com to download the agent configuration."
+}
+```
+
+### Response Parameters
+
+- **`agent_id`**: The unique identifier of the agent.
+- **`name`**: The name of the agent.
+- **`description`**: A brief description of the agent's purpose or functionality.
+- **`hosted_to`**: The deployment type, either `organization` or `agent_store`. This indicates where the agent is hosted.
+  - **`organization`**: The agent is hosted within your organization.
+  - **`agent_store`**: The agent is hosted in the agent store, making it publicly available.
+- **`uploaded_by`**: Information about the user who uploaded the agent.
+    - **`user_id`**: The unique identifier of the user who uploaded the agent.
+    - **`user_email`**: The email address of the user who uploaded the agent.
+
+## Get Agent Configuration (YAML File)
+
+To retrieve the YAML configuration file of the agent, you can use below code to fetch the configuration
+
+``` python title="Python" showLineNumbers
+from svahnar import Svahnar
+
+client = Svahnar()
+
+response = client.agents.download(
+    agent_id="8bd57aa1-a982-49ba-b6f6-91e84e5dfe9c",
+)
+
+print(response)
+```
+
+### Request Parameters
+
+- **`agent_id`**: The unique identifier of the agent whose configuration you want to retrieve. This ID is assigned when you create the agent.
+
+### Response
+
+``` YAML title="YAML" showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: information search agent
+    agent_function:
+      - It is used to search for the information on web or internet and provide the result
+    LLM_config:
+      params:
+        model: gpt-4o-mini
+        temperature: 0.5
+        max_tokens: 1000
+        request_timeout: 600
+    tools:
+      tool_assigned:
+        - name: Tavily
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```

@@ -1,5 +1,61 @@
 ---
-title: "Create Agent"
-sidebarTitle: "Create Agent"
+title: "Create and Deploy Agent"
 ---
+Once you [Test your Agent configuration](./test_agent) and [validate it](./validate_config), you can proceed to deploy the agent. The deployment process involves creating an agent using the YAML configuration file and deploying it to your Organization or Agent Store.
 
+With this SVAHNAR API, you can create and deploy agents using the YAML configuration file. The API provides a simple and efficient way to manage your agents, allowing you to focus on building and deploying them without worrying about the underlying infrastructure.
+
+The API supports various features, including agent creation, deployment, and validation. You can easily create agents with different configurations and deploy them to your Organization or Agent Store.
+
+### Validate Agent Configuration
+
+Before you upload please validate the Agent configuration using the `validate` API. This will help you identify any potential issues in the agent's configuration and provide feedback on what needs to be corrected. Additionally, you can refer to the [Validate Agent Configuration](./validate_config) documentation for more details on the validation process.
+
+## Deploy Agent
+
+To deploy an agent, you need to provide the YAML configuration file. The API will handle the deployment process and ensure that your agent is up and running.
+You can also specify the deployment type, such as `organization` or `agent_store`, to control where the agent will be deployed.
+
+### YAML Configuration File
+
+To start creating YAML configuration file, you can refer to the [Agent Configuration](/docs/AgenticNetwork/Create_simple_agent) documentation for more details on the configuration options available.
+
+
+### Here's a simple example to deploy an agent:
+
+```python title="Python" showLineNumbers
+from svahnar import Svahnar
+from pathlib import Path
+
+client = Svahnar()
+
+agent = client.agents.create(
+    name="Agent Name",
+    description="Description",
+    deploy_to="organization", # "Organization" or "AgentStore"
+    yaml_file=Path("agent.yaml"),
+)
+    
+print(agent)
+```
+### Parameters
+- **`name`**: The name of the agent you want to create.
+- **`description`**: A brief description of the agent's purpose or functionality.
+- **`deploy_to`**: The deployment type, either `Organization` or `AgentStore`. This determines where the agent will be hosted.
+  - **`Organization`**: The agent will be deployed to your organization, making it accessible to your team members.
+  - **`AgentStore`**: The agent will be deployed to the agent store, making it publicly available for others to use.
+- **`yaml_file`**: The path to the YAML configuration file that defines the agent's behavior and settings.
+
+
+You will receive a response containing the details of the deployed agent, including its ID, and any other relevant information.
+
+### Response
+This response will help you verify that the agent has been successfully deployed and is ready for use.
+
+``` json title="json" showLineNumbers
+{
+    "message": "Your agent 'Agent Name' has been successfully created and hosted. You can access it with the ID - 8bd57aa1-a982-49ba-b6f5-91e84e5dfe9c."
+}
+```
+
+Please store this `Agent ID` securely, as it will be required for future interactions with the agent. You can use this Agent ID to run and manage the agent, including updating its configuration or deleting it if necessary.
