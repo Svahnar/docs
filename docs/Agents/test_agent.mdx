@@ -13,7 +13,7 @@ When working with complex agent configurations:
 - Adjust the timeout value as needed based on your configuration complexity
 :::
 
-{/* ## With YAML file
+## With YAML file
 
 You can test the agent using a YAML file. This is useful for testing complex agents in a single YAML file.
 
@@ -30,14 +30,13 @@ response = client.agents.test(
 )
 
 print(response)
-``` */}
+```
 ## With YAML string
 
 You can use a YAML string to test the agent. This is useful for quick tests or when you don't want to create a separate YAML file.
 
 ```python title="Python" showLineNumbers
 from svahnar import Svahnar
-from pathlib import Path
 
 client = Svahnar()
 
