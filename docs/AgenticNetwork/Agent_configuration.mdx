@@ -22,10 +22,12 @@ Each entry in `LLM_config` includes:
 
 | Field    | Type   | Description                                   | Required | Example           |
 |----------|--------|-----------------------------------------------|----------|-------------------|
-| provider | string | LLM provider (`ChatOpenAI`, `ChatNvidia`)     | Yes      | "ChatOpenAI"      |
+| provider | string | LLM provider (`ChatOpenAI`, `ChatNvidia`)     | No  - Only for Enterprise (BYOAI)     | "ChatOpenAI"      |
 | params   | object | Provider-specific parameters                  | Yes      | See below         |
 
-**ChatOpenAI Parameters**:
+`BYOAI (Bring Your Own AI) is only available for Enterprise users.`
+
+**Parameters**:
 
 | Field           | Type    | Allowed Values                      | Required | Example           |
 |-----------------|---------|-------------------------------------|----------|-------------------|
@@ -36,7 +38,7 @@ Each entry in `LLM_config` includes:
 
 ### Validation Rules
 
-- **Top-Level Key**: Must only contain `create_svahnar_agentic_network`.
+- **Top-Level Key**: Must only contain `create_vertical_agent_network`.
 - **Agent Names**: Each agent's `agent_name` must be unique.
 - **Edges**:
   - `incoming_edge` can contain `Start` (only once across all agents).
@@ -44,8 +46,8 @@ Each entry in `LLM_config` includes:
   - Edges must reference valid agent names.
 - **Supervisor Limitations**:
   - `supervisor` agents can only connect to agents defined earlier in the YAML file.
-- **LLM Providers and Models**:
-  - Ensure `provider` is valid, and `params.model` matches the allowed models.
+- **LLMs**:
+  - Ensure and `params` matches the allowed models.
 - **Start Node**:
   - Exactly one agent must have `Start` in its `incoming_edge`.
 
