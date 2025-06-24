@@ -13,11 +13,10 @@ In this guide, we'll learn how to create an **Agentic Network** using the Svahna
 Below is the example YAML configuration for the Agentic Network:
 
 ```yaml
-create_svahnar_agentic_network:
+create_vertical_agent_network:
   agent-1:
     agent_name: "Stock_news_searcher"
     LLM_config:
-      - provider: "ChatOpenAI"
         params:
           model: "gpt-4o-mini"
           temperature: 0.0
@@ -36,7 +35,6 @@ create_svahnar_agentic_network:
   agent-2:
     agent_name: "sms_sender"
     LLM_config:
-      - provider: "ChatOpenAI"
         params:
           model: "gpt-4o-mini"
           temperature: 0.0
@@ -59,7 +57,6 @@ create_svahnar_agentic_network:
     agent_name: "my_supervisor"
     Role: "supervisor"
     LLM_config:
-      - provider: "ChatOpenAI"
         params:
           model: "gpt-4o-mini"
           temperature: 0.0
@@ -87,10 +84,10 @@ This configuration defines an Agentic Network with three agents:
 <Steps titleSize="h2">
 <Step title="Initialize the Agentic Network">
 
-Begin by defining the top-level key `create_svahnar_agentic_network` to initialize the Agentic Network. Under this key, you'll define each agent with a unique identifier.
+Begin by defining the top-level key `create_vertical_agent_network` to initialize the Agentic Network. Under this key, you'll define each agent with a unique identifier.
 
 ```yaml
-create_svahnar_agentic_network:
+create_vertical_agent_network:
   agent-1:
     agent_name: "Stock_news_searcher"
   agent-2:
@@ -113,7 +110,6 @@ Each agent requires an LLM configuration to handle reasoning:
 
 ```yaml
 LLM_config:
-  - provider: "ChatOpenAI"
     params:
       model: "gpt-4o-mini"
       temperature: 0.0
@@ -121,7 +117,6 @@ LLM_config:
       request_timeout: 600
 ```
 
-- **provider**: Specifies the LLM provider (e.g., ChatOpenAI).
 - **model**: Indicates the model variant to use.
 - **temperature**: Controls output randomness; `0.0` ensures deterministic responses.
 - **max_tokens**: Sets the maximum length of the response.
@@ -243,11 +238,10 @@ Learn more about edges at the [Incoming and Outgoing Edges Documentation](/Agent
 Combine all the components to finalize your Agentic Network configuration:
 
 ```yaml
-create_svahnar_agentic_network:
+create_vertical_agent_network:
   agent-1:
     agent_name: "Stock_news_searcher"
     LLM_config:
-      - provider: "ChatOpenAI"
         params:
           model: "gpt-4o-mini"
           temperature: 0.0
@@ -266,7 +260,6 @@ create_svahnar_agentic_network:
   agent-2:
     agent_name: "sms_sender"
     LLM_config:
-      - provider: "ChatOpenAI"
         params:
           model: "gpt-4o-mini"
           temperature: 0.0
@@ -289,7 +282,6 @@ create_svahnar_agentic_network:
     agent_name: "my_supervisor"
     Role: "supervisor"
     LLM_config:
-      - provider: "ChatOpenAI"
         params:
           model: "gpt-4o-mini"
           temperature: 0.0

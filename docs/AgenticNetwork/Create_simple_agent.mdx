@@ -14,11 +14,10 @@ In this guide, we will learn how to create a simple agent using the Svahnar Agen
 Below is an example YAML configuration for the `Web_search` agent:
 
 ```yaml create_first_agent.yaml
-create_svahnar_agentic_network:
+create_vertical_agent_network:
   agent-1:
     agent_name: "Web_search"
     LLM_config:
-      - provider: "ChatOpenAI"
         params:
           model: "gpt-4o"
           temperature: 0.0
@@ -44,12 +43,12 @@ This configuration creates a simple agent named `Web_search`, which performs a s
 <Steps titleSize="h2">
 
 <Step title="Initialize the Agent Network">
-To begin, initialize the **Agentic Network** by defining the top-level key `create_svahnar_agentic_network`. This key acts as a container for all agents in your network.
+To begin, initialize the **Agentic Network** by defining the top-level key `create_vertical_agent_network`. This key acts as a container for all agents in your network.
 
 Next, define your first agent. Use a unique identifier (e.g., `agent-1`) and specify the agent name. For this example, the agent is called `Web_search`.
 
 ```yaml
-create_svahnar_agentic_network:
+create_vertical_agent_network:
   agent-1:
     agent_name: "Web_search"
 ```
@@ -61,11 +60,10 @@ For detailed information, refer to [Initialization Documentation](/AgenticNetwor
 
 </Step>
 <Step title="Configure the LLM for Reasoning">
-The next step is to configure the **Large Language Model (LLM)** that powers your agent. Configure the model provider, specific variant, temperature, and other hyperparameters. For example:
+The next step is to configure the **Large Language Model (LLM)** that powers your agent. Configure the model, specific variant, temperature, and other hyperparameters. For example:
 
 ```yaml
 LLM_config:
-  - provider: "ChatOpenAI"
     params:
       model: "gpt-4o"
       temperature: 0.0
@@ -74,7 +72,6 @@ LLM_config:
 ```
 
 Here’s what these parameters mean:
-- **provider**: The provider of the model (e.g., ChatOpenAI).
 - **model**: Specifies the model variant (`gpt-4o` in this case).
 - **temperature**: Controls randomness in the output. A value of `0.0` ensures deterministic and factual results.
 - **max_tokens**: Sets the maximum response length.
@@ -139,11 +136,10 @@ Learn more about edges at [Incoming and Outgoing Edges Documentation](/AgenticNe
 Combine all the steps to finalize the YAML configuration for your simple `Web_search` agent:
 
 ```yaml create_first_agent.yaml
-create_svahnar_agentic_network:
+create_vertical_agent_network:
   agent-1:
     agent_name: "Web_search"
     LLM_config:
-      - provider: "ChatOpenAI"
         params:
           model: "gpt-4o"
           temperature: 0.0
