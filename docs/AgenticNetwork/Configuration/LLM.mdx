@@ -7,12 +7,12 @@ import TabItem from '@theme/TabItem';
 
 # LLM Configuration
 
-Configuring the **Large Language Models (LLMs)** is crucial for defining how agents reason and process information. This section explains how to specify LLM providers and models for your agents using tabs for better organization.
+Configuring the **Large Language Models (LLMs)** is crucial for defining how agents reason and process information. This section explains how to specify LLMs for your agents using tabs for better organization.
 
 ## Why is LLM Configuration Important?
 
 - **Intelligence**: LLMs empower agents with the ability to understand and generate human-like text.
-- **Customization**: Different providers and models offer varying capabilities.
+- **Customization**: Different models offer varying capabilities.
 - **Performance**: Selecting the appropriate model affects the agent's efficiency and response quality.
 
 ## YAML Configuration for LLMs
@@ -21,7 +21,6 @@ Each agent can be configured with one or more LLMs. Here's how you can define th
 
 ```yaml
 LLM_config:
-  - provider: "<LLM Provider>"
     params:
       model: "<Model Name>"
       temperature: <Value>
@@ -29,75 +28,8 @@ LLM_config:
       request_timeout: <Value>
 ```
 
-## Available LLM Providers and Models
-
-We organize the LLM providers and their available models using tabs for clarity.
-
-<Tabs>
-
-<TabItem label='ChatOpenAI' value='ChatOpenAI' default>
-
-### ChatOpenAI
-
-**Models:**
-
-- `gpt-4o`
-- `gpt-4o-mini`
-
-**Parameters:**
-
-- `temperature`: 0.0 to 1.0
-- `max_tokens`
-- `request_timeout`
-
-**Example Configuration:**
-
-```yaml
-LLM_config:
-  - provider: "ChatOpenAI"
-    params:
-      model: "gpt-4o-mini"
-      temperature: 0.0
-      max_tokens: 1000
-      request_timeout: 600
-```
-
-</TabItem>
-
-<TabItem title="ChatNvidia" label="ChatNvidia" value='ChatNvidia'>
-
-### ChatNvidia
-
-**Models:**
-
-- `meta/llama-3.1-70b-instruct`
-- `mistralai/mistral-large-2-instruct`
-
-**Parameters:**
-
-- `temperature`: 0.0 to 1.0
-- `max_tokens`
-- `request_timeout`
-
-**Example Configuration:**
-
-```yaml
-LLM_config:
-  - provider: "ChatNvidia"
-    params:
-      model: "meta/llama-3.1-70b-instruct"
-      temperature: 0.7
-      max_tokens: 500
-      request_timeout: 30
-```
-
-</TabItem>
-
-</Tabs>
-
 ## Explanation of Parameters
 
-- **provider**: The LLM service provider.
 - **model**: Specifies the model variant to use.
 - **temperature**:
   - Controls the randomness of the output.
