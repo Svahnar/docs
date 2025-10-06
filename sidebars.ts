@@ -64,6 +64,24 @@ const sidebars: SidebarsConfig = {
     'Agents/list_agents',
     'Agents/update_agent_info',
     'Agents/delete_agent',
+
+    {
+      type: 'html',
+      value: '<div style="margin-top: 12px; font-size: 14px; font-weight: bold;">Keyvault</div>',
+      defaultStyle: true,
+    },
+    'Keyvault/Keyvault',
+    {
+      type: 'category',
+      label: 'How to use',
+      collapsed: true,
+      items: [
+        'Keyvault/how to use/Add keys',
+        'Keyvault/how to use/Usage',
+        'Keyvault/how to use/Revoke keys',
+      ],
+    },
+
     {
       type: 'html',
       value: '<div style="margin-top: 12px; font-size: 14px; font-weight: bold;">Tools </div>',
@@ -71,8 +89,6 @@ const sidebars: SidebarsConfig = {
     },
     'Tools/Understanding_Tools',
     'Tools/list_of_tools',
-    
-
     {
       type: 'category',
       label: 'Tools',
@@ -100,6 +116,7 @@ const sidebars: SidebarsConfig = {
       defaultStyle: true,
     },
     'Knowledge Repository/Overview',
+    'Knowledge Repository/Upload files',
     {
       type: 'category',
       label: 'Connectors',
