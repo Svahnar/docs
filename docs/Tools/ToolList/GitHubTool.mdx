@@ -1,0 +1,74 @@
+---
+title: "GitHubTool"
+sidebarTitle: List of Tools
+---
+
+A multifunction GitHub tool to read, write, update, delete files, list files, create issues, and open pull requests in your provided repository.
+
+## Authentication
+
+Tool config must include `repo` (owner/repo) and `PRIVATE_KEY` (GitHub App private key). Optionally provide `APP_ID` and `Branch`.
+
+## Operations
+
+- `read_file`: Return file contents.
+- `write_file`: Create a new file (supply `file_query`).
+- `update_file`: Update file using `update_file_query` format.
+- `delete_file`: Delete a file.
+- `list_files_in_bot_branch`: List files in the bot branch.
+- Issue and PR operations are supported as well.
+
+## YAML usage
+
+```yaml
+tools:
+  tool_assigned:
+    - name: "GitHubTool"
+      config:
+        repo: "owner/repo"
+        PRIVATE_KEY: "${GITHUB_PRIVATE_KEY}"
+        APP_ID: "123456"
+        Branch: "main"
+```
+
+Invocation payload examples
+
+Read a file
+
+```yaml
+payload:
+	operation: "read_file"
+	file_path: "README.md"
+```
+
+Create a new file
+
+```yaml
+payload:
+	operation: "write_file"
+	file_query: "/docs/newfile.md\nNew content here"
+```
+
+### More details
+
+This tool uses a GitHub App private key for authentication. Keep keys secure and avoid embedding them directly in YAML stored in source control. Responses may include SystemMessage objects instructing the agent not to call the tool again when a write/create operation completes.
+
+## Agent integration example
+
+```yaml
+create_vertical_agent_network:
+  agent-1:
+    agent_name: "repo_agent"
+    LLM_config:
+      params:
+        model: "gpt-4o-mini"
+    tools:
+      tool_assigned:
+        - name: "GitHubTool"
+          config:
+            repo: "owner/repo"
+            PRIVATE_KEY: "${GITHUB_PRIVATE_KEY}"
+    agent_function:
+      - "Perform repository read/write operations as requested."
+```
+

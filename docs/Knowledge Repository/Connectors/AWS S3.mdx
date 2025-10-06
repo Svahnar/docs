@@ -1,0 +1,17 @@
+
+The S3 connector lets you point the Knowledge Repository at an S3-compatible bucket (including Svahnar S3) so documents can be imported directly from your cloud storage. Uploaded documents are copied into Svahnar's storage for RAG indexing and retrieval.
+
+## When to use
+
+- Large archives of documents already stored in S3
+- Regular sync from production backups
+
+## Usage
+- You have to provide file/folder path of your S3 file (pdf)
+- AWS credentials like access key id, access key secret (use Keyvault for it)
+- AWS region name e.g- us-east-1
+
+
+## Notes
+
+- Documents copied into Svahnar S3 can be downloaded by user (who have permission) unless the original connector or storage policy prevents downloads.

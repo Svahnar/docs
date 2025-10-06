@@ -1,0 +1,59 @@
+---
+title: "DatabaseToolReadOnly"
+sidebarTitle: List of Tools
+---
+
+Read-only access to SQL databases. Use this tool to run SELECT/SHOW/DESCRIBE queries and return structured results.
+
+## Usage
+
+Provide `db_uri` in tool config and pass a `query` string payload.
+
+Example payload:
+
+```json
+{ "query": "SELECT id, name FROM users LIMIT 10" }
+```
+
+### Notes
+- Only read operations are allowed. Non-SELECT queries will be rejected.
+- On SQL errors the tool returns the error message and a schema hint to help fix queries.
+
+## YAML usage
+
+```yaml
+tools:
+  tool_assigned:
+    - name: "DatabaseToolReadOnly"
+      config:
+        db_uri: "postgresql+psycopg2://user:pass@db.example.com:5432/mydb"
+```
+
+Invocation payload:
+
+```yaml
+payload:
+	query: "SELECT id, name FROM users LIMIT 10"
+```
+
+### More details
+
+Only read operations are allowed; the tool rejects non-SELECT SQL to protect data from accidental mutation.
+
+## Agent integration example
+
+```yaml
+create_vertical_agent_network:
+  agent-1:
+    agent_name: "db_reader"
+    LLM_config:
+      params:
+        model: "gpt-4o-mini"
+    tools:
+      tool_assigned:
+        - name: "DatabaseToolReadOnly"
+          config:
+            db_uri: "postgresql+psycopg2://user:pass@db.example.com:5432/mydb"
+    agent_function:
+      - "Run read-only queries against the database and return results."
+```

@@ -1,0 +1,115 @@
+
+Use the SharePoint connector to bring files and pages from SharePoint into the Knowledge Repository. This connector supports SharePoint site libraries, pages, and attachments where allowed by SharePoint permissions.
+
+## When to use
+
+* Organizations that keep documentation, policies, or knowledge in SharePoint site libraries.
+* Consolidating content from SharePoint into a searchable Knowledge Repository for QA, search, or knowledge ops.
+
+## Notes
+
+* Connector permissions must be configured to allow reading the target files and pages.
+* SVAHNAR does not store your SharePoint files permanently; it reads and ingests data during import according to repository policies.
+
+## Usage
+
+1. Register an Azure AD application (service principal) with the necessary API permissions (see "How to find these" below).
+2. Build the `SharePointData` configuration (below) with your `tenant_id`, `client_id`, `client_secret`, and `site_url`.
+3. Call the import endpoint of the Knowledge Repository connector (or run the connector tool) providing the `SharePointData` payload.
+4. Monitor logs for items that could not be fetched due to permissions, throttling, or unsupported formats.
+
+### Typical flow
+
+* The connector authenticates using OAuth2 client credentials (tenant_id, client_id, client_secret) to receive a token for Microsoft Graph or SharePoint API.
+* It enumerates lists and libraries under the provided `site_url` (pages, document libraries) and downloads files/pages according to the configured flags.
+* The connector normalizes content (optionally preserving structure where possible) and sends extracted text and metadata into the Knowledge Repository ingestion pipeline.
+
+
+
+## Parameter reference
+
+* `tenant_id` (string, required): Your Azure Active Directory tenant identifier (Directory ID). This identifies the Azure AD tenant that owns the SharePoint tenant.
+
+* `client_id` (string, required): The Application (client) ID of the Azure AD app registration used by the connector.
+
+* `client_secret` (string, required): A client secret (value) generated under the Azure AD app registration (Certificates & secrets). Treat this like a password — store it securely.
+
+* `site_url` (string, required): The full URL of the SharePoint site you want to import, for example: `https://contoso.sharepoint.com/sites/Engineering` or `https://contoso.sharepoint.com/teams/HR`.
+
+
+## How to find `tenant_id`, `client_id`, `client_secret`, and `site_url`
+
+**1) Tenant ID (Directory ID)**
+
+* Azure Portal: Sign in to the Azure Portal (portal.azure.com) → **Azure Active Directory** → **Overview** → copy the **Tenant ID** (also called Directory ID).
+* Azure CLI: `az account show --query tenantId -o tsv` (if you use the CLI).
+
+**2) Register an app to get `client_id` and create `client_secret`**
+
+* Azure Portal: Sign in → **Azure Active Directory** → **App registrations** → **New registration**.
+
+  * Give the app a name (e.g., `svc-knowledge-importer`).
+  * For a backend/service connector, choose **Accounts in this organizational directory only** (single tenant) or other option matching your org.
+  * Redirect URI is not required for client credentials flow.
+* After registering:
+
+  * **Application (client) ID** is shown on the app's Overview — this is your `client_id`.
+  * Go to **Certificates & secrets** → **New client secret** → add a description and expiry → **Add**. Copy the **Value** immediately — this is the `client_secret` (you cannot view it again).
+
+**3) API permissions & admin consent**
+
+* Under the registered app → **API permissions** → **Add a permission** → **Microsoft Graph** (or **SharePoint**) → choose **Application permissions** (for app-only access) or **Delegated permissions** (if the connector will act on behalf of a user).
+* Typical application permissions for read-only imports:
+
+  * `Sites.Read.All` (Microsoft Graph) — read items and lists across sites.
+  * `Sites.ReadWrite.All` only if you need write; prefer least privilege.
+* After adding application permissions, click **Grant admin consent** (requires an admin).
+
+**4) Site URL (`site_url`)**
+
+* Navigate to the SharePoint site in your browser and copy the top-level URL. Example site URLs:
+
+  * `https://yourtenant.sharepoint.com/sites/Engineering`
+  * `https://yourtenant.sharepoint.com/teams/HR`
+* If you need to import a sub-site or a specific site collection, use that exact URL.
+
+**Notes on app-only vs delegated**
+
+* **App-only (client credentials)**: The connector authenticates using tenant_id + client_id + client_secret and behaves as the application identity. Use this for server-to-server imports and grant **Application permissions** such as `Sites.Read.All` and give admin consent.
+* **Delegated**: If you prefer the connector to act as a user, use delegated permissions and an OAuth flow where a user signs in; this is less common for automated imports.
+
+## Example payload
+
+```json
+{
+  "tenant_id": "<TENANT_ID>",
+  "client_id": "<CLIENT_ID>",
+  "client_secret": "<CLIENT_SECRET>",
+  "site_url": "https://yourtenant.sharepoint.com/sites/Engineering",
+}
+```
+
+## Authentication & permissions
+
+* Use an Azure AD app registration with the **minimum** required permissions (prefer `Sites.Read.All` for read-only import).
+* Grant **Admin consent** for application permissions so app-only (client credentials) tokens can access site content.
+* Make sure the SharePoint site is within the same tenant and the site permissions don't block the app's access.
+
+## File & page handling
+
+* The connector will attempt to fetch site pages (modern site pages) and files from libraries. Files will be downloaded subject to size limits and ingestion policies.
+* Binary attachments (large videos, very large binaries) may be skipped or stored separately depending on repository ingestion limits.
+
+## Limitations & caveats
+
+* Throttling: Microsoft Graph and SharePoint APIs enforce throttling. Large imports should respect retry/backoff semantics.
+* Complex web parts or custom scripts on pages may not translate perfectly to plain text. The connector will extract the textual content and common web-part outputs but may leave placeholders for custom or unsupported web parts.
+* Permissions: App-only permissions require admin consent; delegated flows require a user with the right permissions.
+
+## Troubleshooting
+
+* 401/403 errors: Verify `tenant_id`, `client_id`, and `client_secret`, and confirm admin consent for application permissions.
+* Missing files/pages: Confirm that the app permission scope includes the target site and that the site URL is correct.
+* Throttling: Implement exponential backoff and consider importing large sites in batches.
+
+

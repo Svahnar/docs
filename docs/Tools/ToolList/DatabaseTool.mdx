@@ -1,0 +1,70 @@
+---
+title: "DatabaseTool"
+sidebarTitle: List of Tools
+---
+
+Execute SQL queries against a configured SQL database. This tool supports both read and write operations (SELECT, INSERT, UPDATE, DELETE, DDL).
+
+## Usage
+
+Provide a `db_uri` (SQLAlchemy-compatible) in the tool config and pass a `query` string payload.
+
+### Example payload
+
+```json
+{ "query": "SELECT id, name FROM users LIMIT 10" }
+```
+
+### Notes
+
+- For write operations the tool commits the transaction and returns the number of rows affected.
+- On errors the tool returns an error message and attempts to include the database schema to help debugging.
+
+## YAML usage
+
+Assign the DatabaseTool to an agent and pass a `db_uri` in `config`:
+
+```yaml
+tools:
+  tool_assigned:
+    - name: "DatabaseTool"
+      config:
+        db_uri: "postgresql+psycopg2://user:pass@db.example.com:5432/mydb"
+```
+
+Invocation payload example (read):
+
+```yaml
+payload:
+	query: "SELECT id, name FROM users LIMIT 10"
+```
+
+Invocation payload example (write):
+
+```yaml
+payload:
+	query: "UPDATE users SET active=true WHERE last_login &lt; '2025-01-01'"
+```
+
+### More details
+
+This tool uses SQLModel / SQLAlchemy under the hood. For write operations the tool commits the transaction. When an exception occurs the tool attempts to include the database schema to help you debug and fix the query.
+
+## Agent integration example
+
+```yaml
+create_vertical_agent_network:
+  agent-1:
+    agent_name: "db_query_agent"
+    LLM_config:
+      params:
+        model: "gpt-4o-mini"
+    tools:
+      tool_assigned:
+        - name: "DatabaseTool"
+          config:
+            db_uri: "postgresql+psycopg2://user:pass@db.example.com:5432/mydb"
+    agent_function:
+      - "Run SQL queries against the reporting database."
+```
+

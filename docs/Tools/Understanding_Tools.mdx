@@ -1,3 +1,34 @@
----
-title: "Understanding Tools"
----
+
+Tools are external capabilities that an agent (an LLM-driven system) can call to perform actions beyond text generation. They give an LLM practical power: access to up-to-date data, precise computation, side effects (APIs, databases, file systems), and longer-term state.
+
+## How tools empower LLMs
+- Extend knowledge: provide current facts (search, web browser, knowledge bases).
+- Perform exact work: calculators, spreadsheets, code runners, and validators remove guesswork.
+- Take actions: APIs, databases, and OS tools let agents effect changes (create tickets, send emails, deploy).
+- Maintain context/state: tools can record or query durable state outside the model context window.
+
+## Roles of tools in an agent
+- Observers: retrieve information (search, sensors, logs).
+- Actors: perform operations with side effects (API calls, job scheduling).
+- Translators/Adapters: convert LLM output to structured inputs or protocol messages.
+- Validators: check correctness and enforce constraints (type checkers, linters, test runners).
+
+## Benefits
+- Grounding: reduces hallucination by sourcing answers from authoritative tools.
+- Accuracy: deterministic tools (math, exact lookup) improve precision.
+- Scalability: offload heavy work to specialized services.
+- Safety: isolate risky operations and enforce checks before performing side effects.
+
+
+Example tool manifest (simple):
+```json
+{
+  "name": "search",
+  "description": "Web search returning top 5 results",
+  "inputSchema": { "query": "string" },
+  "outputSchema": { "results": "array" }
+}
+```
+
+
+Tools transform an LLM from a text predictor into an actionable, reliable system component. Design them to be explicit, safe, and composable.

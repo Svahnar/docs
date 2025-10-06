@@ -1,0 +1,28 @@
+
+
+
+Scrape and extract textual content from web pages. Provide a `urls` field pointing to the page or pages to scrape.
+
+## Usage
+
+Example payload (single URL):
+
+```yaml
+payload:
+	urls: "https://example.com/article"
+```
+
+Example YAML for assigning the tool to an agent:
+
+```yaml
+tools:
+	tool_assigned:
+		- name: "scrape_webpages"
+```
+
+The tool returns extracted document content grouped per page, with basic metadata when available.
+
+### Notes
+
+- Under the hood it uses a WebBaseLoader to fetch and parse pages. Large pages may be truncated by downstream tooling.
+
