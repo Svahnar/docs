@@ -1,0 +1,78 @@
+---
+title: "Outlook Tool"
+sidebar_position: 1
+---
+
+# Outlook Tool 
+
+This document describes the `Outlook` tool function that your LLM can call to interact with Microsoft Outlook / Microsoft Graph for common mailbox and calendar actions.
+
+
+
+## Introduction
+
+This tool lets users to build agents which can communicate with their outlook tenant and perform desired operations like viewing mail from someone or last 7 days mail, create event etc.
+It's a powerful tool which saves lot of user's time letting them to interact with outlook in human understandable language.
+:::info
+Note:- For **first-time** use open the tool config UI and click the **Authenticate** button to complete OAuth and populate the refresh token vault. This is required so the tool can obtain access tokens on behalf of users.
+
+Access tokens cached by the tool expire (in Azure AD refresh flow) roughly **90 days** for the long-lived refresh token scenario your workflow uses. If tokens expire, re-run the Authenticate flow from the tool config.
+:::
+---
+
+## Where to get Azure AD values
+
+Use the Azure Portal ([https://portal.azure.com](https://portal.azure.com)) in the following places:
+
+* **Tenant ID** — In Azure Active Directory → **Overview** → **Tenant ID** (GUID).
+* **Client ID (Application ID)** — Azure AD → App registrations → select your app → **Application (client) ID**.
+* **Client Secret** — Azure AD → App registrations → select your app → Certificates & secrets → **New client secret**. Copy the value immediately — you won't be able to view it again.
+* **Required API permissions (delegated)** — Under your app registration, add Microsoft Graph delegated permissions such as:
+
+  * `Mail.Read` (or `Mail.ReadWrite` depending on needs)
+  * `Mail.Send`
+  * `Calendars.Read` / `Calendars.ReadWrite`
+  * `offline_access` (to allow refresh tokens)
+
+After adding delegated permissions you may need an admin consent step depending on your tenant policy.
+
+---
+
+## Supported operations
+
+| Operation                | Short description                                         |
+| ------------------------ | --------------------------------------------------------- |
+| `important_mail`         | Return messages flagged high importance                   |
+| `mail_from_address`      | Return messages from a sender                             |
+| `content_search_in_mail` | Search mail content (free-text)                           |
+| `send_mail`              | Send an email on behalf of user                           |
+| `event_for_week`         | Return events for a date range                            |
+| `all_event`              | Return all events (detailed) - subject, bodyPreview, etc. |
+| `all_calendar`           | List all calendars for user                               |
+| `schedule_meet`          | Create a calendar event / meeting                         |
+
+
+
+These are the operations supported by this tool.
+
+---
+
+## Example: YAML config
+
+```yaml
+tools:
+      tool_assigned:
+        - name: Outlook
+          config:
+            tennant_id: ${tenant_id}
+            client_id: ${client_id}
+            client_secret: ${client_secret}
+```
+
+---
+
+## Authentication & token lifecycle
+
+* **First run:** you must trigger the OAuth Authenticate flow in your tool config UI so the refresh token is stored in the key vault. Without this, the tool cannot derive access tokens for a user.
+* **Token expiry:** if a token expires or the refresh token is rotated/invalidated, re-run the Authenticate flow in the tool config UI. In this setup, tokens may require re-authentication approximately every **90 days**.
+

@@ -3,15 +3,15 @@ title: "JiraTool"
 sidebarTitle: List of Tools
 ---
 
-Interact with Atlassian Jira for searches, issue creation, and other API calls.
+Interact with Atlassian Jira for searches, issue creation, modifying, deleting, and other API calls.
 
 ## Operations
 
 - `JQL Query`: Run a JQL string to search issues.
 - `Get Projects`: Retrieve projects accessible to the authenticated user.
 - `Create Issue`: Create a new issue (pass issue fields dict).
-- `Catch all Jira API call`: Call other Jira functions by specifying function name and args.
 - `Create confluence page`: Create a Confluence page via the Jira/Confluence API.
+- `Others`: Perform rest of jira operations.
 
 ### Example payloads
 
@@ -54,9 +54,7 @@ payload:
   query: "project = MYPROJ AND assignee = currentUser()"
 ```
 
-### More details
 
-For advanced operations you can use the catch-all mode and supply a function name and args as a dictionary; consult the Atlassian Python docs for the function signatures.
 
 ## Agent integration example
 

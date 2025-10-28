@@ -108,6 +108,7 @@ const sidebars: SidebarsConfig = {
         'Tools/ToolList/JiraTool',
         'Tools/ToolList/APItool',
         'Tools/ToolList/AWS_Lambda',
+        'Tools/ToolList/Outlook',
       ],
     },
     {
