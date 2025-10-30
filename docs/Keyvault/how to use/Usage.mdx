@@ -1,0 +1,64 @@
+
+# Using Keys from Keyvault
+
+Once you’ve added keys to Keyvault, you can reference them securely within the platform by using a placeholder format. The platform will automatically resolve these placeholders to the actual key values at runtime.
+
+
+## Placeholder format
+
+The placeholder syntax is:
+
+```text
+${your_key_name}
+```
+
+* `your_key_name` → the key name you specified during creation in Keyvault.
+* The `$` symbol and curly braces `{}` must be included exactly.
+
+
+## Where to use placeholders
+
+### Agent Console
+
+When configuring an agent in the **Agent Console**, you can provide the placeholder in the **Agent Node** fields or **Tool Config** fields:
+
+```yaml
+api_key: ${tavily_api_key}
+```
+
+This will automatically resolve to the actual stored tavily API key value.
+
+### YAML configurations
+
+When adding keys in YAML configurations (e.g., `agent node tool config`), enclose the placeholder in **double quotes** to ensure proper parsing:
+
+```yaml
+api_key: "${tavily_api_key}"
+```
+
+
+## Example
+
+If you created a key named `tavily_api_key`, you can reference it like this:
+
+* **In agent console**:
+
+  ```yaml
+  api_key: ${tavily_api_key}
+  ```
+
+* **In YAML config fields**:
+
+  ```yaml
+  api_key: "${tavily_api_key}"
+  ```
+
+The platform (Svahnar) will automatically fetch and inject the corresponding secret value wherever the placeholder is used.
+
+
+## Notes
+
+* **Scope**: Key placeholders work only inside the **Agent Console** and **Agent Node** configurations.
+* **Security**: Placeholders ensure that raw secrets are never hardcoded or exposed in configs.
+* **Consistency**: Always use the exact key name defined during creation. Typos will result in missing values.
+

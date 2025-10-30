@@ -1,0 +1,94 @@
+
+
+
+
+Import pages and attachments from Confluence into the Knowledge Repository. This connector supports page hierarchy and attachments where allowed by Confluence permissions.
+
+## When to use
+
+* Centralizing internal documentation from Confluence into the Knowledge Repository for search, QA, or knowledge ops.
+* Migrating documentation or creating an offline/read-only snapshot of a Confluence space.
+
+## Notes
+
+* Some Confluence spaces or pages may be restricted; connector access must have the necessary permissions.
+* SVAHNAR does not store Confluence files permanently; it ingests (reads) the data directly from your Confluence instance during import.
+
+## Usage
+
+1. Prepare a Confluence account with appropriate API permissions (read access to the target space and pages).
+2. Build the `ConfluenceData` configuration (below) with the Confluence base URL, token, and the target `space_key`.
+3. Call the import endpoint of the Knowledge Repository connector (or run the connector tool) providing the `ConfluenceData` payload.
+4. Monitor logs for pages that could not be fetched due to permissions, rate limits, or unsupported content types.
+
+### Typical flow
+
+* The connector lists pages in the given `space_key` and walks the page hierarchy.
+* For each page, it optionally pulls labels, comments, and attachments depending on flags in the configuration.
+* The connector normalizes content (optionally preserving newlines) and sends extracted text and metadata into the Knowledge Repository ingestion pipeline.
+
+
+## Parameter reference
+
+* `url`: Base URL of your Confluence instance. Examples: `https://yourcompany.atlassian.net/wiki` or an on-prem Confluence like `https://confluence.internal.local`.
+
+* `token` : Personal access token or API token used to authenticate the connector. Must be kept secret — provide via environment variables or a secure secret manager when possible.
+
+* `space_key` : The Confluence space key to import (e.g., `ENG`, `HR`, `DOCS`). The connector will enumerate pages under this space.
+
+* `username`: The username or service account email associated with `token`. Used for API calls and helpful in logs/audit.
+
+* `keep_newlines` : When `true`, the connector preserves original newline characters from Confluence page content. When `false`, the connector collapses multiple newlines and normalizes whitespace to produce continuous paragraphs.
+
+* `include_labels` : Whether to import Confluence page labels/tags as metadata. Labels are useful for filtering later.
+
+* `include_comments` : Whether to import page comments as separate records or appended notes. Comments can be noisy; enable only if you need discussion history.
+
+* `include_archived_content` : If `true` the connector will also include pages that are archived in the space (when Confluence exposes archived state via API).
+
+* `include_restricted_content` : If `true`, the connector attempts to import pages that have view restrictions. The connector will only succeed for restricted pages if the authenticated token/user has access.
+
+* `include_attachments` : Whether to download attachments (pdf, images, docs) referenced by pages. Attachments are fetched when permissions allow and can be stored/ingested according to your Knowledge Repository storage policy.
+
+## Example payload
+
+Provide the schema values in your ingestion call. (The connector expects a JSON or equivalent payload matching `ConfluenceData`.)
+
+```json
+{
+  "url": "https://yourcompany.atlassian.net/wiki",
+  "token": "<REDACTED>",
+  "space_key": "DOCS",
+  "username": "svc-confluence@yourcompany.com",
+  "keep_newlines": true,
+  "include_labels": true,
+  "include_comments": false,
+  "include_archived_content": false,
+  "include_restricted_content": false,
+  "include_attachments": true
+}
+```
+
+## Authentication & permissions
+
+* Use a service account or API token with *read* access to the desired space.
+* If you need to import restricted pages or attachments, ensure the service account has explicit access to those items.
+* If you use Atlassian cloud, prefer using an API token tied to a service account rather than a personal token.
+
+## Attachments handling
+
+* When `include_attachments` is enabled the connector will attempt to download attachments for each page and attach them to the ingestion record (subject to permission and size limits).
+* Very large attachments may be skipped or truncated depending on repository ingestion limits — check the connector logs for skipped files.
+
+## Limitations & caveats
+
+* Rate limiting: Confluence cloud enforces API rate limits. Expect import to throttle and possibly take longer for large spaces.
+* Content formats: Some Confluence macros or embedded content may not render to plain text perfectly. The connector strips or attempts to resolve common macros but may leave placeholders for complex macros.
+* Attachments and binary files: The connector can fetch attachments but does not convert proprietary file types automatically.
+
+## Troubleshooting
+
+* 401/403 errors: Check API token and service account permissions.
+* Missing pages: Confirm `space_key` is correct and the token user has read access to those pages.
+* Rate-limited imports: Retry with exponential backoff or import the space in smaller batches.
+

@@ -1,0 +1,61 @@
+---
+title: "Wikipedia"
+sidebarTitle: List of Tools
+---
+Wikipedia is a free online encyclopedia, created and edited by volunteers around the world and hosted by the Wikimedia Foundation.
+
+This tool search wikipedia for summaries and article content using the Wikipedia API wrapper. Provide a `query` string and optional parameters like `top_k_results` or `lang`.
+
+## Example payload
+
+```json
+{ "query": "Reinforcement learning" }
+```
+
+### Notes
+
+- The tool returns a concise article summary and can include additional metadata when available.
+
+## YAML usage
+
+Example of assigning the Wikipedia tool to an agent with optional params:
+
+```yaml
+tools:
+	tool_assigned:
+		- name: "Wikipedia"
+			config:
+				top_k_results: 3
+				lang: en
+```
+
+Invocation payload (what the agent sends to the tool at runtime):
+
+```yaml
+payload:
+	query: "Reinforcement learning"
+```
+
+### More details
+
+The Wikipedia wrapper fetches article summaries and can optionally return extended metadata. Use `top_k_results` to control the number of snippets returned and `lang` to select the language edition.
+
+## Agent integration example
+
+```yaml
+create_vertical_agent_network:
+	agent-1:
+		agent_name: "wiki_lookup"
+		LLM_config:
+			params:
+				model: "gpt-4o-mini"
+		tools:
+			tool_assigned:
+				- name: "Wikipedia"
+					config:
+						top_k_results: 3
+						lang: en
+		agent_function:
+			- "Fetch a concise summary from Wikipedia for the given query."
+```
+

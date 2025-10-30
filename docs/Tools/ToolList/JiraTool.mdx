@@ -1,0 +1,77 @@
+---
+title: "JiraTool"
+sidebarTitle: List of Tools
+---
+
+Interact with Atlassian Jira for searches, issue creation, modifying, deleting, and other API calls.
+
+## Operations
+
+- `JQL Query`: Run a JQL string to search issues.
+- `Get Projects`: Retrieve projects accessible to the authenticated user.
+- `Create Issue`: Create a new issue (pass issue fields dict).
+- `Create confluence page`: Create a Confluence page via the Jira/Confluence API.
+- `Others`: Perform rest of jira operations.
+
+### Example payloads
+
+JQL Query:
+
+```json
+{ "operation": "JQL Query", "query": "project = MYPROJ AND status = \"To Do\"" }
+```
+
+Create Issue:
+
+```json
+{
+  "operation": "Create Issue",
+  "query": {"summary":"New task","description":"Please do this","issuetype":{"name":"Task"},"project":{"key":"MYPROJ"}}
+}
+```
+
+### Authentication
+
+Provide `jira_username`, `jira_api_key`, and `jira_instance_url` in the tool config or environment.
+
+## YAML usage
+
+```yaml
+tools:
+  tool_assigned:
+    - name: "JiraTool"
+      config:
+        jira_username: "jira-user@example.com"
+        jira_api_key: "${JIRA_API_KEY}"
+        jira_instance_url: "https://your-domain.atlassian.net"
+```
+
+Invocation payload (JQL query):
+
+```yaml
+payload:
+  operation: "JQL Query"
+  query: "project = MYPROJ AND assignee = currentUser()"
+```
+
+
+
+## Agent integration example
+
+```yaml
+create_vertical_agent_network:
+  agent-1:
+    agent_name: "issue_manager"
+    LLM_config:
+      params:
+        model: "gpt-4o-mini"
+    tools:
+      tool_assigned:
+        - name: "JiraTool"
+          config:
+            jira_username: "jira-user@example.com"
+            jira_api_key: "${JIRA_API_KEY}"
+            jira_instance_url: "https://your-domain.atlassian.net"
+    agent_function:
+      - "Search or create Jira issues based on user instructions."
+```

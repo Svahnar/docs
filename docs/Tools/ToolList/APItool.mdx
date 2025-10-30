@@ -1,0 +1,84 @@
+
+Call external web APIs using standard HTTP methods. This tool supports GET/POST/PUT/PATCH/DELETE and allows passing headers, query parameters, and a JSON body.
+
+With this you can call your own custom APIs and utilize it in agent workflow. Our agent will communicate with your API and use its response as you design  
+
+## Usage
+
+While adding data in agent node you can do it in two way
+1. Directly adding values
+2. From keyvault
+
+### 1) Direct way
+
+You can nornmally provide value in agent node
+For e.g:-
+In headers
+```
+headers:     
+  key: "value" 
+```
+In above headers (keyword) should be as it is and below that start adding your key values after 2 space from newline and value should be enclosed in quotes `"` 
+
+Same will follow for body and params
+
+### 2) Using keyvault
+
+Instead of providing direct values you can pass the values by using placeholders defined as key in your keyvault <br />
+For e.g:-<br />
+Same in headers if i you have to pass token you can do that using keyvault. Assuming you had added token in you keyvault as AccessToken as key name
+
+Now in agent node in the header part of tool config you can add like this
+```
+headers:     
+  mytoken: "${AccessToken}" 
+```
+Note:- Placeholder should be enclosed in double quote `"` and starts with dollar symbold `$` followed by curly braces `{}`
+
+### Notes
+
+- The tool merges payload and tool_config. Headers and params can be supplied as YAML/JSON strings or dicts.
+- The tool attempts to parse JSON responses; otherwise returns text.
+
+## YAML usage
+
+```yaml
+tools:
+  tool_assigned:
+    - name: "APItool"
+      config:
+        url: "https://api.example.com/data"
+        http_method: "GET"
+```
+
+Invocation payload example:
+
+```yaml
+payload:
+  url: "https://api.example.com/users"
+  http_method: "get"
+  params:
+    limit: 5
+```
+
+### More details
+
+Headers and params may be provided as YAML strings (they will be parsed) or native maps. The tool uses `httpx` asynchronously and returns parsed JSON when available.
+
+## Agent integration example
+
+```yaml
+create_vertical_agent_network:
+  agent-1:
+    agent_name: "api_caller"
+    LLM_config:
+      params:
+        model: "gpt-4o-mini"
+    tools:
+      tool_assigned:
+        - name: "APItool"
+          config:
+            url: "https://api.example.com"
+    agent_function:
+      - "Call the specified external API and return parsed results."
+```

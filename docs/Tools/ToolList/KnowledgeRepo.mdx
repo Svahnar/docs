@@ -1,0 +1,64 @@
+---
+title: "KnowledgeRepo"
+sidebarTitle: List of Tools
+---
+
+Performs a semantic search over your knowledge repository backed by Qdrant and embeddings.
+
+## Usage
+
+Provide `QDRANT_COLLECTION_NAME`, `QDRANT_URL`, `KR_API_KEY`, and `OPENAI_API_KEY` in the tool config. Pass a `query` string to search the repository.
+
+```json
+{ "query": "How to configure SVAHNAR agent network" }
+```
+
+### Returns
+
+Top matching text snippets from the knowledge repository (by default the top 3 results).
+
+## YAML usage
+
+```yaml
+tools:
+  tool_assigned:
+    - name: "KnowledgeRepo"
+      config:
+        QDRANT_COLLECTION_NAME: "my_qdrant_collection"
+        QDRANT_URL: "https://qdrant.example.com"
+        KR_API_KEY: "${KR_API_KEY}"
+        OPENAI_API_KEY: "${OPENAI_API_KEY}"
+```
+
+Invocation payload:
+
+```yaml
+payload:
+	query: "How to configure SVAHNAR agent network"
+	k_repo_id: "<repo-uuid>" # optional to scope the search
+```
+
+### More details
+
+This tool uses OpenAI embeddings to create a query vector and Qdrant to perform the nearest-neighbor search; result ordering and quality rely on the embedding model selected.
+
+## Agent integration example
+
+```yaml
+create_vertical_agent_network:
+  agent-1:
+    agent_name: "knowledge_searcher"
+    LLM_config:
+      params:
+        model: "gpt-4o-mini"
+    tools:
+      tool_assigned:
+        - name: "KnowledgeRepo"
+          config:
+            QDRANT_COLLECTION_NAME: "my_qdrant_collection"
+            QDRANT_URL: "https://qdrant.example.com"
+            KR_API_KEY: "${KR_API_KEY}"
+            OPENAI_API_KEY: "${OPENAI_API_KEY}"
+    agent_function:
+      - "Search the knowledge repository for relevant passages and return top snippets."
+```

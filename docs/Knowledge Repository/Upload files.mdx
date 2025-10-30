@@ -1,0 +1,21 @@
+# File Uploads 
+
+SVAHNAR provides a streamlined pipeline to ingest PDF documents into your Knowledge Repository so your agent can read, analyze and answer queries using the document contents (RAG-style).
+
+## Key capabilities
+
+* **Single or bulk PDF upload** — Upload one or many PDF files in a single operation. The system queues files, extracts text, and indexes content into the repo.
+* **Built‑in OCR** — If a PDF contains scanned images (pictures of text), SVAHNAR runs OCR automatically and extracts readable text so nothing is left behind.
+* **RAG-ready knowledge store** — Uploaded documents are parsed, chunked, and embedded so that retrieval-augmented generation (RAG) can surface exact, context-aware snippets to the agent.
+* **Agent access & analysis** — Your agent can access the indexed documents for deeper analysis, summarization, question-answering and contextual reasoning across all uploaded files.
+* **Searchable knowledge** — Once ingested, documents become queryable: ask natural-language questions and receive answers that reference the original document passages.
+
+## Typical workflow
+
+1. User selects PDFs (single or multiple) via the Upload UI or API endpoint.
+2. Server receives files and performs text extraction. If pages are images, the OCR sub‑pipeline runs automatically.
+3. Extracted text is normalized and split into chunks for indexing.
+4. Chunks are embedded and stored in the Knowledge Repository.
+5. Agent queries the repository; retrieved context is used to generate accurate, source‑backed responses.
+
+

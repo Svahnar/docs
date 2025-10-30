@@ -1,0 +1,69 @@
+---
+title: "Arxiv"
+sidebarTitle: List of Tools
+---
+Arxiv is an open-access archive of scholarly articles and research papers across fields such as physics, mathematics, computer science, quantitative biology, quantitative finance, statistics, electrical engineering & systems science, and economics.
+
+This tool wraps the ArXiv API to allow agents to search for recent and relevant preprints by query. It is suitable for research, literature discovery, and citation lookup.
+
+## Usage
+
+Add the Arxiv tool to an agent's `tools.tool_assigned` list. The minimum required payload is a `query` string. The tool returns a list of matching paper metadata and snippets.
+
+```yaml
+tools:
+	tool_assigned:
+		- name: "Arxiv"
+```
+
+### Example payload
+
+```json
+{ "query": "neural network interpretability" }
+```
+
+### Notes
+
+- The tool requires only a `query` parameter in the payload (or in the merged tool config).
+- Results are returned by the underlying Arxiv API wrapper. Adjustments to paging or result count can be done via tool config if supported by your environment.
+
+For programmatic examples and advanced parameters, see the tool implementation in the codebase.
+
+## YAML usage
+
+Example `tools` section to assign the Arxiv tool to an agent (no params required by default):
+
+```yaml
+tools:
+	tool_assigned:
+		- name: "Arxiv"
+```
+
+To call the tool from an agent runtime, send a payload with a `query` key:
+
+```yaml
+payload:
+	query: "neural network interpretability"
+
+## Agent integration example
+
+Below is an example `create_vertical_agent_network` snippet showing how to attach the Arxiv tool to an agent in the same style used by the Agentic Network docs:
+
+```yaml
+create_vertical_agent_network:
+	agent-1:
+		agent_name: "paper_searcher"
+		LLM_config:
+			params:
+				model: "gpt-4o-mini"
+				temperature: 0.0
+		tools:
+			tool_assigned:
+				- name: "Arxiv"
+		agent_function:
+			- "Search arXiv for papers matching a query and return titles and abstracts."
+		incoming_edge: ["my_supervisor"]
+		outgoing_edge: ["my_supervisor"]
+```
+
+This places the tool on a named agent so it can be called as part of the agent execution flow.

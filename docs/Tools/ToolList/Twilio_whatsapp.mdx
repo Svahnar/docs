@@ -1,0 +1,52 @@
+---
+title: "Twilio - WhatsApp"
+sidebarTitle: List of Tools
+---
+
+Send WhatsApp messages using Twilio. Include Twilio credentials and message details in the payload or tool config.
+
+### Required fields
+
+- `to`: recipient in the format `whatsapp:+123...`
+- `from_`: sender number (Twilio WhatsApp-enabled number)
+- `body_message`: text body
+- `TWILIO_SID` and `TWILIO_AUTH_TOKEN`
+
+### Example payload
+
+```json
+{
+	"to": "whatsapp:+1415...",
+	"from_": "whatsapp:+1415...",
+	"body_message": "Hello from agent"
+}
+```
+
+### Notes
+
+- The tool may accept `content_sid` and `content_variables` for template messages.
+
+## YAML usage
+
+```yaml
+tools:
+	tool_assigned:
+		- name: Twilio_whatsapp
+			config:
+				TWILIO_SID: ${TWILIO_SID}
+				TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN}
+				from_: whatsapp:+1415...
+```
+
+Invocation payload:
+
+```yaml
+payload:
+	to: "whatsapp:+1415..."
+	body_message: "Hello from agent"
+```
+
+### More details
+
+WhatsApp messages may require template approvals on Twilio depending on the content and recipient region.
+

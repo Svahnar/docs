@@ -1,0 +1,73 @@
+---
+title: "AWS SES - Send Email"
+sidebarTitle: List of Tools
+---
+
+Send emails via AWS Simple Email Service (SES). The tool supports both plain text and HTML bodies.
+
+## Required fields
+
+- `sender_email` (string)
+- `recipients` (string or list)
+- `subject` (string)
+- `body_text` (string) or `body`
+
+Optional fields: `body_html`, `AWS_REGION`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `sender_name`.
+
+### Example payload
+
+```json
+{
+  "sender_email": "me@example.com",
+  "recipients": ["you@example.com"],
+  "subject": "Test",
+  "body_text": "Hello from SVAHNAR agent"
+}
+```
+
+Returns the SES Message ID on success.
+
+## YAML usage
+
+Assign the SES tool to an agent and provide AWS config via environment or tool config:
+
+```yaml
+tools:
+  tool_assigned:
+    - name: AWS_SES_send_email
+      config:
+        AWS_REGION: us-east-1
+```
+
+Invocation payload example:
+
+```yaml
+payload:
+  sender_email: "me@example.com"
+  recipients:
+    - "you@example.com"
+  subject: "Test"
+  body_text: "Hello from SVAHNAR agent"
+```
+
+### More details
+
+SES requires verified sender emails or domains in most AWS accounts. If you are in SES sandbox, ensure recipient addresses are verified as well. The tool returns the AWS Message ID on success and raises a meaningful error for common failures (invalid credentials, unverified sender, quota issues).
+
+## Agent integration example
+
+```yaml
+create_vertical_agent_network:
+  agent-1:
+    agent_name: emailer
+    LLM_config:
+      params:
+        model: gpt-4o-mini
+    tools:
+      tool_assigned:
+        - name: AWS_SES_send_email
+          config:
+            AWS_REGION: us-east-1
+    agent_function:
+      - "Send email notifications using AWS SES."
+```

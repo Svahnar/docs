@@ -1,0 +1,58 @@
+
+# Keyvault
+
+**Short summary**: Keyvault is a centralized, secure store where users add keys and secret values (API keys, AWS credentials, tokens, etc.). Secrets remain stored until the user explicitly revokes them. Storing secrets in Keyvault reduces exposure to interception (for example, MITM attacks) and ensures cryptographic hashing and controlled access across the platform.
+
+
+
+## Why Keyvault?
+
+* **Security-first**: Sensitive keys entered into forms can be intercepted (MITM). Keyvault reduces that risk by storing secrets server-side with strong cryptographic protections.
+* **Centralized management**: Keep, rotate, and revoke secrets in one place rather than scattering them through configuration files and environment variables.
+* **Platform-ready**: Secrets stored in Keyvault can be retrieved by authorized components of the platform where needed.
+
+
+## Core concepts
+
+### Secret
+
+A secret is a key/value pair where `key` is the identifier and `value` is the secret content (API key, credential string). The Keyvault stores the secret so it can be used by authorized services.
+
+### Revocation
+
+Secrets live indefinitely **until** a user revokes them. Revoking a secret prevents further retrieval and signals consumers to refresh credentials.
+
+### Cryptographic protection
+
+Keyvault applies cryptographic hashing and secure storage to ensure secret values are not visible in plaintext to operators or attackers.
+
+
+
+## When to use Keyvault
+
+* Anything that must remain confidential (API keys, database credentials, cloud provider keys, encryption keys).
+* Secrets that require rotation or revocation without redeploying services.
+* Cases where minimizing surface area for MITM or configuration leaks is important.
+
+
+
+
+**Note:** The secret is hashed and stored securely—users and operators cannot read the plaintext value after saving.
+
+
+
+
+## FAQ
+
+**Q: Are secrets visible to administrators?**
+A: No — the Keyvault stores secrets using cryptographic protections so raw values are not exposed to operators after creation.
+
+**Q: Can other can see my secret?**
+A: No, others can't see your secrets. Only you can see your keys in keyvault but not there values.
+
+**Q: What happens after revocation?**
+A: Once revoked, the secret cannot be retrieved. Consumers must be updated with replacement credentials.
+
+
+
+

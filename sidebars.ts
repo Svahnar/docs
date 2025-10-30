@@ -64,12 +64,72 @@ const sidebars: SidebarsConfig = {
     'Agents/list_agents',
     'Agents/update_agent_info',
     'Agents/delete_agent',
-    // {
-    //   type: 'html',
-    //   value: '<div style="margin-top: 12px; font-size: 14px; font-weight: bold;">Tools </div>',
-    //   defaultStyle: true,
-    // },
-    // 'Tools/Understanding_Tools',
+
+    {
+      type: 'html',
+      value: '<div style="margin-top: 12px; font-size: 14px; font-weight: bold;">Keyvault</div>',
+      defaultStyle: true,
+    },
+    'Keyvault/Keyvault',
+    {
+      type: 'category',
+      label: 'How to use',
+      collapsed: true,
+      items: [
+        'Keyvault/how to use/Add keys',
+        'Keyvault/how to use/Usage',
+        'Keyvault/how to use/Revoke keys',
+      ],
+    },
+
+    {
+      type: 'html',
+      value: '<div style="margin-top: 12px; font-size: 14px; font-weight: bold;">Tools </div>',
+      defaultStyle: true,
+    },
+    'Tools/Understanding_Tools',
+    'Tools/list_of_tools',
+    {
+      type: 'category',
+      label: 'Tools',
+      collapsed: true,
+      items: [
+        'Tools/ToolList/Arxiv',
+        'Tools/ToolList/Wikipedia',
+        'Tools/ToolList/Tavily',
+        'Tools/ToolList/scrape_webpages',
+        'Tools/ToolList/Twilio_sms',
+        'Tools/ToolList/Twilio_whatsapp',
+        'Tools/ToolList/AWS_SES_send_email',
+        'Tools/ToolList/GitHubTool',
+        'Tools/ToolList/DatabaseTool',
+        'Tools/ToolList/DatabaseToolReadOnly',
+        'Tools/ToolList/KnowledgeRepo',
+        'Tools/ToolList/JiraTool',
+        'Tools/ToolList/APItool',
+        'Tools/ToolList/AWS_Lambda',
+        'Tools/ToolList/Outlook',
+      ],
+    },
+    {
+      type: 'html',
+      value: '<div style="margin-top: 12px; font-size: 14px; font-weight: bold;">Knowledge Repository</div>',
+      defaultStyle: true,
+    },
+    'Knowledge Repository/Overview',
+    'Knowledge Repository/Upload files',
+    {
+      type: 'category',
+      label: 'Connectors',
+      collapsed: true,
+      items: [
+        'Knowledge Repository/Connectors/URL',
+        'Knowledge Repository/Connectors/AWS S3',
+        'Knowledge Repository/Connectors/Confluence',
+        'Knowledge Repository/Connectors/Sharepoint',
+      ],
+    },
+
     {
       type: 'html',
       value: '<div style="margin-top: 12px; font-size: 14px; font-weight: bold;">Additional Resources</div>',

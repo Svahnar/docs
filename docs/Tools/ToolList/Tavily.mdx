@@ -1,0 +1,75 @@
+Tavily is the real‑time search engine for AI agents and RAG workflows
+
+Search the web using Tavily. This tool performs web searches and can return aggregated answers, raw content, and images depending on the provided parameters.
+
+## Usage
+
+Provide an `API_key` and a `query` string (or include the API key in environment variables). The tool accepts additional parameters like `max_results`, `include_answer`, `include_raw_content`, and `search_depth`.
+
+You can pass api key directly to api key field in agent node or you can place placeholder name (Note:- Name of placeholder should match with the name of key defined in key vault)
+
+```yaml
+tools:
+	tool_assigned:
+		- name: Tavily
+			config:
+				API_key: tvly-w35dfg-
+```
+
+### Using Key-vault (Recomnended)
+
+```yaml
+tools:
+	tool_assigned:
+		- name: Tavily
+			config:
+				API_key: ${TAVILY_API_KEY}
+```
+
+### Notes
+
+
+## YAML usage
+
+If you want to configure Tavily in an agent, include the API key and any desired options in the `config` block:
+
+```yaml
+tools:
+	tool_assigned:
+		- name: "Tavily"
+			config:
+				API_key: ${TAVILY_API_KEY}
+				max_results: 5
+				include_answer: True
+```
+
+Invocation payload:
+
+```yaml
+payload:
+	query: "latest research on retrieval augmented generation"
+```
+
+### More details
+
+Tavily is intended for broad web searches and may return both short answers and raw source content. Because it reaches the public web, be mindful of rate limits and API billing.
+
+## Agent integration example
+
+```yaml
+create_vertical_agent_network:
+	agent-1:
+		agent_name: "web_search_agent"
+		LLM_config:
+			params:
+				model: "gpt-4o-mini"
+		tools:
+			tool_assigned:
+				- name: Tavily
+					config:
+						API_key: ${TAVILY_API_KEY}
+						max_results: 5
+		agent_function:
+			- "Search the web for authoritative resources about the query."
+```
+
