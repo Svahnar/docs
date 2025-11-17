@@ -104,7 +104,7 @@ const sidebars: SidebarsConfig = {
         'Tools/ToolList/JiraTool',
         'Tools/ToolList/KnowledgeRepo',
         'Tools/ToolList/Outlook',
-        'Tools/ToolList/Pinecone_Search',
+        'Tools/ToolList/Pinecone',
         'Tools/ToolList/Tavily',
         'Tools/ToolList/Twilio_sms',
         'Tools/ToolList/Twilio_whatsapp',
