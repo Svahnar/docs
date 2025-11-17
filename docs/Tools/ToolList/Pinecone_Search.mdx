@@ -1,176 +1,251 @@
-# Pinecone Search 
+# Pinecone Search
 
-> Semantic, lexical, and hybrid retrieval for agents that need fast, accurate vector search.
+Access fast, accurate, and multi-faceted search for your agents. This tool allows you to perform **semantic**, **lexical**, and **hybrid** queries against your Pinecone vector indexes.
 
-This page documents the PineconeSearch tool: what it does, how to configure it, examples, tips, and troubleshooting. It is written to be concise and practical so you can copy configuration directly into your agent setup.
+This guide will walk you through the core concepts, configuration (from simple to advanced), and practical recipes to get you started.
 
----
+## 💡 Core Concepts
 
-## Quick overview
+To configure this tool, you must first answer **three key questions** about your Pinecone setup. Your answers will determine which parameters you need.
 
-* The tool performs retrieval against Pinecone indexes.
-* Supported search modes: **semantic**, **lexical**, and **hybrid** (two hybrid flavors).
-* For semantic retrieval the tool converts queries into vectors using an embedding model. That model may be an OpenAI embedding model or a Pinecone-hosted inference model.
-* Filters let you narrow results by metadata using Pinecone filter operators.
+### 1\. What is your `search_type`?
 
-## Supported search types
-> Please check with your admin for index type
-1. **semantic** 
-   * `semantic` - Dense vector search using embeddings.
-   * Default mode when `search` is not provided.
-2. **lexical**
-   * `lexical` - Keyword search against sparse indexes.
-   * Useful for exact-match lookups and metadata-heavy queries.
-3. **hybrid**
-   * Combine dense and sparse signals to improve search.
-   * Two options:
-     * `separate_index_hybrid` - dense and sparse indexes are separate. You must provide both hosts.
-     * `single_index_hybrid` - a single index supports hybrid queries (both dense and sparse embeddings stored together).
+This is the most important setting. It tells the tool *how* to query your data.
 
----
+  * **`semantic`**: (Default) The best choice for "meaning-based" or "concept" search. It uses dense vectors.
+  * **`lexical`**: The best choice for "keyword" or "exact-match" search. It uses sparse vectors.
+  * **`single_index_hybrid`**: The best of both worlds. It queries a *single index* that contains both dense and sparse vectors, then reranks the results.
+  * **`seperate_index_hybrid`**: Queries two *different indexes* (one dense, one sparse) and merges the results.
 
-## Quick start example
+> **Note on Sparse Vectors:** For `lexical` and `hybrid` searches, the tool automatically uses the `pinecone-sparse-english-v0` model to generate sparse vectors for your query text.
 
-```yaml
-create_vertical_agent_network:
-  agent-1:
-    agent_name: "pinecone_search"
-    LLM_config:
-      params:
-        model: "gpt-5"
-    tools:
-      tool_assigned:
-        - name: "PineconeSearch"
-          config:
-            search: separate_index_hybrid
-            namespaces: ["products", "kb"]
-            top_k: 5
-            filter:
-              $and:
-                - category: "documentation"
-                - published_year:
-                    $gte: 2021
-    agent_function:
-      - "Search the Pinecone vector DB for relevant documents"
-    incoming_edge:
-      - "Start"
-    outgoing_edge: []
-```
+### 2\. What is your Index Setup?
 
----
+Your `search_type` dictates which index parameters to use.
 
-## Configuration reference
+> **Important:** You will use **EITHER** the "Single Index" group **OR** the "Separate Index" group. **Never both.**
 
-All available `tool_config` keys shown with type, default, and applicability.
+| If your `search_type` is... | You MUST provide these parameters: |
+| :--- | :--- |
+| `semantic` | `index_host` and `namespace` |
+| `lexical` | `index_host` and `namespace` |
+| `single_index_hybrid` | `index_host` and `namespace` |
+| `seperate_index_hybrid` | `dense_index`, `dense_index_namespace`, `sparse_index`, and `sparse_index_namespace` |
 
-|              Field |     Type     |   Default  |              Applicable to              | Notes                                                                                                                                                 |
-| -----------------: | :----------: | :--------: | :-------------------------------------: | :---------------------------------------------------------------------------------------------------------------------------------------------------- |
-|          `api_key` |    string    |  required  |        semantic, lexical, hybrid        | Pinecone API key. Required for all search operations.                                                                                                 |
-|       `index_host` |    string    |  required  |  semantic, lexical, single_index_hybrid | Hostname for the Pinecone index (e.g. `index-xyz.svc.region.pinecone.io`). For separate-index hybrid supply `dense_index` and `sparse_index` instead. |
-|      `dense_index` |    string    |    None    |          separate_index_hybrid          | Host for the dense index. Required for separate-index hybrid.                                                                                         |
-|     `sparse_index` |    string    |    None    |          separate_index_hybrid          | Host for the sparse index. Required for separate-index hybrid.                                                                                        |
-|        `namespace` |    string    |  Optional  |                   all                   | Search within a single namespace. If omitted, searches the whole index.                                                                               |
-|       `namespaces` | list[string] |     []     |                   all                   | Search across multiple namespaces. If present, takes precedence over `namespace`.                                                                     |
-|            `top_k` |      int     |      3     |                   all                   | Number of results to return. Adjust for UX or downstream consumption.                                                                                 |
-| `include_metadata` |     bool     |    true    |                   all                   | Return record metadata with results.                                                                                                                  |
-|           `filter` |    mapping   |    None    |                   all                   | Pinecone metadata filter. Use operators like `$and`, `$or`, `$eq`, `$gte`, `$in`. Metadata keys must not begin with `$`.                              |
-|   `openai_api_key` |    string    |    None    | semantic (when using OpenAI embeddings) | Required if your embedding model is an OpenAI model such as text-embedding-3-small. Not needed when using Pinecone-hosted inference embeddings.       |
-|  `embedding_model` |    string    |    None    |         semantic, hybrid (dense)        | Model used for query embeddings. Omit when index supports server-side text search or if you rely on server-side embeddings.                           |
-|           `search` |    string    | "semantic" |                   all                   | One of: `semantic`, `lexical`, `separate_index_hybrid`, `single_index_hybrid`.                                                                        |
+### 3\. What is your Embedding Setup?
 
----
+This only applies to `semantic` and `hybrid` searches.
 
-## Filters and metadata
+  * **Scenario A: Server-Side Embeddings (Modern)**
 
-* Filters must be a flat JSON or YAML mapping. Nested objects are not allowed except inside operators.
-* Operators supported include `$and`, `$or`, `$eq`, `$ne`, `$gt`, `$gte`, `$lt`, `$lte`, `$in`, and array membership checks.
-* Metadata values cannot be null. Lists must contain only strings.
+      * If your Pinecone index was created recently and configured with a model, Pinecone handles embeddings automatically.
+      * In this case, you **OMIT** the `embedding_model` and `openai_api_key` fields. The tool sends raw text, and Pinecone does the work.
 
-Example filter:
+  * **Scenario B: Client-Side Embeddings (Manual)**
 
-```yaml
-filter:
-  $and:
-    - genre: "comedy"
-    - year:
-        $gte: 2019
-```
+      * If your index is older or you manage embeddings manually, the tool must generate them *before* sending them to Pinecone.
+      * In this case, you **MUST** provide the `embedding_model` and any required API keys.
 
-Another example:
+-----
 
-```yaml
-filter:
-  tags:
-    $in: ["release-note", "user-guide"]
-```
+## ⚙️ Configuration Reference
 
----
+Here are all the available parameters, broken down by necessity.
 
-## When you need an OpenAI key
+### 🔑 Universal Parameters (Always Required)
 
-* Use `openai_api_key` when your `embedding_model` is an OpenAI model such as `text-embedding-3-small` and you need to generate embeddings client-side.
-* If your index uses Pinecone inference models, you do not need an OpenAI key. Use the Pinecone `api_key` only.
+These parameters are required for **all** search types.
 
----
+| Field | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| **`api_key`** | string | required | Your Pinecone API key. This is *always* needed. |
+| **`search_type`** | string | "semantic" | `semantic`, `lexical`, `single_index_hybrid`, or `seperate_index_hybrid`. |
+| **`top_k`** | int | 3 | The number of search results to return. |
 
-## Hybrid search notes
+-----
 
-* `separate_index_hybrid` requires both `dense_index` and `sparse_index` hosts. The tool will query both indexes and merge results according to configured weights.
-* `single_index_hybrid` works when your index stores dense and sparse embeddings together and supports hybrid scoring server-side.
-* Behavior and scoring may differ by index configuration. Run smoke tests to validate relevance for your data.
+### 🗂️ Group 1: Single-Index Parameters
 
----
+Provide these **only if** `search_type` is `semantic`, `lexical`, or `single_index_hybrid`.
 
-## Example configurations
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| **`index_host`** | string | **Required.** The full hostname of your index (e.g., `my-index-123.svc.region.pinecone.io`). |
+| **`namespace`** | string | **Required.** The namespace within the index you want to search. |
 
-### Pure semantic search
+-----
+
+### 🧬 Group 2: Separate-Index Hybrid Parameters
+
+Provide these **only if** `search_type` is `seperate_index_hybrid`.
+
+> **Note:** When using this group, **DO NOT** provide `index_host` or `namespace`.
+
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| **`dense_index`** | string | **Required.** The full hostname of your **dense (semantic)** index. |
+| **`dense_index_namespace`** | string | **Required.** The namespace within your dense index. |
+| **`sparse_index`** | string | **Required.** The full hostname of your **sparse (lexical)** index. |
+| **`sparse_index_namespace`** | string | **Required.** The namespace within your sparse index. |
+
+-----
+
+### 🤖 Group 3: Embedding & Filter Parameters (Optional)
+> **Note on Sparse Vectors:** For `lexical` and `hybrid` searches, the tool automatically uses the `pinecone-sparse-english-v0` model to generate sparse vectors for your query text.
+These parameters control client-side embeddings and metadata filtering.
+
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| `embedding_model` | string | **See "Embedding Setup" above.** Omit this if your index handles embeddings server-side. |
+| `openai_api_key` | string | **Required only if** `embedding_model` is an OpenAI model (e.g., `text-embedding-3-small`). |
+| `dimensions` | int | **Required only if** `embedding_model` is a Pinecone model (e.g., `llama-text-embed-v2`). Check with your admin for the correct value. (OpenAI API key is not required if you're using `multilingual-e5-large` or `llama-text-embed-v2`) |
+| `filter` | mapping | A Pinecone metadata filter. (e.g., `{ "genre": { "$eq": "documentation" } }`). |
+
+### Summary of Supported Embedding Models (Client-Side)
+
+| Model Provider | `embedding_model` Value | Required Keys | Embedding dimensions |
+| :--- | :--- | :--- | :--- |
+| **OpenAI** | `text-embedding-3-small` | `openai_api_key` & `embedding_model` | `1536` (no need to provide `dimensions`) |
+| | `text-embedding-3-large` | `openai_api_key` & `embedding_model` | `3072` (no need to provide `dimensions`) |
+| | `text-embedding-ada-002` | `openai_api_key` & `embedding_model` | `1536` (no need to provide `dimensions`) |
+| **Pinecone** | `multilingual-e5-large` | `dimensions` & `embedding_model` | `1024` (default) (Optional to provide `dimensions`) |
+| | `llama-text-embed-v2` | `dimensions` & `embedding_model` | `1024` (default), `2048`, `768`, `512`, `384`  (need to provide `dimensions`)|
+
+-----
+
+## 📚 Practical Recipes (Examples)
+
+Copy and paste these configurations as a starting point.
+
+### Recipe 1: Modern Semantic Search (Server-Side)
+
+> **Use Case:** The most common and recommended setup. Your index handles embeddings automatically.
 
 ```yaml
 config:
-  api_key: "pc-abc123"
-  index_host: "index-xyz.svc.region.pinecone.io"
-  embedding_model: "text-embedding-3-small"
-  openai_api_key: "sk-..."
+  api_key: "pc-abc123..."
+  search_type: "semantic"
   top_k: 5
+  
+  # Single-Index Params
+  index_host: "my-modern-index.svc.region.pinecone.io"
+  namespace: "production-docs"
+  
+  # embedding_model is OMITTED
 ```
 
-### Lexical search
+### Recipe 2: Manual Semantic Search (Client-Side OpenAI)
+
+> **Use Case:** Your index is older and requires you to provide vectors. You use OpenAI's `text-embedding-3-small` model.
 
 ```yaml
 config:
-  api_key: "pc-abc123"
-  index_host: "index-sparse.svc.region.pinecone.io"
-  search: "lexical"
+  api_key: "pc-abc123..."
+  search_type: "semantic"
+  top_k: 5
+  
+  # Single-Index Params
+  index_host: "my-legacy-index.svc.region.pinecone.io"
+  namespace: "archive"
+  
+  # Embedding Params
+  embedding_model: "text-embedding-3-small"
+  openai_api_key: "sk-xyz..." 
+```
+
+### Recipe 3: Lexical (Keyword) Search
+
+> **Use Case:** You only want to find exact keyword matches.
+
+```yaml
+config:
+  api_key: "pc-abc123..."
+  search_type: "lexical"
   top_k: 10
+  
+  # Single-Index Params
+  index_host: "my-sparse-index.svc.region.pinecone.io"
+  namespace: "logs"
 ```
 
-### Separate index hybrid
+### Recipe 4: Single-Index Hybrid Search
+
+> **Use Case:** You have one advanced index that stores both dense and sparse vectors and want a single, reranked list of results.
 
 ```yaml
 config:
-  api_key: "pc-abc123"
-  dense_index: "dense-xyz.svc.region.pinecone.io"
-  sparse_index: "sparse-xyz.svc.region.pinecone.io"
-  search: "separate_index_hybrid"
-  top_k: 6
+  api_key: "pc-abc123..."
+  search_type: "single_index_hybrid"
+  top_k: 5
+  
+  # Single-Index Params
+  index_host: "my-hybrid-index.svc.region.pinecone.io"
+  namespace: "default"
+  
+  # Embedding Params (assuming server-side for this example)
+  # Omit embedding_model if index handles it
 ```
 
----
+### Recipe 5: Separate-Index Hybrid Search (Most Complex)
 
-## Best practices
+> **Use Case:** You have two separate indexes (one semantic, one lexical) and want to query both and merge the results.
 
-* Set `top_k` according to downstream consumption. If building a context window for an LLM, consider the token budget.
-* Prefer `namespaces` when you must aggregate across multiple isolated collections.
-* Validate filters with a small dataset before rolling out at scale.
-* Keep metadata flat and predictable for easier filtering and auditing.
-* Use Pinecone-hosted embeddings when possible to reduce external keys and simplify security.
+```yaml
+config:
+  api_key: "pc-abc123..."
+  search_type: "seperate_index_hybrid"
+  top_k: 7
+  
+  # Separate-Index Params
+  dense_index: "my-dense-index.svc.region.pinecone.io"
+  dense_index_namespace: "main"
+  sparse_index: "my-sparse-index.svc.region.pinecone.io"
+  sparse_index_namespace: "main"
+  
+  # Embedding Params for the DENSE index
+  embedding_model: "TextEmbeddingADA002"
+  openai_api_key: "sk-xyz..."
+```
 
----
+### Recipe 6: Semantic Search with a Metadata Filter
 
-## Troubleshooting
+> **Use Case:** You want to find documents about "agentic AI" but only those published in or after 2024.
 
-* If searches return no results: verify `namespace` and `namespaces`, confirm that metadata values are not null, check index host and API key.
-* If semantic queries behave poorly: confirm the `embedding_model` used to index the data matches the model used for query embeddings, or rely on server-side embeddings if available.
+```yaml
+config:
+  api_key: "pc-abc123..."
+  search_type: "semantic"
+  top_k: 5
+  
+  index_host: "my-modern-index.svc.region.pinecone.io"
+  namespace: "production-docs"
+  
+  # Filter Param
+  filter:
+    year:
+      $gte: 2024
+```
 
+-----
 
+## 🚑 Troubleshooting & FAQ
 
+  * **Error: "Parameter 'index\_host' not provided"**
+
+      * You set `search_type` to `semantic`, `lexical`, or `single_index_hybrid`, but you forgot to provide the `index_host` and `namespace` parameters.
+
+  * **Error: "Parameter 'dense\_index' not provided"**
+
+      * You set `search_type` to `seperate_index_hybrid`, but you provided `index_host` instead of the required `dense_index`, `sparse_index`, `dense_index_namespace`, and `sparse_index_namespace`.
+
+  * **Error: "OpenAI API key not provided"**
+
+      * You specified an `embedding_model` from OpenAI (like `TextEmbedding3Small`) but forgot to add the `openai_api_key`.
+
+  * **My search results are bad or irrelevant.**
+
+      * This is almost always an embedding model mismatch. If you are using client-side embeddings, **double-check** that the `embedding_model` you set in the config is the *exact same model* that was used to create the vectors in your index.
+
+  * **I get no results.**
+
+      * Check your `namespace` and `filter` values. An incorrect namespace or a filter that matches nothing are the most common causes.
