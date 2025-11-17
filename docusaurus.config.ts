@@ -1,6 +1,7 @@
-import {themes as prismThemes} from 'prism-react-renderer';
-import type {Config} from '@docusaurus/types';
+import { themes as prismThemes } from 'prism-react-renderer';
+import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
+import { img } from 'framer-motion/client';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
@@ -22,7 +23,6 @@ const config: Config = {
   deploymentBranch: 'main',
 
   onBrokenLinks: 'warn',
-  onBrokenMarkdownLinks: 'warn',
 
   // Even if you don't use internationalization, you can use this field to set
   // useful metadata like html lang. For example, if your site is Chinese, you
@@ -30,6 +30,14 @@ const config: Config = {
   i18n: {
     defaultLocale: 'en',
     locales: ['en'],
+  },
+  // Markdown config - hooks are the preferred location for handling markdown link
+  // behaviour; `onBrokenMarkdownLinks` is deprecated at the top level and will be
+  // removed in Docusaurus v4. Move it into `markdown.hooks` to silence the deprecation warning.
+  markdown: {
+    hooks: {
+      onBrokenMarkdownLinks: 'warn',
+    },
   },
   presets: [
     [
@@ -93,8 +101,8 @@ const config: Config = {
         },
       ],
     },
-// footer: {
-//   style: 'dark',
+    // footer: {
+    //   style: 'dark',
     //   links: [
     //     {
     //       title: 'Docs',
@@ -142,6 +150,90 @@ const config: Config = {
     prism: {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
+    },
+    footer: {
+      // style: 'dark',
+
+      links: [
+        {
+          items: [
+            {
+              html: `
+<style>
+/* basic sizing */
+.theme-logo img { height: 40px; display: inline-block; }
+
+/* default: show light, hide dark */
+.theme-logo .logo-dark { display: none; }
+
+/* dark theme selectors: try several common selectors that Docusaurus or themes use */
+html[data-theme="dark"] .theme-logo .logo-light,
+html.theme-dark .theme-logo .logo-light,
+html.dark .theme-logo .logo-light,
+:root.dark .theme-logo .logo-light {
+  display: none;
+}
+html[data-theme="dark"] .theme-logo .logo-dark,
+html.theme-dark .theme-logo .logo-dark,
+html.dark .theme-logo .logo-dark,
+:root.dark .theme-logo .logo-dark {
+  display: inline-block;
+}
+
+/* optional: keep images accessible and responsive */
+.theme-logo img { vertical-align: middle; }
+</style>
+
+<span class="theme-logo">
+  <img class="logo-light" src="/img/light.svg" alt="logo (light)" />
+  <img class="logo-dark"  src="/img/dark.svg"  alt="logo (dark)" />
+</span>
+              `,
+            },
+          ],
+
+        },
+        {
+          title: 'Docs',
+          items: [
+            {
+              label: 'Get Started',
+              to: '/docs/GetStarted/Overview',
+            },
+            {
+              label: 'Quickstart',
+              to: '/docs/GetStarted/Quickstart',
+            },
+          ],
+        },
+        {
+          title: 'Community',
+          items: [
+            {
+              label: 'GitHub',
+              href: 'https://github.com/orgs/Svahnar/repositories',
+            },
+            {
+              label: 'Website',
+              href: 'https://www.svahnar.com',
+            },
+          ],
+        },
+        {
+          title: 'More',
+          items: [
+            {
+              label: 'Get Help',
+              href: 'https://www.svahnar.com/contact',
+            },
+            {
+              label: 'Privacy',
+              href: 'https://www.svahnar.com/policies/privacy-policy',
+            },
+          ],
+        },
+      ],
+      copyright: `Copyright © ${new Date().getFullYear()} SVAHNAR.`,
     },
   } satisfies Preset.ThemeConfig,
 };
