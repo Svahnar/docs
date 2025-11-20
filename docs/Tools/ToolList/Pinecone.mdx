@@ -226,6 +226,37 @@ config:
       $gte: 2024
 ```
 
+### 💡 Tip: Converting JSON Filters to YAML
+
+If you have a complex Pinecone filter in JSON format and need to convert it to YAML, you can use this Python snippet:
+
+```python
+import json
+import yaml
+
+json_string = '''
+{
+  "genre": { "$in": ["comedy", "documentary", "drama"] },
+  "year": { "$eq": 2019 }
+}
+'''
+
+data = json.loads(json_string)
+
+yaml_str = yaml.safe_dump(data, sort_keys=False)
+print(yaml_str)
+```
+and the output will be:
+``` yaml
+genre:
+  $in:
+    - comedy
+    - documentary
+    - drama
+year:
+  $eq: 2019
+```
+
 -----
 
 ## 🚑 Troubleshooting & FAQ
