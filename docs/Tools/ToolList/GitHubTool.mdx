@@ -40,7 +40,7 @@ Before initializing your agent, the following environment variables need to be s
 
 ## YAML usage
 
-```yaml
+```yaml showLineNumbers
 tools:
   tool_assigned:
     - name: "GitHubTool"
@@ -55,7 +55,7 @@ Invocation payload examples
 
 Read a file
 
-```yaml
+```yaml showLineNumbers
 payload:
 	operation: "read_file"
 	file_path: "README.md"
@@ -63,7 +63,7 @@ payload:
 
 Create a new file
 
-```yaml
+```yaml showLineNumbers
 payload:
 	operation: "write_file"
 	file_query: "/docs/newfile.md\nNew content here"
@@ -75,7 +75,7 @@ This tool uses a GitHub App private key for authentication. Keep keys secure and
 
 ## Agent integration example
 
-```yaml
+```yaml showLineNumbers
 create_vertical_agent_network:
   agent-1:
     agent_name: "repo_agent"

@@ -31,7 +31,7 @@ Returns the SES Message ID on success.
 
 Assign the SES tool to an agent and provide AWS config via environment or tool config:
 
-```yaml
+```yaml showLineNumbers
 tools:
   tool_assigned:
     - name: AWS_SES_send_email
@@ -41,7 +41,7 @@ tools:
 
 Invocation payload example:
 
-```yaml
+```yaml showLineNumbers
 payload:
   sender_email: "me@example.com"
   recipients:
@@ -56,7 +56,7 @@ SES requires verified sender emails or domains in most AWS accounts. If you are 
 
 ## Agent integration example
 
-```yaml
+```yaml showLineNumbers
 create_vertical_agent_network:
   agent-1:
     agent_name: emailer

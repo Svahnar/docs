@@ -11,7 +11,7 @@ To start building your **Agentic Network** using the Svahnar Agentic AI Framewor
 
 Here's how you can initialize your Agentic Network by defining agents:
 
-```yaml example.yaml
+```yaml showLineNumbers example.yaml
 create_vertical_agent_network:
   agent-1:
     agent_name: "stock_news_searcher"
@@ -77,7 +77,7 @@ The `Role` field defines the purpose and behavior of an agent within the network
       - Passes the task to another agent for further processing.
       - Escalates the task to its own supervisor for additional decision-making.
 
-    ```yaml example_hierarchical.yaml
+    ```yaml showLineNumbers example_hierarchical.yaml
     create_vertical_agent_network:
       agent-1:
         agent_name: "data_collector"
@@ -100,7 +100,7 @@ The `Role` field defines the purpose and behavior of an agent within the network
     ### Example Use Case:
     - **Sequential Workflow**: `agent-1` collects data, passes it to `agent-2` for analysis, and then `agent-2` passes the results to `agent-3` for reporting.
 
-    ```yaml example_sequential.yaml
+    ```yaml showLineNumbers example_sequential.yaml
     create_vertical_agent_network:
       agent-1:
         agent_name: "data_collector"

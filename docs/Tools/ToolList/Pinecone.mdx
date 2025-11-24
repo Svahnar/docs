@@ -121,7 +121,7 @@ Copy and paste these configurations as a starting point.
 
 > **Use Case:** The most common and recommended setup. Your index handles embeddings automatically.
 
-```yaml
+```yaml showLineNumbers
 create_vertical_agent_network:
   agent-1:
     agent_name: Pinecone_agent
@@ -151,7 +151,7 @@ create_vertical_agent_network:
 
 > **Use Case:** Your index is older and requires you to provide vectors. You use OpenAI's `text-embedding-3-small` model.
 
-```yaml
+```yaml showLineNumbers
 create_vertical_agent_network:
   agent-1:
     agent_name: Pinecone_agent
@@ -183,7 +183,7 @@ create_vertical_agent_network:
 
 > **Use Case:** You only want to find exact keyword matches.
 
-```yaml
+```yaml showLineNumbers
 create_vertical_agent_network:
   agent-1:
     agent_name: Pinecone_agent
@@ -211,7 +211,7 @@ create_vertical_agent_network:
 
 > **Use Case:** You have one advanced index that stores both dense and sparse vectors and want a single, reranked list of results.
 
-```yaml
+```yaml showLineNumbers
 create_vertical_agent_network:
   agent-1:
     agent_name: Pinecone_agent
@@ -242,7 +242,7 @@ create_vertical_agent_network:
 
 > **Use Case:** You have two separate indexes (one semantic, one lexical) and want to query both and merge the results.
 
-```yaml
+```yaml showLineNumbers
 create_vertical_agent_network:
   agent-1:
     agent_name: Pinecone_agent
@@ -277,7 +277,7 @@ create_vertical_agent_network:
 
 > **Use Case:** You want to find documents about "agentic AI" but only those published in or after 2024.
 
-```yaml
+```yaml showLineNumbers
 create_vertical_agent_network:
   agent-1:
     agent_name: Pinecone_agent
@@ -327,7 +327,7 @@ yaml_str = yaml.safe_dump(data, sort_keys=False)
 print(yaml_str)
 ```
 and the output will be:
-``` yaml
+```yaml showLineNumbers
 genre:
   $in:
     - comedy

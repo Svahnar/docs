@@ -76,10 +76,11 @@ const config: Config = {
 
   themeConfig: {
     // Replace with your project's social card
+    
     navbar: {
       // title: 'SVAHNAR DOCS',
       logo: {
-        alt: 'My Site Logo',
+        alt: 'SVAHNAR',
         src: 'img/light.svg', // Logo for light theme
         srcDark: 'img/dark.svg', // Logo for dark theme
         href: 'https://www.svahnar.com', // URL to redirect when the logo is clicked
@@ -148,8 +149,11 @@ const config: Config = {
     // },
 
     prism: {
-      theme: prismThemes.github,
-      darkTheme: prismThemes.dracula,
+      // pick a built-in theme
+      theme: prismThemes.vsLight,     // light mode code style
+      darkTheme: prismThemes.vsDark,  // dark mode code style
+
+      
     },
     footer: {
       // style: 'dark',

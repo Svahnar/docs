@@ -19,7 +19,7 @@ Top matching text snippets from the knowledge repository (by default the top 3 r
 
 ## YAML usage
 
-```yaml
+```yaml showLineNumbers
 tools:
   tool_assigned:
     - name: "KnowledgeRepo"
@@ -32,7 +32,7 @@ tools:
 
 Invocation payload:
 
-```yaml
+```yaml showLineNumbers
 payload:
 	query: "How to configure SVAHNAR agent network"
 	k_repo_id: "<repo-uuid>" # optional to scope the search
@@ -44,7 +44,7 @@ This tool uses OpenAI embeddings to create a query vector and Qdrant to perform 
 
 ## Agent integration example
 
-```yaml
+```yaml showLineNumbers
 create_vertical_agent_network:
   agent-1:
     agent_name: "knowledge_searcher"
