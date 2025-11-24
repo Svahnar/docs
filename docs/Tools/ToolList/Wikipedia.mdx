@@ -20,7 +20,7 @@ This tool search wikipedia for summaries and article content using the Wikipedia
 
 Example of assigning the Wikipedia tool to an agent with optional params:
 
-```yaml
+```yaml showLineNumbers
 tools:
 	tool_assigned:
 		- name: "Wikipedia"
@@ -31,7 +31,7 @@ tools:
 
 Invocation payload (what the agent sends to the tool at runtime):
 
-```yaml
+```yaml showLineNumbers
 payload:
 	query: "Reinforcement learning"
 ```
@@ -42,7 +42,7 @@ The Wikipedia wrapper fetches article summaries and can optionally return extend
 
 ## Agent integration example
 
-```yaml
+```yaml showLineNumbers
 create_vertical_agent_network:
 	agent-1:
 		agent_name: "wiki_lookup"

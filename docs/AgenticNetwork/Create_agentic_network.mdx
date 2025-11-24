@@ -12,7 +12,7 @@ In this guide, we'll learn how to create an **Agentic Network** using the Svahna
 
 Below is the example YAML configuration for the Agentic Network:
 
-```yaml
+```yaml showLineNumbers
 create_vertical_agent_network:
   agent-1:
     agent_name: "Stock_news_searcher"
@@ -86,7 +86,7 @@ This configuration defines an Agentic Network with three agents:
 
 Begin by defining the top-level key `create_vertical_agent_network` to initialize the Agentic Network. Under this key, you'll define each agent with a unique identifier.
 
-```yaml
+```yaml showLineNumbers
 create_vertical_agent_network:
   agent-1:
     agent_name: "Stock_news_searcher"
@@ -108,7 +108,7 @@ For detailed information, refer to the [Initialization Documentation](/docs/Agen
 
 Each agent requires an LLM configuration to handle reasoning:
 
-```yaml
+```yaml showLineNumbers
 LLM_config:
     params:
       model: "gpt-4o-mini"
@@ -134,7 +134,7 @@ Agents can be equipped with tools to enhance their functionality.
 
 - **Stock_news_searcher** uses the `YahooFinanceNewsTool` to fetch financial news.
 
-  ```yaml
+  ```yaml showLineNumbers
   tools:
     tool_assigned:
       - name: "YahooFinanceNewsTool"
@@ -142,7 +142,7 @@ Agents can be equipped with tools to enhance their functionality.
 
 - **sms_sender** uses the `Twilio_sms` tool to send SMS messages.
 
-  ```yaml
+  ```yaml showLineNumbers
   tools:
     tool_assigned:
       - name: "Twilio_sms"
@@ -165,21 +165,21 @@ Specify the purpose and role of each agent using `agent_function` and, if applic
 
 - **Stock_news_searcher**:
 
-  ```yaml
+  ```yaml showLineNumbers
   agent_function:
     - "Your function is to search the web or the internet for the latest news about given companies and the stock market, including all relevant news articles and official filings."
   ```
 
 - **sms_sender**:
 
-  ```yaml
+  ```yaml showLineNumbers
   agent_function:
     - "You can send SMS messages to the user using Twilio."
   ```
 
 - **my_supervisor**:
 
-  ```yaml
+  ```yaml showLineNumbers
   agent_function:
     - "You are the supervisor of the agents defined in outgoing edges."
   ```
@@ -194,7 +194,7 @@ Configure how agents communicate and trigger each other using `incoming_edge` an
 
 - **Stock_news_searcher**:
 
-  ```yaml
+  ```yaml showLineNumbers
   incoming_edge:
     - "my_supervisor"
   outgoing_edge:
@@ -203,7 +203,7 @@ Configure how agents communicate and trigger each other using `incoming_edge` an
 
 - **sms_sender**:
 
-  ```yaml
+  ```yaml showLineNumbers
   incoming_edge:
     - "my_supervisor"
   outgoing_edge:
@@ -212,7 +212,7 @@ Configure how agents communicate and trigger each other using `incoming_edge` an
 
 - **my_supervisor**:
 
-  ```yaml
+  ```yaml showLineNumbers
   incoming_edge:
     - "Start"
     - "Stock_news_searcher"
@@ -237,7 +237,7 @@ Learn more about edges at the [Incoming and Outgoing Edges Documentation](/docs/
 
 Combine all the components to finalize your Agentic Network configuration:
 
-```yaml
+```yaml showLineNumbers
 create_vertical_agent_network:
   agent-1:
     agent_name: "Stock_news_searcher"

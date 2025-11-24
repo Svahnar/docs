@@ -13,7 +13,7 @@ In this guide, we will learn how to create a simple agent using the Svahnar Agen
 
 Below is an example YAML configuration for the `Web_search` agent:
 
-```yaml create_first_agent.yaml
+```yaml showLineNumbers create_first_agent.yaml
 create_vertical_agent_network:
   agent-1:
     agent_name: "Web_search"
@@ -47,7 +47,7 @@ To begin, initialize the **Agentic Network** by defining the top-level key `crea
 
 Next, define your first agent. Use a unique identifier (e.g., `agent-1`) and specify the agent name. For this example, the agent is called `Web_search`.
 
-```yaml
+```yaml showLineNumbers
 create_vertical_agent_network:
   agent-1:
     agent_name: "Web_search"
@@ -62,7 +62,7 @@ For detailed information, refer to [Initialization Documentation](/docs/AgenticN
 <Step title="Configure the LLM for Reasoning">
 The next step is to configure the **Large Language Model (LLM)** that powers your agent. Configure the model, specific variant, temperature, and other hyperparameters. For example:
 
-```yaml
+```yaml showLineNumbers
 LLM_config:
     params:
       model: "gpt-4o"
@@ -86,7 +86,7 @@ For more details, visit [LLM Configuration Documentation](/docs/AgenticNetwork/C
 <Step title="Integrate Tools with the Agent">
 You can enhance the agent's functionality by assigning external tools. In this case, we integrate the `Tavily` tool for web searches and configure it to limit the number of results to 5:
 
-```yaml
+```yaml showLineNumbers
 tools:
   tool_assigned:
     - name: "Tavily"
@@ -103,7 +103,7 @@ For additional information, check out [Tools Documentation](/docs/AgenticNetwork
 <Step title="Define the Agent's Function">
 Define the agent's purpose using the `agent_function` property. For the `Web_search` agent example:
 
-```yaml
+```yaml showLineNumbers
 agent_function:
   - "Your function is to search the web or internet for information"
 ```
@@ -117,7 +117,7 @@ Explore more about defining agent functions at [Agent Function Documentation](/d
 <Step title="Specify Incoming and Outgoing Edges">
 Configure the data flow in your network by specifying **incoming edges** (triggers) and **outgoing edges** (connections to other agents or systems). For this agent:
 
-```yaml
+```yaml showLineNumbers
 incoming_edge:
   - "Start"
 outgoing_edge: []
@@ -135,7 +135,7 @@ Learn more about edges at [Incoming and Outgoing Edges Documentation](/docs/Agen
 <Step title="Final YAML Configuration">
 Combine all the steps to finalize the YAML configuration for your simple `Web_search` agent:
 
-```yaml create_first_agent.yaml
+```yaml showLineNumbers create_first_agent.yaml
 create_vertical_agent_network:
   agent-1:
     agent_name: "Web_search"

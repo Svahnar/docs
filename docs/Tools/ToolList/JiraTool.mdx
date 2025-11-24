@@ -36,7 +36,7 @@ Provide `jira_username`, `jira_api_key`, and `jira_instance_url` in the tool con
 
 ## YAML usage
 
-```yaml
+```yaml showLineNumbers
 tools:
   tool_assigned:
     - name: "JiraTool"
@@ -48,7 +48,7 @@ tools:
 
 Invocation payload (JQL query):
 
-```yaml
+```yaml showLineNumbers
 payload:
   operation: "JQL Query"
   query: "project = MYPROJ AND assignee = currentUser()"
@@ -58,7 +58,7 @@ payload:
 
 ## Agent integration example
 
-```yaml
+```yaml showLineNumbers
 create_vertical_agent_network:
   agent-1:
     agent_name: "issue_manager"

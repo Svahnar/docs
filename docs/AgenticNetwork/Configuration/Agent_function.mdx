@@ -18,21 +18,21 @@ Agent functions are defined using the `agent_function` field, which takes an arr
 
 - **Stock_news_searcher**:
 
-  ```yaml
+  ```yaml showLineNumbers
   agent_function:
     - "Your function is to search the web or the internet for the latest news about given companies and the stock market, including all relevant news articles and official filings."
   ```
 
 - **sms_sender**:
 
-  ```yaml
+  ```yaml showLineNumbers
   agent_function:
     - "You can send SMS messages to the user using Twilio."
   ```
 
 - **my_supervisor**:
 
-  ```yaml title="index.js"
+  ```yaml showLineNumbers title="index.js"
   agent_function:
     - "You are the supervisor of the agents defined in outgoing edges."
   ```

@@ -11,7 +11,7 @@ Use this tool when you need to trigger serverless logic, run background jobs, or
 
 Assign the tool to an agent and provide the `function_name`. You can pass AWS credentials via the tool config or environment variables.
 
-```yaml
+```yaml showLineNumbers
 tools:
   tool_assigned:
     - name: "AWS_Lambda"
@@ -75,7 +75,7 @@ Note:- Placeholder should be enclosed in double quote `"` and starts with dollar
 
 Assigning the Lambda tool to an agent and invoking it with a payload follows the same pattern used throughout the Agentic Network YAML.
 
-```yaml
+```yaml showLineNumbers
 tools:
   tool_assigned:
     - name: "AWS_Lambda"

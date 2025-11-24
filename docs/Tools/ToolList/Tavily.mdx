@@ -8,7 +8,7 @@ Provide an `API_key` and a `query` string (or include the API key in environment
 
 You can pass api key directly to api key field in agent node or you can place placeholder name (Note:- Name of placeholder should match with the name of key defined in key vault)
 
-```yaml
+```yaml showLineNumbers
 tools:
 	tool_assigned:
 		- name: Tavily
@@ -18,7 +18,7 @@ tools:
 
 ### Using Key-vault (Recomnended)
 
-```yaml
+```yaml showLineNumbers
 tools:
 	tool_assigned:
 		- name: Tavily
@@ -33,7 +33,7 @@ tools:
 
 If you want to configure Tavily in an agent, include the API key and any desired options in the `config` block:
 
-```yaml
+```yaml showLineNumbers
 tools:
 	tool_assigned:
 		- name: "Tavily"
@@ -45,7 +45,7 @@ tools:
 
 Invocation payload:
 
-```yaml
+```yaml showLineNumbers
 payload:
 	query: "latest research on retrieval augmented generation"
 ```
@@ -56,7 +56,7 @@ Tavily is intended for broad web searches and may return both short answers and 
 
 ## Agent integration example
 
-```yaml
+```yaml showLineNumbers
 create_vertical_agent_network:
 	agent-1:
 		agent_name: "web_search_agent"

@@ -23,7 +23,7 @@ Send SMS via Twilio from an agent. Provide Twilio credentials and the message pa
 
 Assign Twilio SMS to an agent and include credential placeholders in `config`:
 
-```yaml
+```yaml showLineNumbers
 tools:
 	tool_assigned:
 		- name: Twilio_sms
@@ -36,7 +36,7 @@ tools:
 
 Invocation payload example:
 
-```yaml
+```yaml showLineNumbers
 payload:
 	to: +1234567890
 	from_: +1098765432

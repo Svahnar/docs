@@ -23,7 +23,7 @@ Each agent specifies edges using the `incoming_edge` and `outgoing_edge` fields:
 
 ### For `my_supervisor`
 
-```yaml
+```yaml showLineNumbers
 incoming_edge:
   - "Start"
   - "Stock_news_searcher"
@@ -35,7 +35,7 @@ outgoing_edge:
 
 ### For `Stock_news_searcher`
 
-```yaml
+```yaml showLineNumbers
 incoming_edge:
   - "my_supervisor"
 outgoing_edge:
@@ -44,7 +44,7 @@ outgoing_edge:
 
 ### For `sms_sender`
 
-```yaml
+```yaml showLineNumbers
 incoming_edge:
   - "my_supervisor"
 outgoing_edge:

@@ -22,7 +22,7 @@ ${your_key_name}
 
 When configuring an agent in the **Agent Console**, you can provide the placeholder in the **Agent Node** fields or **Tool Config** fields:
 
-```yaml
+```yaml showLineNumbers
 api_key: ${tavily_api_key}
 ```
 
@@ -32,7 +32,7 @@ This will automatically resolve to the actual stored tavily API key value.
 
 When adding keys in YAML configurations (e.g., `agent node tool config`), enclose the placeholder in **double quotes** to ensure proper parsing:
 
-```yaml
+```yaml showLineNumbers
 api_key: "${tavily_api_key}"
 ```
 
@@ -43,13 +43,13 @@ If you created a key named `tavily_api_key`, you can reference it like this:
 
 * **In agent console**:
 
-  ```yaml
+  ```yaml showLineNumbers
   api_key: ${tavily_api_key}
   ```
 
 * **In YAML config fields**:
 
-  ```yaml
+  ```yaml showLineNumbers
   api_key: "${tavily_api_key}"
   ```
 

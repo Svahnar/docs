@@ -21,7 +21,7 @@ Example payload:
 
 ## YAML usage
 
-```yaml
+```yaml showLineNumbers
 tools:
   tool_assigned:
     - name: "DatabaseToolReadOnly"
@@ -31,7 +31,7 @@ tools:
 
 Invocation payload:
 
-```yaml
+```yaml showLineNumbers
 payload:
 	query: "SELECT id, name FROM users LIMIT 10"
 ```
@@ -42,7 +42,7 @@ Only read operations are allowed; the tool rejects non-SELECT SQL to protect dat
 
 ## Agent integration example
 
-```yaml
+```yaml showLineNumbers
 create_vertical_agent_network:
   agent-1:
     agent_name: "db_reader"

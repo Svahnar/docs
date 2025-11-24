@@ -11,14 +11,14 @@ Scrape and extract textual content from web pages. Provide a `urls` field pointi
 
 Example payload (single URL):
 
-```yaml
+```yaml showLineNumbers
 payload:
 	urls: "https://example.com/article"
 ```
 
 Example YAML for assigning the tool to an agent:
 
-```yaml
+```yaml showLineNumbers
 tools:
 	tool_assigned:
 		- name: "webpage_search"

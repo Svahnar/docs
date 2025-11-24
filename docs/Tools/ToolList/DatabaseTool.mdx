@@ -24,7 +24,7 @@ Provide a `db_uri` (SQLAlchemy-compatible) in the tool config and pass a `query`
 
 Assign the DatabaseTool to an agent and pass a `db_uri` in `config`:
 
-```yaml
+```yaml showLineNumbers
 tools:
   tool_assigned:
     - name: "DatabaseTool"
@@ -34,14 +34,14 @@ tools:
 
 Invocation payload example (read):
 
-```yaml
+```yaml showLineNumbers
 payload:
 	query: "SELECT id, name FROM users LIMIT 10"
 ```
 
 Invocation payload example (write):
 
-```yaml
+```yaml showLineNumbers
 payload:
 	query: "UPDATE users SET active=true WHERE last_login &lt; '2025-01-01'"
 ```
@@ -52,7 +52,7 @@ This tool uses SQLModel / SQLAlchemy under the hood. For write operations the to
 
 ## Agent integration example
 
-```yaml
+```yaml showLineNumbers
 create_vertical_agent_network:
   agent-1:
     agent_name: "db_query_agent"

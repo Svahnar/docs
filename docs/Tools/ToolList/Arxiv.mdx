@@ -10,7 +10,7 @@ This tool wraps the ArXiv API to allow agents to search for recent and relevant 
 
 Add the Arxiv tool to an agent's `tools.tool_assigned` list. The minimum required payload is a `query` string. The tool returns a list of matching paper metadata and snippets.
 
-```yaml
+```yaml showLineNumbers
 tools:
 	tool_assigned:
 		- name: "Arxiv"
@@ -33,7 +33,7 @@ For programmatic examples and advanced parameters, see the tool implementation i
 
 Example `tools` section to assign the Arxiv tool to an agent (no params required by default):
 
-```yaml
+```yaml showLineNumbers
 tools:
 	tool_assigned:
 		- name: "Arxiv"
@@ -41,7 +41,7 @@ tools:
 
 To call the tool from an agent runtime, send a payload with a `query` key:
 
-```yaml
+```yaml showLineNumbers
 payload:
 	query: "neural network interpretability"
 
@@ -49,7 +49,7 @@ payload:
 
 Below is an example `create_vertical_agent_network` snippet showing how to attach the Arxiv tool to an agent in the same style used by the Agentic Network docs:
 
-```yaml
+```yaml showLineNumbers
 create_vertical_agent_network:
 	agent-1:
 		agent_name: "paper_searcher"
