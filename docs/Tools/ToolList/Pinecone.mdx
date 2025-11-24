@@ -122,16 +122,29 @@ Copy and paste these configurations as a starting point.
 > **Use Case:** The most common and recommended setup. Your index handles embeddings automatically.
 
 ```yaml
-config:
-  api_key: "pc-abc123..."
-  search_type: "semantic"
-  top_k: 5
-  
-  # Single-Index Params
-  index_host: "my-modern-index.svc.region.pinecone.io"
-  namespace: "production-docs"
-  
-  # embedding_model is OMITTED
+create_vertical_agent_network:
+  agent-1:
+    agent_name: Pinecone_agent
+    LLM_config:
+        params:
+          model: gpt-5-nano
+    tools:
+      tool_assigned:
+        - name: PineconeTool
+          config:
+            api_key: "pc-abc123..."
+            search_type: "semantic"
+            top_k: 5            
+            # Single-Index Params
+            index_host: "my-modern-index.svc.region.pinecone.io"
+            namespace: "production-docs"
+            
+            # embedding_model is OMITTED
+    agent_function:
+      - Analyze the user's intent and immediately call PineconeTool with a distinct search query if external context is needed to answer. Use the retrieved data to ground your answer, citing the source where possible, and only request clarification if the tool returns insufficient results.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
 ```
 
 ### Recipe 2: Manual Semantic Search (Client-Side OpenAI)
@@ -139,18 +152,31 @@ config:
 > **Use Case:** Your index is older and requires you to provide vectors. You use OpenAI's `text-embedding-3-small` model.
 
 ```yaml
-config:
-  api_key: "pc-abc123..."
-  search_type: "semantic"
-  top_k: 5
-  
-  # Single-Index Params
-  index_host: "my-legacy-index.svc.region.pinecone.io"
-  namespace: "archive"
-  
-  # Embedding Params
-  embedding_model: "text-embedding-3-small"
-  openai_api_key: "sk-xyz..." 
+create_vertical_agent_network:
+  agent-1:
+    agent_name: Pinecone_agent
+    LLM_config:
+        params:
+          model: gpt-5-nano
+    tools:
+      tool_assigned:
+        - name: PineconeTool
+          config:
+            api_key: "pc-abc123..."
+            search_type: "semantic"
+            top_k: 5
+            # Single-Index Params
+            index_host: "my-legacy-index.svc.region.pinecone.io"
+            namespace: "archive"
+            
+            # Embedding Params
+            embedding_model: "text-embedding-3-small"
+            openai_api_key: "sk-xyz..." 
+    agent_function:
+      - Analyze the user's intent and immediately call PineconeTool with a distinct search query if external context is needed to answer. Use the retrieved data to ground your answer, citing the source where possible, and only request clarification if the tool returns insufficient results.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
 ```
 
 ### Recipe 3: Lexical (Keyword) Search
@@ -158,14 +184,27 @@ config:
 > **Use Case:** You only want to find exact keyword matches.
 
 ```yaml
-config:
-  api_key: "pc-abc123..."
-  search_type: "lexical"
-  top_k: 10
-  
-  # Single-Index Params
-  index_host: "my-sparse-index.svc.region.pinecone.io"
-  namespace: "logs"
+create_vertical_agent_network:
+  agent-1:
+    agent_name: Pinecone_agent
+    LLM_config:
+        params:
+          model: gpt-5-nano
+    tools:
+      tool_assigned:
+        - name: PineconeTool
+          config:
+            api_key: "pc-abc123..."
+            search_type: "lexical"
+            top_k: 10
+            # Single-Index Params
+            index_host: "my-sparse-index.svc.region.pinecone.io"
+            namespace: "logs"
+    agent_function:
+      - Analyze the user's intent and immediately call PineconeTool with a distinct search query if external context is needed to answer. Use the retrieved data to ground your answer, citing the source where possible, and only request clarification if the tool returns insufficient results.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
 ```
 
 ### Recipe 4: Single-Index Hybrid Search
@@ -173,17 +212,30 @@ config:
 > **Use Case:** You have one advanced index that stores both dense and sparse vectors and want a single, reranked list of results.
 
 ```yaml
-config:
-  api_key: "pc-abc123..."
-  search_type: "single_index_hybrid"
-  top_k: 5
-  
-  # Single-Index Params
-  index_host: "my-hybrid-index.svc.region.pinecone.io"
-  namespace: "default"
-  
-  # Embedding Params (assuming server-side for this example)
-  # Omit embedding_model if index handles it
+create_vertical_agent_network:
+  agent-1:
+    agent_name: Pinecone_agent
+    LLM_config:
+        params:
+          model: gpt-5-nano
+    tools:
+      tool_assigned:
+        - name: PineconeTool
+          config:
+            api_key: "pc-abc123..."
+            search_type: "single_index_hybrid"
+            top_k: 5         
+            # Single-Index Params
+            index_host: "my-hybrid-index.svc.region.pinecone.io"
+            namespace: "default"
+            
+            # Embedding Params (assuming server-side for this example)
+            # Omit embedding_model if index handles it
+    agent_function:
+      - Analyze the user's intent and immediately call PineconeTool with a distinct search query if external context is needed to answer. Use the retrieved data to ground your answer, citing the source where possible, and only request clarification if the tool returns insufficient results.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
 ```
 
 ### Recipe 5: Separate-Index Hybrid Search (Most Complex)
@@ -191,20 +243,34 @@ config:
 > **Use Case:** You have two separate indexes (one semantic, one lexical) and want to query both and merge the results.
 
 ```yaml
-config:
-  api_key: "pc-abc123..."
-  search_type: "seperate_index_hybrid"
-  top_k: 7
-  
-  # Separate-Index Params
-  dense_index: "my-dense-index.svc.region.pinecone.io"
-  dense_index_namespace: "main"
-  sparse_index: "my-sparse-index.svc.region.pinecone.io"
-  sparse_index_namespace: "main"
-  
-  # Embedding Params for the DENSE index
-  embedding_model: "TextEmbeddingADA002"
-  openai_api_key: "sk-xyz..."
+create_vertical_agent_network:
+  agent-1:
+    agent_name: Pinecone_agent
+    LLM_config:
+        params:
+          model: gpt-5-nano
+    tools:
+      tool_assigned:
+        - name: PineconeTool
+          config:
+            api_key: "pc-abc123..."
+            search_type: "seperate_index_hybrid"
+            top_k: 7
+            
+            # Separate-Index Params
+            dense_index: "my-dense-index.svc.region.pinecone.io"
+            dense_index_namespace: "main"
+            sparse_index: "my-sparse-index.svc.region.pinecone.io"
+            sparse_index_namespace: "main"
+            
+            # Embedding Params for the DENSE index
+            embedding_model: "TextEmbeddingADA002"
+            openai_api_key: "sk-xyz..."
+    agent_function:
+      - Analyze the user's intent and immediately call PineconeTool with a distinct search query if external context is needed to answer. Use the retrieved data to ground your answer, citing the source where possible, and only request clarification if the tool returns insufficient results.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
 ```
 
 ### Recipe 6: Semantic Search with a Metadata Filter
@@ -212,18 +278,32 @@ config:
 > **Use Case:** You want to find documents about "agentic AI" but only those published in or after 2024.
 
 ```yaml
-config:
-  api_key: "pc-abc123..."
-  search_type: "semantic"
-  top_k: 5
-  
-  index_host: "my-modern-index.svc.region.pinecone.io"
-  namespace: "production-docs"
-  
-  # Filter Param
-  filter:
-    year:
-      $gte: 2024
+create_vertical_agent_network:
+  agent-1:
+    agent_name: Pinecone_agent
+    LLM_config:
+        params:
+          model: gpt-5-nano
+    tools:
+      tool_assigned:
+        - name: PineconeTool
+          config:
+            api_key: "pc-abc123..."
+            search_type: "semantic"
+            top_k: 5
+
+            index_host: "my-modern-index.svc.region.pinecone.io"
+            namespace: "production-docs"
+            
+            # Filter Param
+            filter:
+              year:
+                $gte: 2024
+    agent_function:
+      - Analyze the user's intent and immediately call PineconeTool with a distinct search query if external context is needed to answer. Use the retrieved data to ground your answer, citing the source where possible, and only request clarification if the tool returns insufficient results.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
 ```
 
 ### 💡 Tip: Converting JSON Filters to YAML
