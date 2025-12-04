@@ -23,7 +23,6 @@ Each agent can be configured with one or more LLMs. Here's how you can define th
 LLM_config:
     params:
       model: "<Model Name>"
-      temperature: <Value>
       max_tokens: <Value>
       request_timeout: <Value>
 ```
@@ -31,9 +30,5 @@ LLM_config:
 ## Explanation of Parameters
 
 - **model**: Specifies the model variant to use.
-- **temperature**:
-  - Controls the randomness of the output.
-  - A lower value (e.g., 0.0) makes output deterministic.
-  - A higher value (e.g., 0.7) allows for more creativity.
 - **max_tokens**: Maximum number of tokens in the output.
 - **request_timeout**: Time in seconds before the request times out.

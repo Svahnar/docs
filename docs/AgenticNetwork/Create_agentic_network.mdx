@@ -19,7 +19,6 @@ create_vertical_agent_network:
     LLM_config:
         params:
           model: "gpt-4o-mini"
-          temperature: 0.0
           max_tokens: 1000
           request_timeout: 600
     tools:
@@ -37,7 +36,6 @@ create_vertical_agent_network:
     LLM_config:
         params:
           model: "gpt-4o-mini"
-          temperature: 0.0
           max_tokens: 1000
           request_timeout: 600
     tools:
@@ -59,7 +57,6 @@ create_vertical_agent_network:
     LLM_config:
         params:
           model: "gpt-4o-mini"
-          temperature: 0.0
           max_tokens: 1000
           request_timeout: 600
     agent_function:
@@ -112,13 +109,11 @@ Each agent requires an LLM configuration to handle reasoning:
 LLM_config:
     params:
       model: "gpt-4o-mini"
-      temperature: 0.0
       max_tokens: 1000
       request_timeout: 600
 ```
 
 - **model**: Indicates the model variant to use.
-- **temperature**: Controls output randomness; `0.0` ensures deterministic responses.
 - **max_tokens**: Sets the maximum length of the response.
 - **request_timeout**: The maximum time to wait for a response from the LLM.
 
@@ -244,7 +239,6 @@ create_vertical_agent_network:
     LLM_config:
         params:
           model: "gpt-4o-mini"
-          temperature: 0.0
           max_tokens: 1000
           request_timeout: 600
     tools:
@@ -262,7 +256,6 @@ create_vertical_agent_network:
     LLM_config:
         params:
           model: "gpt-4o-mini"
-          temperature: 0.0
           max_tokens: 1000
           request_timeout: 600
     tools:
@@ -284,7 +277,6 @@ create_vertical_agent_network:
     LLM_config:
         params:
           model: "gpt-4o-mini"
-          temperature: 0.0
           max_tokens: 1000
           request_timeout: 600
     agent_function:

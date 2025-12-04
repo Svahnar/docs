@@ -20,7 +20,6 @@ create_vertical_agent_network:
     LLM_config:
         params:
           model: "gpt-4o"
-          temperature: 0.0
           max_tokens: 1000
           request_timeout: 600
     tools:
@@ -60,20 +59,18 @@ For detailed information, refer to [Initialization Documentation](/docs/AgenticN
 
 </Step>
 <Step title="Configure the LLM for Reasoning">
-The next step is to configure the **Large Language Model (LLM)** that powers your agent. Configure the model, specific variant, temperature, and other hyperparameters. For example:
+The next step is to configure the **Large Language Model (LLM)** that powers your agent. Configure the model, specific variant, and other hyperparameters. For example:
 
 ```yaml showLineNumbers
 LLM_config:
     params:
       model: "gpt-4o"
-      temperature: 0.0
       max_tokens: 1000
       request_timeout: 600
 ```
 
 Here’s what these parameters mean:
 - **model**: Specifies the model variant (`gpt-4o` in this case).
-- **temperature**: Controls randomness in the output. A value of `0.0` ensures deterministic and factual results.
 - **max_tokens**: Sets the maximum response length.
 - **request_timeout**: Defines the maximum duration (in seconds) for requests to the LLM.
 
@@ -142,7 +139,6 @@ create_vertical_agent_network:
     LLM_config:
         params:
           model: "gpt-4o"
-          temperature: 0.0
           max_tokens: 1000
           request_timeout: 600
     tools:
