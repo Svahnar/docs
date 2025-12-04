@@ -18,7 +18,7 @@ create_vertical_agent_network:
     agent_name: "Stock_news_searcher"
     LLM_config:
         params:
-          model: "gpt-4o-mini"
+          model: "gpt-5-mini"
           max_tokens: 1000
           request_timeout: 600
     tools:
@@ -35,7 +35,7 @@ create_vertical_agent_network:
     agent_name: "sms_sender"
     LLM_config:
         params:
-          model: "gpt-4o-mini"
+          model: "gpt-5-mini"
           max_tokens: 1000
           request_timeout: 600
     tools:
@@ -56,7 +56,7 @@ create_vertical_agent_network:
     Role: "supervisor"
     LLM_config:
         params:
-          model: "gpt-4o-mini"
+          model: "gpt-5-mini"
           max_tokens: 1000
           request_timeout: 600
     agent_function:
@@ -108,7 +108,7 @@ Each agent requires an LLM configuration to handle reasoning:
 ```yaml showLineNumbers
 LLM_config:
     params:
-      model: "gpt-4o-mini"
+      model: "gpt-5-mini"
       max_tokens: 1000
       request_timeout: 600
 ```
@@ -238,7 +238,7 @@ create_vertical_agent_network:
     agent_name: "Stock_news_searcher"
     LLM_config:
         params:
-          model: "gpt-4o-mini"
+          model: "gpt-5-mini"
           max_tokens: 1000
           request_timeout: 600
     tools:
@@ -255,7 +255,7 @@ create_vertical_agent_network:
     agent_name: "sms_sender"
     LLM_config:
         params:
-          model: "gpt-4o-mini"
+          model: "gpt-5-mini"
           max_tokens: 1000
           request_timeout: 600
     tools:
@@ -276,7 +276,7 @@ create_vertical_agent_network:
     Role: "supervisor"
     LLM_config:
         params:
-          model: "gpt-4o-mini"
+          model: "gpt-5-mini"
           max_tokens: 1000
           request_timeout: 600
     agent_function:

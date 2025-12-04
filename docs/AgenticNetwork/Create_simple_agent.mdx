@@ -19,7 +19,7 @@ create_vertical_agent_network:
     agent_name: "Web_search"
     LLM_config:
         params:
-          model: "gpt-4o"
+          model: "gpt-5"
           max_tokens: 1000
           request_timeout: 600
     tools:
@@ -64,13 +64,13 @@ The next step is to configure the **Large Language Model (LLM)** that powers you
 ```yaml showLineNumbers
 LLM_config:
     params:
-      model: "gpt-4o"
+      model: "gpt-5"
       max_tokens: 1000
       request_timeout: 600
 ```
 
 Here’s what these parameters mean:
-- **model**: Specifies the model variant (`gpt-4o` in this case).
+- **model**: Specifies the model variant (`gpt-5` in this case).
 - **max_tokens**: Sets the maximum response length.
 - **request_timeout**: Defines the maximum duration (in seconds) for requests to the LLM.
 
@@ -138,7 +138,7 @@ create_vertical_agent_network:
     agent_name: "Web_search"
     LLM_config:
         params:
-          model: "gpt-4o"
+          model: "gpt-5"
           max_tokens: 1000
           request_timeout: 600
     tools:
