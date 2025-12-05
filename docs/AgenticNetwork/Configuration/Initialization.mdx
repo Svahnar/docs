@@ -26,7 +26,7 @@ create_vertical_agent_network:
 
 - **`create_vertical_agent_network`**: The top-level key that initializes the Agentic Network. This acts as a strict container for all agents in the network to function cohesively. Ensure this key is always present in your YAML configuration.
 - **`agent-1`, `agent-2`, `agent-3`**: Unique identifiers for each agent within the network. These must follow the format `agent-[number]` and should always be in order without any duplications.
-- **`agent_name`**: A descriptive name for the agent. This name should be both human-readable and agent-readable, meaning other agents or supervisor agents can easily identify and remember this agent using its name. It is recommended to use descriptive names in snake_case format (e.g., `stock_news_searcher`).
+- **`agent_name`**: A descriptive name for the agent. This name should be both human-readable and agent-readable, meaning other agents or supervisor agents can easily identify and remember this agent using its name. It is recommended to use descriptive names in **snake_case format** (e.g., `stock_news_searcher`).
 - **`Role`**: Specifies the role of the agent. The `my_supervisor` agent is assigned the role `"supervisor"`, indicating that this agent oversees and coordinates other agents. The `Role` field defaults to `normal` if not specified.
 
 ### Detailed Explanation of `Role`

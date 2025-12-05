@@ -1,6 +1,6 @@
 ---
 title: "Understand Agent Fields and Validation Rules"
-sidebarTitle: "YAML Validation"
+sidebarTitle: "Agent Configuration"
 ---
 Here's a table summarizing the main fields for each agent:
 
@@ -11,10 +11,10 @@ Here's a table summarizing the main fields for each agent:
 | agent_name       | string  | Unique name for the agent                                                     | Yes      | "example_agent"           |
 | LLM_config       | array   | Configuration of the LLM(s) used by the agent                                 | Yes      | See LLM Configurations    |
 | Role             | string  | Role of the agent (`normal` or `supervisor`)                                  | No       | "supervisor"              |
-| agent_function   | array   | List of functions the agent performs                                          | Yes      | ["process_data"]          |
+| agent_function   | string  | List of functions the agent performs                                          | Yes      | "Your goal is to send a request to the API endpoint with the given parameters. Make sure you check the parameters before sending the request. Parameters are: "param1": "value1", "param2": "value2"          |
 | incoming_edge    | array   | List of agents or `Start` connected to this agent                             | Yes      | ["Start"]                 |
 | outgoing_edge    | array   | List of agents connected from this agent                                      | Yes      | ["agent-2"]               |
-| tools            | object  | Tools assigned to the agent                                                   | No       | See Tool Configuration    |
+| tools            | object  | Tools assigned to the agent                                                   | No       | [See Tool Configuration](/docs/AgenticNetwork/Configuration/Tools)    |
 
 ### LLM Configurations
 
