@@ -33,12 +33,13 @@ const sidebars: SidebarsConfig = {
     
     {
       type: 'html',
-      value: '<div style="margin-top: 12px; font-size: 14px; font-weight: bold;">SVAHNAR AGENTIC AI NETWORK</div>',
+      value: '<div style="margin-top: 12px; font-size: 14px; font-weight: bold;">SVAHNAR AGENTIC AI FRAMEWORK</div>',
       defaultStyle: true,
     },
     'AgenticNetwork/introduction',
     'AgenticNetwork/Create_simple_agent',
     'AgenticNetwork/Create_agentic_network',
+    'AgenticNetwork/Agent_configuration',
     {
       type: 'category',
       label: 'Configuration',
@@ -131,12 +132,7 @@ const sidebars: SidebarsConfig = {
       ],
     },
 
-    {
-      type: 'html',
-      value: '<div style="margin-top: 12px; font-size: 14px; font-weight: bold;">Additional Resources</div>',
-      defaultStyle: true,
-    },
-    'AgenticNetwork/Agent_configuration',
+   
   ],
 };
 

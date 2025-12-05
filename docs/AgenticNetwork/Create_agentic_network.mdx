@@ -18,8 +18,7 @@ create_vertical_agent_network:
     agent_name: "Stock_news_searcher"
     LLM_config:
         params:
-          model: "gpt-4o-mini"
-          temperature: 0.0
+          model: "gpt-5-mini"
           max_tokens: 1000
           request_timeout: 600
     tools:
@@ -36,8 +35,7 @@ create_vertical_agent_network:
     agent_name: "sms_sender"
     LLM_config:
         params:
-          model: "gpt-4o-mini"
-          temperature: 0.0
+          model: "gpt-5-mini"
           max_tokens: 1000
           request_timeout: 600
     tools:
@@ -58,8 +56,7 @@ create_vertical_agent_network:
     Role: "supervisor"
     LLM_config:
         params:
-          model: "gpt-4o-mini"
-          temperature: 0.0
+          model: "gpt-5-mini"
           max_tokens: 1000
           request_timeout: 600
     agent_function:
@@ -111,14 +108,12 @@ Each agent requires an LLM configuration to handle reasoning:
 ```yaml showLineNumbers
 LLM_config:
     params:
-      model: "gpt-4o-mini"
-      temperature: 0.0
+      model: "gpt-5-mini"
       max_tokens: 1000
       request_timeout: 600
 ```
 
 - **model**: Indicates the model variant to use.
-- **temperature**: Controls output randomness; `0.0` ensures deterministic responses.
 - **max_tokens**: Sets the maximum length of the response.
 - **request_timeout**: The maximum time to wait for a response from the LLM.
 
@@ -243,8 +238,7 @@ create_vertical_agent_network:
     agent_name: "Stock_news_searcher"
     LLM_config:
         params:
-          model: "gpt-4o-mini"
-          temperature: 0.0
+          model: "gpt-5-mini"
           max_tokens: 1000
           request_timeout: 600
     tools:
@@ -261,8 +255,7 @@ create_vertical_agent_network:
     agent_name: "sms_sender"
     LLM_config:
         params:
-          model: "gpt-4o-mini"
-          temperature: 0.0
+          model: "gpt-5-mini"
           max_tokens: 1000
           request_timeout: 600
     tools:
@@ -283,8 +276,7 @@ create_vertical_agent_network:
     Role: "supervisor"
     LLM_config:
         params:
-          model: "gpt-4o-mini"
-          temperature: 0.0
+          model: "gpt-5-mini"
           max_tokens: 1000
           request_timeout: 600
     agent_function:
