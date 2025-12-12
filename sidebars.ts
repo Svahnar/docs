@@ -111,6 +111,7 @@ const sidebars: SidebarsConfig = {
         'Tools/ToolList/Twilio_whatsapp',
         'Tools/ToolList/webpage_search',
         'Tools/ToolList/Wikipedia',
+        'Tools/ToolList/Zapier',
       ],
     },
     {
