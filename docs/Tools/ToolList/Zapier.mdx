@@ -1,0 +1,120 @@
+# Zapier
+
+Seamlessly integrate your agents with thousands of apps by triggering **Zapier Zaps**.
+
+This guide will walk you through setting up a Zapier trigger, configuring your agent, and mapping data fields.
+
+## 💡 Core Concepts
+
+To configure this tool, you need to understand two key components.
+
+### 1\. How does this Zapier Trigger work?
+
+The Zapier Trigger tool allows your agent to send a JSON payload to a specific Zap with Zap ID. This initiates workflow (Zap) in Zapier, passing along data like `first_name`, `email`, or any other keys in key-value pairs you define.
+
+### 2\. What is a Zap ID?
+
+The **Zap ID** is the unique identifier for your Zap.
+
+**How to find it:**
+1. Create or Edit your Zap in the Zapier editor.
+2. Look at your browser's address bar: `https://zapier.com/editor/123456789/draft/...`
+3. The number `123456789` is your **Zap ID**.
+
+-----
+
+## ⚙️ Configuration Steps
+
+Follow these steps to set up the integration from scratch.
+
+### Step 1: Create a Zap & Select Trigger
+
+1. Log in to Zapier and click **Create Zap**.
+2. For the **Trigger**, search for and select **"Svahnar"**.
+3. Select **"New Request"** as the Trigger Event.
+
+{/* ![Select Svahnar Trigger](/assets/zapier_select_trigger.png) */}
+
+### Step 2: Authenticate
+
+1. Click on **Account**.
+2. You will be asked to sign in to your SVAHNAR account.
+3. Use your **API Key** from the SVAHNAR platform.
+
+
+Check the [Quickstart](/docs/GetStarted/Quickstart) to learn how to generate your API Key.
+
+### Step 3: Configure Trigger
+
+1.  **Define Data Fields**:
+    *   In the "Trigger" section, specify the data fields your agent will send.
+    *   Under **Fields**, add the keys (e.g., `first_name`, `email`) that your SVAHNAR agent will include in its payload.
+
+    :::info
+    These fields inform Zapier about the expected data, enabling you to map them in subsequent actions.
+    :::
+
+2.  **Enter Zap ID**:
+    *   Locate the **Zap ID** field and paste the unique identifier you copied from your Zap's URL (refer to [Core Concepts](#-core-concepts) for details).
+
+
+### Step 4: Test & Map
+
+1. Click **Test trigger**.
+2. Zapier will look for a recent request or use the sample data you provided in the fields configuration.
+3. Verify that you see the data (e.g., `first_name: John`).
+4. Continue to add an **Action** (e.g., Google Sheets, Slack) and map the fields from the trigger to the action.
+
+import Video from '@site/src/components/Video';
+
+{/* /docs.svahnar.com/ToolList/zapier.mp4 */}
+<Video src="https://content.svahnar.com/docs.svahnar.com/ToolList/zapier.mp4" />
+
+-----
+
+## 📚 Practical Recipes (Examples)
+
+### Recipe 1: Basic Zapier Trigger Agent
+
+> **Use Case:** An agent that collects user details and sends them to Zapier.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: zapier_agent
+    LLM_config:
+        params:
+          model: gpt-5-nano
+    tools:
+      tool_assigned:
+        - name: Zapier_Trigger
+          config:
+            # Your unique Zap ID
+            zap_id: 335989371 
+            # Optional: Additional static info to send with every request
+            additional_info:
+              source: "svahnar_agent"
+              environment: "production"
+    agent_function:
+      - your function is to send the user id, first_name, last_name and email to the zapier.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+### 💡 Tip: Sending Additional Info
+
+You can use the `additional_info` block in the tool config to hardcode values that should be sent with every webhook payload, regardless of what the agent dynamically generates.
+
+-----
+
+## 🚑 Troubleshooting
+
+* **Zap not triggering**
+    * Check if the **Zap ID** is correct.
+    * Ensure the Zap is **ON**.
+    * If it still implies, toggle the Zap OFF and back ON to refresh the connection.
+
+* **Missing Data Fields**
+    * Ensure your agent's function explicitly mentions the fields it needs to extract and send (e.g., "send first_name and email").
+    * Verify that the keys in your Zapier Trigger configuration match exactly what the agent is sending.
