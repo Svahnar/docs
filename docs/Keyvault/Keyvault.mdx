@@ -1,57 +1,123 @@
-
 # Keyvault
 
-**Short summary**: Keyvault is a centralized, secure store where users add keys and secret values (API keys, AWS credentials, tokens, etc.). Secrets remain stored until the user explicitly revokes them. Storing secrets in Keyvault reduces exposure to interception (for example, MITM attacks) and ensures cryptographic hashing and controlled access across the platform.
+Securely store and manage your API keys, credentials, and sensitive data.
+
+**Short summary**: Keyvault is a centralized, secure store where users add keys and secret values (API keys, credentials, tokens, etc.). Secrets remain stored until the user explicitly revokes them. Storing secrets in Keyvault reduces exposure and ensures controlled access across the platform.
+
+## 💡 Core Concepts
+
+To use Keyvault effectively, you should understand these key concepts.
+
+### 1. Secret
+
+A **Secret** is a key/value pair where `key` is the identifier (e.g., `OPENAI_API_KEY`) and `value` is the sensitive content (the actual key string). The Keyvault stores the secret securely so it can be retrieved by authorized agents and services at runtime.
+
+### 2. Revocation
+
+Secrets live indefinitely **until** you explicitly revoke them. Revoking a secret immediately prevents further retrieval and signals consumers to refresh credentials.
+
+### 3. Protection
+
+Keyvault encrypts your keys both at rest and in transit. Once saved, **no one** (not even you or the administrators) can view the plaintext value of the secret again. You can only revoke it.
+
+-----
+
+## ⚙️ Configuration & Usage
+
+### Step 1: Add a Secret
+
+Adding keys to the Keyvault ensures sensitive values are securely stored and retrievable only by authorized services.
+
+1.  **Navigate to Keyvault**
+    *   From the **header**, click **Keys**.
+    *   In the left-hand sidebar, click **Key vault** to open the Keyvault panel.
+2.  **Click Add Keys**
+    *   Press the **Create Keys** (or **+ Add Secret**) button.
+    *   A modal will open where you can enter the key details.
+3.  **Fill in details**
+    *   **Key name**: An identifier for your secret (e.g., `OPENAI_API_KEY`).
+    *   **Key Value**: The actual secret value (e.g., your OpenAI API key string).
+    *   **Description**: Add context to remember what this key is for (e.g., *"Production API key"*).
+4.  **Save**
+    *   Click **Save**. The secret is now encrypted and stored.
 
 
+import Video from '@site/src/components/Video';
 
-## Why Keyvault?
+{/* <Video src="https://content.svahnar.com/docs.svahnar.com/Keyvault/adding_secret.mp4" /> */}
 
-* **Security-first**: Sensitive keys entered into forms can be intercepted (MITM). Keyvault reduces that risk by storing secrets server-side with strong cryptographic protections.
-* **Centralized management**: Keep, rotate, and revoke secrets in one place rather than scattering them through configuration files and environment variables.
-* **Platform-ready**: Secrets stored in Keyvault can be retrieved by authorized components of the platform where needed.
+### Step 2: Use in an Agent
+
+Once stored, you can reference the secret in your agent configuration using the special placeholder format:
+
+```text
+${your_key_name}
+```
+
+The platform will automatically resolve this placeholder to the actual key value at runtime.
+
+**Where to use:**
+
+*   **Agent Console**: In Agent Node fields or Tool Config fields.
+    ```yaml
+    api_key: ${tavily_api_key}
+    ```
+
+*   **YAML Configurations**: When adding keys in YAML, enclose the placeholder in **double quotes** to ensure proper parsing.
+    ```yaml
+    api_key: "${tavily_api_key}"
+    ```
+
+### Step 3: Revoke a Secret
+
+You can revoke a key at any time.
+
+1.  Navigate to your **Key Vault**.
+2.  Locate the key you want to revoke.
+3.  In the key’s row, click on the **Delete** icon.
+4.  Confirm the action in the dialog.
+
+:::note
+Only the user who created the key can delete it.
+:::
+
+:::warning
+Once a key is revoked, it is **permanently deleted**. You will no longer be able to access or recover it from any location.
+:::
+
+-----
+
+## 📚 Example: Using a Secret in a Tool Configuration
 
 
-## Core concepts
+> **Use Case:** Authenticating a tool.
 
-### Secret
+```yaml showLineNumbers
+tools:
+  tool_assigned:
+    - name: Zapier_Trigger
+      config:
+        # Reference the Zap ID
+        zap_id: "${MY_ZAP_ID}"
+    - name: Google_Search
+      config:
+        api_token: "${SERP_API_TOKEN}"
+```
 
-A secret is a key/value pair where `key` is the identifier and `value` is the secret content (API key, credential string). The Keyvault stores the secret so it can be used by authorized services.
+-----
 
-### Revocation
+## 🚑 Troubleshooting
 
-Secrets live indefinitely **until** a user revokes them. Revoking a secret prevents further retrieval and signals consumers to refresh credentials.
+*   **Secret not working / "Authentication Failed"**
+    *   Ensure the **Key Name** in your YAML matches exactly what is in Keyvault.
+    *   Check for typos in `${key_name}`.
+    *   If using YAML, ensure you used double quotes: `"${key_name}"`.
 
-### Cryptographic protection
+*   **Can I see my secret value again?**
+    *   **No.** The value is visible only once, at the time of creation. After saving, even the creator cannot view it again.
 
-Keyvault applies cryptographic hashing and secure storage to ensure secret values are not visible in plaintext to operators or attackers.
-
-
-
-## When to use Keyvault
-
-* Anything that must remain confidential (API keys, database credentials, cloud provider keys, encryption keys).
-* Secrets that require rotation or revocation without redeploying services.
-* Cases where minimizing surface area for MITM or configuration leaks is important.
-
-
-
-
-**Note:** The secret is hashed and stored securely—users and operators cannot read the plaintext value after saving.
-
-
-
-
-## FAQ
-
-**Q: Are secrets visible to administrators?**
-A: No — the Keyvault stores secrets using cryptographic protections so raw values are not exposed to operators after creation.
-
-**Q: Can other can see my secret?**
-A: No, others can't see your secrets. Only you can see your keys in keyvault but not there values.
-
-**Q: What happens after revocation?**
-A: Once revoked, the secret cannot be retrieved. Consumers must be updated with replacement credentials.
+*   **Who can revoke my keys?**
+    *   Only the user who created the key can revoke/delete it.
 
 
 

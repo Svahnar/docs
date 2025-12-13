@@ -72,16 +72,16 @@ const sidebars: SidebarsConfig = {
       defaultStyle: true,
     },
     'Keyvault/Keyvault',
-    {
-      type: 'category',
-      label: 'How to use',
-      collapsed: true,
-      items: [
-        'Keyvault/how to use/Add keys',
-        'Keyvault/how to use/Usage',
-        'Keyvault/how to use/Revoke keys',
-      ],
-    },
+    // {
+    //   type: 'category',
+    //   label: 'How to use',
+    //   collapsed: true,
+    //   items: [
+    //     'Keyvault/how to use/Add keys',
+    //     'Keyvault/how to use/Usage',
+    //     'Keyvault/how to use/Revoke keys',
+    //   ],
+    // },
 
     {
       type: 'html',
