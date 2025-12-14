@@ -20,6 +20,10 @@ Secrets live indefinitely **until** you explicitly revoke them. Revoking a secre
 
 Keyvault encrypts your keys both at rest and in transit. Once saved, **no one** (not even you or the administrators) can view the plaintext value of the secret again. You can only revoke it.
 
+### 4. System Set Tokens
+
+There are system set tokens that Svahnar sets for certain tools and agents used on behalf of the user. These are your OAuth tokens and other tokens used when you login to other applications. Note that these tokens **cannot** be deleted by you directly.
+
 -----
 
 ## ⚙️ Configuration & Usage
@@ -58,14 +62,14 @@ The platform will automatically resolve this placeholder to the actual key value
 
 **Where to use:**
 
-*   **Agent Console**: In Agent Node fields or Tool Config fields.
+*   **Agent Console**: In Tool Config fields.
     ```yaml
     api_key: ${tavily_api_key}
     ```
 
-*   **YAML Configurations**: When adding keys in YAML, enclose the placeholder in **double quotes** to ensure proper parsing.
+*   **YAML Configurations**: When adding keys in YAML, the placeholder can be used directly, as shown in the examples.
     ```yaml
-    api_key: "${tavily_api_key}"
+    api_key: ${tavily_api_key}
     ```
 
 ### Step 3: Revoke a Secret
@@ -90,7 +94,7 @@ Once a key is revoked, it is **permanently deleted**. You will no longer be able
 ## 📚 Example: Using a Secret in a Tool Configuration
 
 
-> **Use Case:** Authenticating a tool.
+> **Use Case:** Authenticating a tool or Knowledge Repository Connector.
 
 ```yaml showLineNumbers
 tools:
