@@ -3,22 +3,29 @@ title: "Quickstart"
 sidebarTitle: "Quickstart"
 ---
 import { Steps, Step } from '@site/src/components/Steps/Steps';
+import Image from '@site/src/components/Image';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
 Set up your SVAHNAR environment and create your first agent in minutes using the SVAHNAR SDK. This guide will walk you through the steps to get started quickly.
 
-### Configure your development environment
+## Configure your development environment
 To start using the SVAHNAR SDK, you need to set up your development environment. This includes installing the necessary dependencies and getting your API key.
 
 Before you start with the development, you need to create and export an API key. This key will be used to authenticate your requests to the SVAHNAR API.
 <Steps>
-    <Step title='Get an API Key'>
+    <Step>
+
+### Get an API Key
+
     Create a new API Key in the [SVAHNAR Platform](https://platform.svahnar.com/). Navigate to the API keys section in your account. Create a new API key and copy it.
 
-    ![API Key Generation](./images/2.gif)
+    <Image src="https://content.svahnar.com/docs.svahnar.com/create_api_key.gif" helpText="API Key Generation" />
     </Step>
-    <Step title='Export the API key'>
+    <Step>
+
+### Export the API key
+
     Export the API key as an environment variable
     <Tabs>
         <TabItem value="mac/linux" label="macOS / Linux" default>
@@ -33,7 +40,10 @@ Before you start with the development, you need to create and export an API key.
         </TabItem>
     </Tabs>
     </Step>
-    <Step title='Install the SVAHNAR SDK'>
+    <Step>
+
+### Install the SVAHNAR SDK
+
     Install the SVAHNAR SDK using pip. Open your terminal and run the following command:
     <Tabs>
         <TabItem value="pip" label="Python" default>
@@ -43,7 +53,10 @@ Before you start with the development, you need to create and export an API key.
         </TabItem>
     </Tabs>
     </Step>
-    <Step title='Create your first agent'>
+    <Step>
+
+### Create your first agent
+
     To verify that the SVAHNAR SDK is installed correctly, create a file `test.py` and add the following code:
     ```python title="test.py" showLineNumbers
     from svahnar import Svahnar

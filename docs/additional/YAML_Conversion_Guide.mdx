@@ -1,0 +1,82 @@
+# JSON to YAML Conversion Guide
+
+This guide helps you convert JSON configurations (often used in documentation or API examples) into the YAML format required for your agent's configuration.
+
+## 🤖 Automated Conversion (Python Script)
+
+If you have a complex JSON object, the easiest way to convert it is using a script.
+
+```python
+import json
+import yaml
+
+# Paste your JSON here
+json_string = '''
+{
+  "genre": { "$in": ["comedy", "documentary", "drama"] },
+  "year": { "$eq": 2019 }
+}
+'''
+
+data = json.loads(json_string)
+yaml_str = yaml.safe_dump(data, sort_keys=False)
+print(yaml_str)
+```
+
+**Output:**
+```yaml
+genre:
+  $in:
+    - comedy
+    - documentary
+    - drama
+year:
+  $eq: 2019
+```
+
+---
+
+## ✍️ Manual Conversion Guide
+
+If you can't run a script, you can convert JSON to YAML manually by following these simple rules.
+
+### 1. Structure & Indentation
+*   **JSON** uses curly braces `{}` to wrap objects and indentation is optional (but recommended).
+*   **YAML** relies **strictly** on indentation (spaces). It does NOT use curly braces for blocks.
+*   **Rule:** Remove the `{` and `}`, and ensure everything inside is indented by 2 or 4 spaces relative to the parent.
+
+### 2. Key-Value Pairs
+*   **JSON:** `"key": "value"` (Quotes are required for keys).
+*   **YAML:** `key: value` (Quotes are optional for keys and most string values).
+*   **Rule:** Remove the quotes around the key. Ensure there is a space after the colon `:`.
+
+### 3. Lists / Arrays
+*   **JSON:** Uses square brackets `[]` and commas `,`.
+    ```json
+    "items": ["apple", "banana", "cherry"]
+    ```
+*   **YAML:** Uses dashes `-` for each item on a new line.
+    ```yaml
+    items:
+      - apple
+      - banana
+      - cherry
+    ```
+*   **Rule:** Replace `[` and `]` with a list of items, each starting with `- ` (dash + space) on a new indented line.
+
+### 4. Special Characters
+*   If your key or value contains special characters (like `:`, `{`, `}`, `[`, `]`, or starts with a symbol like `$`), it's safer to keep it in quotes.
+    *   Example: `"$eq": 2019` -> `$eq: 2019` (works) or `"$eq": 2019` (also works).
+
+---
+
+## 🆚 Visual Comparison
+
+| JSON (Source) | YAML (Target) |
+| :--- | :--- |
+| **Object** | |
+| `{"name": "Alice", "age": 30}` | `name: Alice`<br/>`age: 30` |
+| **Nested Object** | |
+| `{"user": {"id": 123}}` | `user:`<br/>&nbsp;&nbsp;`id: 123` |
+| **List/Array** | |
+| `{"colors": ["red", "blue"]}` | `colors:`<br/>&nbsp;&nbsp;`- red`<br/>&nbsp;&nbsp;`- blue` |

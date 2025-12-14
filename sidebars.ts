@@ -95,7 +95,7 @@ const sidebars: SidebarsConfig = {
       label: 'Tools',
       collapsed: false,
       items: [
-        'Tools/ToolList/APItool',
+        'Tools/ToolList/API',
         'Tools/ToolList/Arxiv',
         'Tools/ToolList/AWS_Lambda',
         'Tools/ToolList/AWS_SES_send_email',
@@ -132,6 +132,12 @@ const sidebars: SidebarsConfig = {
         'Knowledge Repository/Connectors/Sharepoint',
       ],
     },
+    {
+      type: 'html',
+      value: '<div style="margin-top: 12px; font-size: 14px; font-weight: bold;">Additional Resources</div>',
+      defaultStyle: true,
+    },
+    'additional/YAML_Conversion_Guide',
 
    
   ],

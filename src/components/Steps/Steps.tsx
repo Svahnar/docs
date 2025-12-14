@@ -3,7 +3,7 @@ import './Steps.css';
 
 interface StepProps {
   /** The primary text for the step that shows up next to the indicator */
-  title: string;
+  title?: string;
   /** The content of a step either as plain text or components */
   children: React.ReactNode;
   /** A Font Awesome icon, Lucide icon, or SVG code */
@@ -14,7 +14,18 @@ interface StepProps {
   stepNumber?: number;
   /** The size of the step title: "h2" (default), or "h3". This determines the actual HTML element rendered. */
   titleSize?: "h2" | "h3";
+  /** Optional ID for deep linking. If not provided, one will be generated from the title. */
+  id?: string;
 }
+
+const slugify = (text: string): string =>
+  text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')     // Replace spaces with -
+    .replace(/[^\w\-]+/g, '') // Remove all non-word chars
+    .replace(/\-\-+/g, '-');  // Replace multiple - with single -
 
 export const Step: React.FC<StepProps> = ({
   title,
@@ -23,7 +34,11 @@ export const Step: React.FC<StepProps> = ({
   iconType,
   stepNumber,
   titleSize = "h2",
+  id,
 }) => {
+  const stepId = id || (title ? slugify(title) : undefined);
+  const TitleTag = titleSize;
+
   return (
     <div className="step">
       <div className="step-header">
@@ -36,11 +51,14 @@ export const Step: React.FC<StepProps> = ({
             )}
           </div>
         )}
-        {titleSize === "h2" ? (
-          <h2 className="step-title">{title}</h2>
-        ) : (
-          <h3 className="step-title">{title}</h3>
-        )}
+        {title ? (
+          <TitleTag className="step-title" id={stepId}>
+            {title}
+            <a href={`#${stepId}`} className="step-anchor-link" aria-label={`Link to ${title}`}>
+              #
+            </a>
+          </TitleTag>
+        ) : null}
       </div>
       <div className="step-content">{children}</div>
     </div>

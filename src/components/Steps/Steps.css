@@ -67,3 +67,24 @@
     height: calc((100% - 70px) / 1.1);
     background: linear-gradient(to bottom, var(--line-color), transparent);
 }
+
+.step-anchor-link {
+    opacity: 0;
+    margin-left: 0.5rem;
+    color: var(--ifm-color-primary, #6ecfef);
+    text-decoration: none;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.step-title:hover .step-anchor-link {
+    opacity: 1;
+}
+
+/* Support for headers inside children (e.g. from Markdown) */
+.step-content > h3:first-child,
+.step-content > h2:first-child {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
