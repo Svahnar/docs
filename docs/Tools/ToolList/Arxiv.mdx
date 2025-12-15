@@ -1,68 +1,81 @@
+# Arxiv
+
+Access the open-access archive for 2 million+ scholarly articles in Physics, Mathematics, Computer Science, and more.
+
+This tool allows your agents to search for preprints, summaries, and authors to ground their answers in scientific research.
+
+## 💡 Core Concepts
+
+The **Arxiv** tool is straightforward:
+1.  **Configuration**: You can (optionally) set limits on how many results to return or how much text to fetch.
+2.  **Querying**: The agent sends a search term to find relevant papers.
+
 ---
-title: "Arxiv"
-sidebarTitle: List of Tools
+
+## ⚙️ Configuration Reference
+
+### Tool Configuration (`config`)
+
+These parameters control the behavior of the ArXiv wrapper and are set in your YAML.
+
+| Field | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| **`top_k_results`** | int | `3` | The maximum number of papers to return for a single query. |
+| **`load_max_docs`** | int | `3` | Same as `top_k_results`. Limits the number of documents loaded. |
+| **`doc_content_chars_max`** | int | `4000` | The maximum number of characters to read from the abstract/summary. Useful for saving tokens. |
+| **`load_all_available_meta`** | bool | `False` | If true, loads extra metadata (DOI, published date, etc.) beyond just the summary. |
+
+
+:::tip Helper
+Need to convert JSON payloads or configs to YAML? Check out our **[JSON to YAML Conversion Guide](/docs/additional/YAML_Conversion_Guide)**.
+:::
+
 ---
-Arxiv is an open-access archive of scholarly articles and research papers across fields such as physics, mathematics, computer science, quantitative biology, quantitative finance, statistics, electrical engineering & systems science, and economics.
 
-This tool wraps the ArXiv API to allow agents to search for recent and relevant preprints by query. It is suitable for research, literature discovery, and citation lookup.
+## 📚 Practical Recipes (Examples)
 
-## Usage
-
-Add the Arxiv tool to an agent's `tools.tool_assigned` list. The minimum required payload is a `query` string. The tool returns a list of matching paper metadata and snippets.
-
-```yaml showLineNumbers
-tools:
-	tool_assigned:
-		- name: "Arxiv"
-```
-
-### Example payload
-
-```json
-{ "query": "neural network interpretability" }
-```
-
-### Notes
-
-- The tool requires only a `query` parameter in the payload (or in the merged tool config).
-- Results are returned by the underlying Arxiv API wrapper. Adjustments to paging or result count can be done via tool config if supported by your environment.
-
-For programmatic examples and advanced parameters, see the tool implementation in the codebase.
-
-## YAML usage
-
-Example `tools` section to assign the Arxiv tool to an agent (no params required by default):
-
-```yaml showLineNumbers
-tools:
-	tool_assigned:
-		- name: "Arxiv"
-```
-
-To call the tool from an agent runtime, send a payload with a `query` key:
-
-```yaml showLineNumbers
-payload:
-	query: "neural network interpretability"
-
-## Agent integration example
-
-Below is an example `create_vertical_agent_network` snippet showing how to attach the Arxiv tool to an agent in the same style used by the Agentic Network docs:
+### Recipe 1: Basic Research Assistant
+> **Use Case:** A general-purpose researcher that finds the top 3 papers.
 
 ```yaml showLineNumbers
 create_vertical_agent_network:
-	agent-1:
-		agent_name: "paper_searcher"
-		LLM_config:
-			params:
-				model: "gpt-5-mini"
-		tools:
-			tool_assigned:
-				- name: "Arxiv"
-		agent_function:
-			- "Search arXiv for papers matching a query and return titles and abstracts."
-		incoming_edge: ["my_supervisor"]
-		outgoing_edge: ["my_supervisor"]
+  agent-1:
+    agent_name: Researcher
+    LLM_config:
+        params:
+          model: gpt-5-nano
+    tools:
+      tool_assigned:
+        - name: Arxiv
+          config:
+            top_k_results: 3
+    agent_function:
+      - "Search Arxiv for papers on specific topics when asked."
 ```
 
-This places the tool on a named agent so it can be called as part of the agent execution flow.
+### Recipe 2: Deep Dive (More Content)
+> **Use Case:** When you need more details from the abstracts and more papers.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: DeepResearcher
+    tools:
+      tool_assigned:
+        - name: Arxiv
+          config:
+            top_k_results: 10
+            load_max_docs: 10
+            doc_content_chars_max: 10000
+```
+
+---
+
+## 🚑 Troubleshooting
+
+*   **Empty Results**
+    *   The query might be too specific or contain typos. ArXiv search can be sensitive.
+    *   Try broadening the search terms.
+
+*   **Rate Limits**
+    *   The ArXiv API has rate limits. If you make too many requests quickly, you might be temporarily blocked. The wrapper handles some retries, but be mindful of loop usage.

@@ -1,3 +1,5 @@
+import { Steps, Step } from '@site/src/components/Steps/Steps';
+
 # Keyvault
 
 Securely store and manage your API keys, credentials, and sensitive data.
@@ -20,77 +22,82 @@ Secrets live indefinitely **until** you explicitly revoke them. Revoking a secre
 
 Keyvault encrypts your keys both at rest and in transit. Once saved, **no one** (not even you or the administrators) can view the plaintext value of the secret again. You can only revoke it.
 
+### 4. System Set Tokens
+
+There are system set tokens that Svahnar sets for certain tools and agents used on behalf of the user. These are your OAuth tokens and other tokens used when you login to other applications. Note that these tokens **cannot** be deleted by you directly.
+
 -----
 
 ## ⚙️ Configuration & Usage
 
-### Step 1: Add a Secret
-
-Adding keys to the Keyvault ensures sensitive values are securely stored and retrievable only by authorized services.
-
-1.  **Navigate to Keyvault**
-    *   From the **header**, click **Keys**.
-    *   In the left-hand sidebar, click **Key vault** to open the Keyvault panel.
-2.  **Click Add Keys**
-    *   Press the **Create Keys** (or **+ Add Secret**) button.
-    *   A modal will open where you can enter the key details.
-3.  **Fill in details**
-    *   **Key name**: An identifier for your secret (e.g., `OPENAI_API_KEY`).
-    *   **Key Value**: The actual secret value (e.g., your OpenAI API key string).
-    *   **Description**: Add context to remember what this key is for (e.g., *"Production API key"*).
-4.  **Save**
-    *   Click **Save**. The secret is now encrypted and stored.
 
 
-import Video from '@site/src/components/Video';
+### Add a Secret
 
-{/* <Video src="https://content.svahnar.com/docs.svahnar.com/Keyvault/adding_secret.mp4" /> */}
+    Adding keys to the Keyvault ensures sensitive values are securely stored and retrievable only by authorized services.
 
-### Step 2: Use in an Agent
+    1.  **Navigate to Keyvault**
+        *   From the **header**, click **Keys**.
+        *   In the left-hand sidebar, click **Key vault** to open the Keyvault panel.
+    2.  **Click Add Keys**
+        *   Press the **Create Keys** (or **+ Add Secret**) button.
+        *   A modal will open where you can enter the key details.
+    3.  **Fill in details**
+        *   **Key name**: An identifier for your secret (e.g., `OPENAI_API_KEY`).
+        *   **Key Value**: The actual secret value (e.g., your OpenAI API key string).
+        *   **Description**: Add context to remember what this key is for (e.g., *"Production API key"*).
+    4.  **Save**
+        *   Click **Save**. The secret is now encrypted and stored.
 
-Once stored, you can reference the secret in your agent configuration using the special placeholder format:
+    {/* // import Video from '@site/src/components/Video'; */}
 
-```text
-${your_key_name}
-```
+    {/* <Video src="https://content.svahnar.com/docs.svahnar.com/Keyvault/adding_secret.mp4" /> */}
 
-The platform will automatically resolve this placeholder to the actual key value at runtime.
+### Use in an Agent
 
-**Where to use:**
+    Once stored, you can reference the secret in your agent configuration using the special placeholder format:
 
-*   **Agent Console**: In Agent Node fields or Tool Config fields.
-    ```yaml
-    api_key: ${tavily_api_key}
+    ```text
+    ${your_key_name}
     ```
 
-*   **YAML Configurations**: When adding keys in YAML, enclose the placeholder in **double quotes** to ensure proper parsing.
-    ```yaml
-    api_key: "${tavily_api_key}"
-    ```
+    The platform will automatically resolve this placeholder to the actual key value at runtime.
 
-### Step 3: Revoke a Secret
+    **Where to use:**
 
-You can revoke a key at any time.
+    *   **Agent Console**: In Tool Config fields.
+        ```yaml
+        api_key: ${tavily_api_key}
+        ```
 
-1.  Navigate to your **Key Vault**.
-2.  Locate the key you want to revoke.
-3.  In the key’s row, click on the **Delete** icon.
-4.  Confirm the action in the dialog.
+    *   **YAML Configurations**: When adding keys in YAML, the placeholder can be used directly, as shown in the examples.
+        ```yaml
+        api_key: ${tavily_api_key}
+        ```
 
-:::note
-Only the user who created the key can delete it.
-:::
+### Revoke a Secret
 
-:::warning
-Once a key is revoked, it is **permanently deleted**. You will no longer be able to access or recover it from any location.
-:::
+    You can revoke a key at any time.
+
+    1.  Navigate to your **Key Vault**.
+    2.  Locate the key you want to revoke.
+    3.  In the key’s row, click on the **Delete** icon.
+    4.  Confirm the action in the dialog.
+
+    :::note
+    Only the user who created the key can delete it.
+    :::
+
+    :::warning
+    Once a key is revoked, it is **permanently deleted**. You will no longer be able to access or recover it from any location.
+    :::
 
 -----
 
 ## 📚 Example: Using a Secret in a Tool Configuration
 
 
-> **Use Case:** Authenticating a tool.
+> **Use Case:** Authenticating a tool or Knowledge Repository Connector.
 
 ```yaml showLineNumbers
 tools:

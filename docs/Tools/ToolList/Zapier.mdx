@@ -1,3 +1,6 @@
+import Video from '@site/src/components/Video';
+import { Steps, Step } from '@site/src/components/Steps/Steps';
+
 # Zapier
 
 Seamlessly integrate your agents with thousands of apps by triggering **Zapier Zaps**.
@@ -27,48 +30,61 @@ The **Zap ID** is the unique identifier for your Zap.
 
 Follow these steps to set up the integration from scratch.
 
-### Step 1: Create a Zap & Select Trigger
+<Steps>
+  <Step>
 
-1. Log in to Zapier and click **Create Zap**.
-2. For the **Trigger**, search for and select **"Svahnar"**.
-3. Select **"New Request"** as the Trigger Event.
+### Create a Zap & Select Trigger
 
-{/* ![Select Svahnar Trigger](/assets/zapier_select_trigger.png) */}
+  1. Log in to Zapier and click **Create Zap**.
+  2. For the **Trigger**, search for and select **"Svahnar"**.
+  3. Select **"New Request"** as the Trigger Event.
 
-### Step 2: Authenticate
+  {/* ![Select Svahnar Trigger](/assets/zapier_select_trigger.png) */}
+  </Step>
 
-1. Click on **Account**.
-2. You will be asked to sign in to your SVAHNAR account.
-3. Use your **API Key** from the SVAHNAR platform.
+  <Step>
 
+### Authenticate
 
-Check the [Quickstart](/docs/GetStarted/Quickstart) to learn how to generate your API Key.
-
-### Step 3: Configure Trigger
-
-1.  **Define Data Fields**:
-    *   In the "Trigger" section, specify the data fields your agent will send.
-    *   Under **Fields**, add the keys (e.g., `first_name`, `email`) that your SVAHNAR agent will include in its payload.
-
-    :::info
-    These fields inform Zapier about the expected data, enabling you to map them in subsequent actions.
-    :::
-
-2.  **Enter Zap ID**:
-    *   Locate the **Zap ID** field and paste the unique identifier you copied from your Zap's URL (refer to [Core Concepts](#-core-concepts) for details).
+  1. Click on **Account**.
+  2. You will be asked to sign in to your SVAHNAR account.
+  3. Use your **API Key** from the SVAHNAR platform.
 
 
-### Step 4: Test & Map
+  Check the [Quickstart](/docs/GetStarted/Quickstart) to learn how to generate your API Key.
+  </Step>
 
-1. Click **Test trigger**.
-2. Zapier will look for a recent request or use the sample data you provided in the fields configuration.
-3. Verify that you see the data (e.g., `first_name: John`).
-4. Continue to add an **Action** (e.g., Google Sheets, Slack) and map the fields from the trigger to the action.
+  <Step>
 
-import Video from '@site/src/components/Video';
+### Configure Trigger
 
-{/* /docs.svahnar.com/ToolList/zapier.mp4 */}
-<Video src="https://content.svahnar.com/docs.svahnar.com/ToolList/zapier.mp4" />
+  1.  **Define Data Fields**:
+      *   In the "Trigger" section, specify the data fields your agent will send.
+      *   Under **Fields**, add the keys (e.g., `first_name`, `email`) that your SVAHNAR agent will include in its payload.
+
+      :::info
+      These fields inform Zapier about the expected data, enabling you to map them in subsequent actions.
+      :::
+
+  2.  **Enter Zap ID**:
+      *   Locate the **Zap ID** field and paste the unique identifier you copied from your Zap's URL (refer to [Core Concepts](#-core-concepts) for details).
+  </Step>
+
+  <Step>
+
+### Test & Map
+
+  1. Click **Test trigger**.
+  2. Zapier will look for a recent request or use the sample data you provided in the fields configuration.
+  3. Verify that you see the data (e.g., `first_name: John`).
+  4. Continue to add an **Action** (e.g., Google Sheets, Slack) and map the fields from the trigger to the action.
+
+  </Step>
+  <Video 
+    src="https://content.svahnar.com/docs.svahnar.com/ToolList/zapier.mp4" 
+    helpText="How to Configure SVAHNAR Trigger in Zapier"
+  />
+</Steps>
 
 -----
 
