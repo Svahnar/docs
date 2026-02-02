@@ -1,5 +1,5 @@
 ---
-title: "Execute Agent"
+title: "Run Agent"
 sidebarTitle: "Run Agent"
 description: "Execute a specific agent to perform its designated tasks."
 ---
@@ -12,6 +12,10 @@ To execute the agents you deployed, you can use the following code. This API all
 
 :::
 
+### Basic Execution (Without History)
+
+Use this for single-turn tasks where context from previous messages is not required.
+
 ```python title="Python" showLineNumbers
 from svahnar import Svahnar
 
@@ -23,9 +27,38 @@ response = client.agents.run(
 print(response)
 ```
 
+{/* ### With Agent History
+
+To maintain context across multiple interactions (e.g., a chatbot), you must pass the `agent_history` parameter.
+
+:::tip
+For detailed instructions on how to construct and manage the `agent_history` structure, please refer to the **[Chat History Guide](./chat_history.mdx)**.
+:::
+
+```python title="Python" showLineNumbers
+from svahnar import Svahnar
+
+client = Svahnar()
+
+# 'chat_history' should be constructed using the generate_chat_history helper
+# or formatted manually as a list of dictionaries.
+# See docs/Agents/chat_history.mdx for details.
+
+response = client.agents.run(
+    agent_id="b06b8e39-51a7-4b6a-8474-e6340a6b9fa6",
+    message="What are the key goals?",
+    agent_history=[
+        {"role": "user", "content": "Tell me about Stargate Project"},
+        {"role": "assistant", "content": "Information search agent - The Stargate Project is..."}
+    ]
+)
+print(response)
+``` */}
+
 ### Request Parameters
 - **`agent_id`**: The unique identifier of the agent you want to execute. This ID is assigned when you create the agent.
 - **`message`**: The input data or message you want to send to the agent for processing. Currently it only supports string input.
+{/* - **`agent_history`**: Optional. JSON‐encoded list of prior messages; defaults to empty list. */}
 
 ### Response
 
@@ -33,53 +66,10 @@ print(response)
 ``` json title="json" showLineNumbers
 {
     "response": [
-        {
-            "Supervisor_agent_1": {
-                "next": "Web_Search_Agent"
-            }
-        },
-        {
-            "Web_Search_Agent": {
-                "messages": [
-                    {
-                        "content": "It seems there was an error while trying to write the content to a text file. However, I can provide you with the content here, and you can manually save it to a text file if you wish.\n\n### Content for the Text File\n\n```\nOverview of the Stargate Project\n\n- Announcement: The Stargate Project was formally announced on January 21, 2025, by U.S. President Donald Trump.\n- Partnership: It is a joint venture involving OpenAI, SoftBank, Oracle, and investment firm MGX.\n- Investment: The project plans to invest up to $500 billion in AI infrastructure in the United States over the next four years.\n- Goals: The initiative aims to enhance AI innovation, secure American leadership in AI, create hundreds of thousands of jobs, and generate significant economic benefits globally.\n\nInfrastructure Development\n\n- Data Centers: The project will involve the construction of multiple large-scale data centers across the U.S., with initial investments focusing on two data centers in Abilene, Texas.\n- Funding: An initial $100 billion is being deployed immediately for the construction of these facilities, with plans for additional funding as the project progresses.\n\nStrategic Importance\n\n- National Security: The Stargate Project is positioned not only as an economic initiative but also as a strategic capability to protect national security.\n- Healthcare Impact: The project is expected to have transformative effects on healthcare technology, particularly in cancer research and treatment.\n\nKey Participants\n\n- Leadership: SoftBank's CEO, Masayoshi Son, will serve as the chairman of the venture.\n- Collaboration: OpenAI is looking to partner with various firms across the data center infrastructure landscape, including those involved in power, land, construction, and equipment.\n```\n\nYou can copy this text into a text editor (like Notepad or TextEdit) and save it as a `.txt` file. If you need further assistance, feel free to ask!"
-                    }
-                ]
-            }
-        },
-        {
-            "Supervisor_agent_1": {
-                "next": "Web_Search_Agent"
-            }
-        },
-        {
-            "Web_Search_Agent": {
-                "messages": [
-                    {
-                        "content": "I encountered an issue while trying to write the content to a text file. However, I can provide you with the content here, and you can easily copy it into a text file on your own. \n\n### Content for the Text File\n\n```\n### Stargate Project Overview\n\n- **Announcement**: The Stargate Project was formally announced on January 21, 2025, by U.S. President Donald Trump.\n- **Partnership**: It is a joint venture involving OpenAI, SoftBank, Oracle, and investment firm MGX.\n- **Investment**: The project plans to invest up to $500 billion in AI infrastructure in the United States by 2029.\n- **Goals**: The initiative aims to enhance AI innovation, secure American leadership in AI, create hundreds of thousands of jobs, and generate significant economic benefits globally.\n\n### Infrastructure Development\n\n- **Data Centers**: The project will involve the construction of multiple large-scale data centers across the U.S., with initial investments focusing on two data centers in Abilene, Texas.\n- **Funding**: An initial $100 billion is being deployed immediately for the construction of these facilities, with plans for additional funding as the project progresses.\n\n### Strategic Importance\n\n- **National Security**: The Stargate Project is positioned not only as an economic initiative but also as a strategic capability to protect national security.\n- **Healthcare Impact**: The project is expected to have transformative effects on healthcare technology, particularly in cancer research and treatment.\n\n### Key Participants\n\n- **Leadership**: SoftBank's CEO, Masayoshi Son, will serve as the venture's chairman.\n- **Collaboration**: OpenAI is looking to partner with various firms across the data center infrastructure landscape, including those involved in power, land, construction, and equipment.\n\n### Sources\n1. [Stargate LLC - Wikipedia](https://en.wikipedia.org/wiki/Stargate_LLC)\n2. [Energy Demands for OpenAI's Stargate Project - Certrec](https://www.certrec.com/blog/energy-demands-for-openai-stargate-project/)\n3. [Stargate AI explained: What's in the $500 billion project - TechTarget](https://www.techtarget.com/whatis/feature/Stargate-AI-explained-Whats-in-the-project)\n4. [Announcing The Stargate Project | OpenAI](https://openai.com/index/announcing-the-stargate-project/)\n5. [Stargate AI Project: The $500 Billion Gamble To Dominate The Future - Forbes](https://www.forbes.com/sites/emilsayegh/2025/01/22/stargate-ai-project-the-500-billion-gamble-to-dominate-the-future/)\n```\n\nYou can copy this text into a text editor (like Notepad or TextEdit) and save it as a `.txt` file. If you need any further assistance, feel free to ask!"
-                    }
-                ]
-            }
-        },
-        {
-            "Supervisor_agent_1": {
-                "next": "Content_Writing_Agent"
-            }
-        },
-        {
-            "Content_Writing_Agent": {
-                "messages": [
-                    {
-                        "content": "The content about the Stargate Project has been successfully written to a text file named `output.txt`. If you need further assistance or have any other requests, feel free to ask!"
-                    }
-                ]
-            }
-        },
-        {
-            "Supervisor_agent_1": {
-                "next": "__end__"
-            }
+        "supervisor_agent_1" : {
+
         }
+        
     ],
     "usage": {
         "credits_charged": [
@@ -100,6 +90,9 @@ print(response)
             }
         ],
         "total_credits_charged": 7
+    },
+    "additional_metadata": {
+        "thread_id": "000000-00000-00000-00000"
     }
 }
 ```
@@ -107,9 +100,7 @@ print(response)
 :::info
 The response may vary based on the agent's configuration and the input message provided. The example above is a sample output to illustrate the structure of the response. The actual content and the <u>**credits consumed**</u> may differ based on the agent's functionality and the input message.
 :::
-:::note
-    Writer tools will be available soon.
-:::
+
 
 ## Response Parameters
 

@@ -7,98 +7,149 @@ import Image from '@site/src/components/Image';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Set up your SVAHNAR environment and create your first agent in minutes using the SVAHNAR SDK. This guide will walk you through the steps to get started quickly.
+# Quickstart
 
-## Configure your development environment
-To start using the SVAHNAR SDK, you need to set up your development environment. This includes installing the necessary dependencies and getting your API key.
+Set up your SVAHNAR environment and deploy your first agent in minutes.
 
-Before you start with the development, you need to create and export an API key. This key will be used to authenticate your requests to the SVAHNAR API.
+This guide covers getting your credentials, installing the SDK, and running a simple Web Search agent.
+
+## 💡 Core Concepts
+
+Before diving in, it helps to understand the two main components you will use:
+
+1.  **API Key**: Your unique identity that authorizes your machine to talk to SVAHNAR's cloud.
+2.  **Agent YAML**: The blueprint file where you define *what* the agent does (its brain, tools, and instructions).
+
+---
+
+## 🚀 Setup & Installation
+
+Follow these steps to get your environment ready.
+
 <Steps>
     <Step>
 
 ### Get an API Key
 
-    Create a new API Key in the [SVAHNAR Platform](https://platform.svahnar.com/). Navigate to the API keys section in your account. Create a new API key and copy it.
+    1. Log in to the [SVAHNAR Platform](https://platform.svahnar.com/).
+    2. Navigate to **API Keys** in your account settings.
+    3. Click **Create New Key** and copy it immediately.
 
-    <Image src="https://content.svahnar.com/docs.svahnar.com/create_api_key.gif" helpText="API Key Generation" />
+    <Image src="https://content.svahnar.com/docs.svahnar.com/create_api_key.gif" helpText="Generating a SVAHNAR API Key" />
     </Step>
+
     <Step>
 
-### Export the API key
+### Export the API Key
 
-    Export the API key as an environment variable
+    Make the key accessible to the SDK by exporting it as an environment variable.
+
     <Tabs>
         <TabItem value="mac/linux" label="macOS / Linux" default>
-            ```js title="Export an env variable on macOS or Linux systems"
+            ```bash title="Terminal"
             export SVAHNAR_API_KEY="your_api_key_here"
             ```    
         </TabItem>
-        <TabItem value="windows" label="Windows">
-            ```js title="Export an env variable in PowerShell"
-            setx SVAHNAR_API_KEY "your_api_key_here"
+        <TabItem value="windows" label="Windows (PowerShell)">
+            ```powershell title="PowerShell"
+            $Env:SVAHNAR_API_KEY = "your_api_key_here"
             ```
+            
+            :::tip Persistent Variable
+            To make this change permanent on Windows, use:
+            `setx SVAHNAR_API_KEY "your_api_key_here"`
+            :::
         </TabItem>
     </Tabs>
     </Step>
+
     <Step>
 
-### Install the SVAHNAR SDK
+### Install the SDK
 
-    Install the SVAHNAR SDK using pip. Open your terminal and run the following command:
+    Install the Python package using pip.
+
     <Tabs>
         <TabItem value="pip" label="Python" default>
-            ```bash title="Install the SVAHNAR SDK using pip"
+            ```bash title="Terminal"
             pip install svahnar
             ```
         </TabItem>
     </Tabs>
     </Step>
+
     <Step>
 
-### Create your first agent
+### Create Your First Agent
 
-    To verify that the SVAHNAR SDK is installed correctly, create a file `test.py` and add the following code:
-    ```python title="test.py" showLineNumbers
-    from svahnar import Svahnar
-    from pathlib import Path
+    We will create a simple **Web Search Agent**. This requires two files: a configuration file (`agent.yaml`) and a python script (`test.py`) to run it.
 
-    client = Svahnar()
+    **1. Define the Agent (`agent.yaml`)**
+    Create a file named `agent.yaml` and paste the following configuration:
 
-    response = client.agents.create(
-        name="Web Search Agent",
-        description="This Agent is used to search for the information on web or internet and provide the result",
-        deploy_to="Organization",
-        yaml_content=Path("agent.yaml")
-    )
-    print(response)
-    ```
-    Execute the code with `python test.py`. In a few moments, you should see the output of your API request.
-    :::info
-    Make sure to replace `agent.yaml` with the path to your agent configuration file.
-    You can find the example agent configuration YAML below
-    :::
-
-
-    ```yaml showLineNumbers title="agent.yaml" showLineNumbers
-    create_vertical_agent_network:
+    ```yaml title="agent.yaml" showLineNumbers
+    create_agent_network:
         agent-1:
             agent_name: "Web_search"
             LLM_config:
                 params:
-                model: "gpt-5"
-                max_tokens: 1000
-                request_timeout: 600
+                    model: "gpt-5"
+                    max_tokens: 1000
+                    request_timeout: 600
             tools:
-            tool_assigned:
-                - name: "Tavily"
-                config:
-                    max_results: 5
+                tool_assigned:
+                    - name: "Tavily"
+                      config:
+                        max_results: 5
             agent_function:
-            - "Your function is to search the web or internet for information"
+                - "Your function is to search the web or internet for information"
             incoming_edge:
-            - "Start"
+                - "Start"
             outgoing_edge: []
     ```
+
+    **2. Run the Agent (`test.py`)**
+    Create a file named `test.py` to initialize the SDK and deploy the agent.
+
+    ```python title="test.py" showLineNumbers
+    from svahnar import Svahnar
+    from pathlib import Path
+
+    # Initialize the client (automatically picks up env variable)
+    client = Svahnar()
+
+    # Create and deploy the agent
+    response = client.agents.create(
+        name="Web Search Agent",
+        description="This Agent searches the web for information.",
+        deploy_to="Organization",
+        yaml_content=Path("agent.yaml")
+    )
+
+    print(response)
+    ```
+
+    **3. Execute**
+    Run the script in your terminal to create your first Agent:
+    ```bash
+    python test.py
+    ```
+
     </Step>
 
 </Steps>
+
+---
+
+## 🚑 Troubleshooting
+
+* **ModuleNotFoundError: No module named 'svahnar'**
+    * Ensure you ran `pip install svahnar`.
+    * If you are using a virtual environment, make sure it is activated.
+
+* **Authentication Error / 401**
+    * Check that you exported the `SVAHNAR_API_KEY` correctly.
+    * Try printing `os.environ.get('SVAHNAR_API_KEY')` in Python to verify the script can see it.
+
+* **FileNotFoundError: agent.yaml**
+    * Ensure `agent.yaml` is in the same directory as your `test.py` script, or provide the full absolute path in `Path()`.

@@ -72,6 +72,7 @@ const config: Config = {
         ],
       },
     ],
+    // 'docusaurus-markdown-source-plugin',
   ],
 
   themeConfig: {

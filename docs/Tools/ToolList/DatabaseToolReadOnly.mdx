@@ -1,59 +1,109 @@
+import { Steps, Step } from '@site/src/components/Steps/Steps';
+
+# Database (Read-Only)
+
+Give your agents the power to **analyze data** securely by connecting them to your SQL databases in a restricted, read-only mode.
+
+This tool allows agents to execute `SELECT` queries to retrieve information without any risk of altering, deleting, or corrupting your data.
+
+## 💡 Core Concepts
+
+To use this tool effectively, understanding these safety mechanisms is helpful.
+
+### 1. What is "Read-Only" Protection?
+This tool is strictly designed for analysis. It includes a safety layer that **blocks** any operations that might change data.
+* **Allowed:** `SELECT`, `SHOW`, `DESCRIBE`, `EXPLAIN`
+* **Blocked:** `INSERT`, `UPDATE`, `DELETE`, `DROP`, `ALTER`
+
+If an agent attempts a destructive command, the tool will reject it automatically.
+
 ---
-title: "DatabaseToolReadOnly"
-sidebarTitle: List of Tools
+
+## ⚙️ Configuration Steps
+
+Follow these steps to safely connect your database.
+
+<Steps>
+  <Step>
+    
+### Prepare Connection String (URI)
+
+To connect, you need a standard database Connection URI. This tells SVAHNAR where your database lives and how to access it.
+
+**Format:** `dialect+driver://username:password@host:port/database`
+
+**Examples:**
+* **PostgreSQL:** `postgresql+psycopg2://user:pass@localhost:5432/mydb`
+* **MySQL:** `mysql+pymysql://user:pass@localhost:3306/mydb`
+
+:::tip
+Ensure the database user you provide in the URI has sufficient privileges to read the tables you want the agent to access.
+:::
+
+  </Step>
+
+<Step>
+
+### Configure Tool in YAML
+
+In your agent configuration, assign the `DatabaseToolReadOnly` and provide the URI in the `tool_config`.
+
+* **db_uri**: (Required) Your connection string.
+
+</Step>
+</Steps>
+
 ---
 
-Read-only access to SQL databases. Use this tool to run SELECT/SHOW/DESCRIBE queries and return structured results.
+## 📚 Practical Recipes (Examples)
 
-## Usage
+### Recipe 1: The Data Analyst Agent
 
-Provide `db_uri` in tool config and pass a `query` string payload.
-
-Example payload:
-
-```json
-{ "query": "SELECT id, name FROM users LIMIT 10" }
-```
-
-### Notes
-- Only read operations are allowed. Non-SELECT queries will be rejected.
-- On SQL errors the tool returns the error message and a schema hint to help fix queries.
-
-## YAML usage
+> **Use Case:** An agent that answers questions about sales data by querying a PostgreSQL database.
 
 ```yaml showLineNumbers
-tools:
-  tool_assigned:
-    - name: "DatabaseToolReadOnly"
-      config:
-        db_uri: "postgresql+psycopg2://user:pass@db.example.com:5432/mydb"
-```
-
-Invocation payload:
-
-```yaml showLineNumbers
-payload:
-	query: "SELECT id, name FROM users LIMIT 10"
-```
-
-### More details
-
-Only read operations are allowed; the tool rejects non-SELECT SQL to protect data from accidental mutation.
-
-## Agent integration example
-
-```yaml showLineNumbers
-create_vertical_agent_network:
+create_agent_network:
   agent-1:
-    agent_name: "db_reader"
+    agent_name: sales_analyst
     LLM_config:
       params:
-        model: "gpt-5-mini"
+        model: gpt-4o
     tools:
       tool_assigned:
-        - name: "DatabaseToolReadOnly"
+        - name: DatabaseToolReadOnly
           config:
-            db_uri: "postgresql+psycopg2://user:pass@db.example.com:5432/mydb"
+            # The connection string to your sales database
+            db_uri: "postgresql+psycopg2://admin:securepass@db.example.com:5432/sales_db"
     agent_function:
-      - "Run read-only queries against the database and return results."
+      - You are a data analyst. Use the database tool to answer questions about monthly revenue and top-selling products.
+      - If a query fails, use the schema provided in the error to correct your SQL.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+
 ```
+
+### 💡 Tip: Handling Complex Queries
+
+For complex data questions, instruct your agent in the `agent_function` to "break down the request into smaller SQL queries" rather than trying to write one massive JOIN statement immediately.
+
+---
+
+## 🚑 Troubleshooting
+
+* **Error: "Only SELECT queries are allowed..."**
+    * The agent attempted to change data (e.g., `UPDATE` or `DELETE`).
+    * *Fix:* This is working as intended. Ensure your prompt doesn't ask the agent to modify records.
+
+
+* **Error: "Missing required field: 'db_uri'"**
+    * You forgot to add the `db_uri` to the `config` section of your YAML file.
+    * *Fix:* Check your YAML indentation and spelling.
+
+
+* **Connection Refused / Timeouts**
+    * SVAHNAR might not have network access to your database.
+    * *Fix:* If your database is behind a firewall or on a private network (like a local `192.168.x.x` address), ensure you have allowed traffic from the SVAHNAR IP or use a public connection string.
+    * For dedicated IP addresses, please contact SVAHNAR support to get a list of IPs to whitelist in your firewall (Only for Teams and Enterprise plans).
+
+

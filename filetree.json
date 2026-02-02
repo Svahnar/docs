@@ -1,0 +1,576 @@
+{
+  "name": "docs",
+  "path": "/home/ubuntu/svahnar/docs",
+  "type": "directory",
+  "children": [
+    {
+      "name": ".github",
+      "type": "folder",
+      "children": [
+        {
+          "name": "workflows",
+          "type": "folder",
+          "children": [
+            {
+              "name": "deploy.yaml",
+              "type": "file"
+            },
+            {
+              "name": "test-deploy.yml",
+              "type": "file"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "blog",
+      "type": "folder",
+      "children": [
+        {
+          "name": "2021-08-26-welcome",
+          "type": "folder",
+          "children": [
+            {
+              "name": "docusaurus-plushie-banner.jpeg",
+              "type": "file"
+            },
+            {
+              "name": "index.md",
+              "type": "file"
+            }
+          ]
+        },
+        {
+          "name": "2019-05-28-first-blog-post.md",
+          "type": "file"
+        },
+        {
+          "name": "2019-05-29-long-blog-post.md",
+          "type": "file"
+        },
+        {
+          "name": "2021-08-01-mdx-blog-post.mdx",
+          "type": "file"
+        },
+        {
+          "name": "authors.yml",
+          "type": "file"
+        },
+        {
+          "name": "tags.yml",
+          "type": "file"
+        }
+      ]
+    },
+    {
+      "name": "docs",
+      "type": "folder",
+      "children": [
+        {
+          "name": "AgenticNetwork",
+          "type": "folder",
+          "children": [
+            {
+              "name": "Configuration",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "Agent_function.mdx",
+                  "type": "file"
+                },
+                {
+                  "name": "Edges.mdx",
+                  "type": "file"
+                },
+                {
+                  "name": "Initialization.mdx",
+                  "type": "file"
+                },
+                {
+                  "name": "LLM.mdx",
+                  "type": "file"
+                },
+                {
+                  "name": "Tools.mdx",
+                  "type": "file"
+                }
+              ]
+            },
+            {
+              "name": "images",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "AI-Agent.jpg",
+                  "type": "file"
+                }
+              ]
+            },
+            {
+              "name": "Agent_configuration.mdx",
+              "type": "file"
+            },
+            {
+              "name": "Create_agentic_network.mdx",
+              "type": "file"
+            },
+            {
+              "name": "Create_simple_agent.mdx",
+              "type": "file"
+            },
+            {
+              "name": "introduction.mdx",
+              "type": "file"
+            }
+          ]
+        },
+        {
+          "name": "Agents",
+          "type": "folder",
+          "children": [
+            {
+              "name": "chat_history.mdx",
+              "type": "file"
+            },
+            {
+              "name": "create_agent.mdx",
+              "type": "file"
+            },
+            {
+              "name": "delete_agent.mdx",
+              "type": "file"
+            },
+            {
+              "name": "get_agent_details.mdx",
+              "type": "file"
+            },
+            {
+              "name": "list_agents.mdx",
+              "type": "file"
+            },
+            {
+              "name": "run_agent.mdx",
+              "type": "file"
+            },
+            {
+              "name": "test_agent.mdx",
+              "type": "file"
+            },
+            {
+              "name": "update_agent_info.mdx",
+              "type": "file"
+            },
+            {
+              "name": "validate_config.mdx",
+              "type": "file"
+            }
+          ]
+        },
+        {
+          "name": "GetStarted",
+          "type": "folder",
+          "children": [
+            {
+              "name": "customcss",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "modelList.module.css",
+                  "type": "file"
+                }
+              ]
+            },
+            {
+              "name": "images",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "1.png",
+                  "type": "file"
+                },
+                {
+                  "name": "2.gif",
+                  "type": "file"
+                }
+              ]
+            },
+            {
+              "name": "Models.mdx",
+              "type": "file"
+            },
+            {
+              "name": "Overview.mdx",
+              "type": "file"
+            },
+            {
+              "name": "Quickstart.mdx",
+              "type": "file"
+            }
+          ]
+        },
+        {
+          "name": "Keyvault",
+          "type": "folder",
+          "children": [
+            {
+              "name": "Keyvault.mdx",
+              "type": "file"
+            }
+          ]
+        },
+        {
+          "name": "Knowledge Repository",
+          "type": "folder",
+          "children": [
+            {
+              "name": "Connectors",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "AWS S3.mdx",
+                  "type": "file"
+                },
+                {
+                  "name": "Confluence.mdx",
+                  "type": "file"
+                },
+                {
+                  "name": "Sharepoint.mdx",
+                  "type": "file"
+                },
+                {
+                  "name": "URL.mdx",
+                  "type": "file"
+                }
+              ]
+            },
+            {
+              "name": "Overview.mdx",
+              "type": "file"
+            },
+            {
+              "name": "Upload files.mdx",
+              "type": "file"
+            }
+          ]
+        },
+        {
+          "name": "Tools",
+          "type": "folder",
+          "children": [
+            {
+              "name": "ToolList",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "API.mdx",
+                  "type": "file"
+                },
+                {
+                  "name": "AWS_Lambda.mdx",
+                  "type": "file"
+                },
+                {
+                  "name": "AWS_SES_send_email.mdx",
+                  "type": "file"
+                },
+                {
+                  "name": "Arxiv.mdx",
+                  "type": "file"
+                },
+                {
+                  "name": "DatabaseTool.mdx",
+                  "type": "file"
+                },
+                {
+                  "name": "DatabaseToolReadOnly.mdx",
+                  "type": "file"
+                },
+                {
+                  "name": "GitHubTool.mdx",
+                  "type": "file"
+                },
+                {
+                  "name": "JiraTool.mdx",
+                  "type": "file"
+                },
+                {
+                  "name": "KnowledgeRepo.mdx",
+                  "type": "file"
+                },
+                {
+                  "name": "Outlook.mdx",
+                  "type": "file"
+                },
+                {
+                  "name": "Pinecone.mdx",
+                  "type": "file"
+                },
+                {
+                  "name": "Tavily.mdx",
+                  "type": "file"
+                },
+                {
+                  "name": "Twilio_sms.mdx",
+                  "type": "file"
+                },
+                {
+                  "name": "Twilio_whatsapp.mdx",
+                  "type": "file"
+                },
+                {
+                  "name": "Wikipedia.mdx",
+                  "type": "file"
+                },
+                {
+                  "name": "Zapier.mdx",
+                  "type": "file"
+                },
+                {
+                  "name": "webpage_search.mdx",
+                  "type": "file"
+                }
+              ]
+            },
+            {
+              "name": "Understanding_Tools.mdx",
+              "type": "file"
+            },
+            {
+              "name": "list_of_tools.mdx",
+              "type": "file"
+            }
+          ]
+        },
+        {
+          "name": "additional",
+          "type": "folder",
+          "children": [
+            {
+              "name": "YAML_Conversion_Guide.mdx",
+              "type": "file"
+            }
+          ]
+        },
+        {
+          "name": "_heading_basics.mdx",
+          "type": "file"
+        }
+      ]
+    },
+    {
+      "name": "plugins",
+      "type": "folder",
+      "children": [
+        {
+          "name": "docusaurus-markdown-source-plugin",
+          "type": "folder"
+        }
+      ]
+    },
+    {
+      "name": "releasenotes",
+      "type": "folder",
+      "children": [
+        {
+          "name": "intro.md",
+          "type": "file"
+        }
+      ]
+    },
+    {
+      "name": "src",
+      "type": "folder",
+      "children": [
+        {
+          "name": "components",
+          "type": "folder",
+          "children": [
+            {
+              "name": "HomepageFeatures",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "index.tsx",
+                  "type": "file"
+                },
+                {
+                  "name": "styles.module.css",
+                  "type": "file"
+                }
+              ]
+            },
+            {
+              "name": "Steps",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "Steps.css",
+                  "type": "file"
+                },
+                {
+                  "name": "Steps.tsx",
+                  "type": "file"
+                }
+              ]
+            },
+            {
+              "name": "Card.tsx",
+              "type": "file"
+            },
+            {
+              "name": "Image.tsx",
+              "type": "file"
+            },
+            {
+              "name": "VersionedLink.tsx",
+              "type": "file"
+            },
+            {
+              "name": "Video.tsx",
+              "type": "file"
+            }
+          ]
+        },
+        {
+          "name": "css",
+          "type": "folder",
+          "children": [
+            {
+              "name": "custom.css",
+              "type": "file"
+            }
+          ]
+        },
+        {
+          "name": "pages",
+          "type": "folder",
+          "children": [
+            {
+              "name": "index.module.css",
+              "type": "file"
+            },
+            {
+              "name": "index.tsx",
+              "type": "file"
+            },
+            {
+              "name": "markdown-page.md",
+              "type": "file"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "static",
+      "type": "folder",
+      "children": [
+        {
+          "name": "icons",
+          "type": "folder",
+          "children": [
+            {
+              "name": "right_arrow.svg",
+              "type": "file"
+            }
+          ]
+        },
+        {
+          "name": "img",
+          "type": "folder",
+          "children": [
+            {
+              "name": "dark.svg",
+              "type": "file"
+            },
+            {
+              "name": "docusaurus-social-card.jpg",
+              "type": "file"
+            },
+            {
+              "name": "docusaurus.png",
+              "type": "file"
+            },
+            {
+              "name": "favicon.ico",
+              "type": "file"
+            },
+            {
+              "name": "light.svg",
+              "type": "file"
+            },
+            {
+              "name": "logo.svg",
+              "type": "file"
+            },
+            {
+              "name": "undraw_docusaurus_mountain.svg",
+              "type": "file"
+            },
+            {
+              "name": "undraw_docusaurus_react.svg",
+              "type": "file"
+            },
+            {
+              "name": "undraw_docusaurus_tree.svg",
+              "type": "file"
+            }
+          ]
+        },
+        {
+          "name": ".nojekyll",
+          "type": "file"
+        }
+      ]
+    },
+    {
+      "name": ".gitignore",
+      "type": "file"
+    },
+    {
+      "name": "=20",
+      "type": "file"
+    },
+    {
+      "name": "CNAME",
+      "type": "file"
+    },
+    {
+      "name": "LICENSE",
+      "type": "file"
+    },
+    {
+      "name": "README.md",
+      "type": "file"
+    },
+    {
+      "name": "docusaurus.config.ts",
+      "type": "file"
+    },
+    {
+      "name": "package-lock.json",
+      "type": "file"
+    },
+    {
+      "name": "package.json",
+      "type": "file"
+    },
+    {
+      "name": "sidebars.ts",
+      "type": "file"
+    },
+    {
+      "name": "tsconfig.json",
+      "type": "file"
+    }
+  ],
+  "metadata": {
+    "generated": "2026-02-01T00:32:59.159Z",
+    "generator": "FileTree Pro Extension",
+    "version": "0.2.0",
+    "showIcons": false,
+    "maxDepth": 10
+  }
+}

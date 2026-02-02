@@ -1,94 +1,112 @@
+import Video from '@site/src/components/Video';
+import { Steps, Step } from '@site/src/components/Steps/Steps';
+
+# GitHub Tool
+
+Empower your agents to manage code, track issues, and automate workflows directly within your **GitHub repositories**.
+
+This guide covers authenticating with a GitHub App, configuring permissions, and performing file operations.
+
+## 💡 Core Concepts
+
+To configure this tool, you need to understand the authentication mechanism.
+
+### 1. Why a GitHub App?
+
+Unlike personal access tokens, a **GitHub App** provides a secure, permission-scoped identity for your agent. It allows the agent to act as a "bot" user, ensuring your personal credentials remain private while giving the agent specific access to read code, write files, or manage issues.
+
+### 2. Key Credentials
+
+* **App ID:** A unique 6-digit number identifying your GitHub App.
+* **Private Key:** A secure certificate (`.pem` file) used to sign requests and prove the agent's identity.
+
 ---
-title: "GitHubTool"
-sidebarTitle: List of Tools
+
+## ⚙️ Configuration Steps
+
+Follow these steps to create your app and link it to SVAHNAR.
+
+<Steps>
+<Step>
+
+### Create a GitHub App
+
+1. Go to your GitHub [Developer Settings](https://github.com/settings/apps) and click **New GitHub App**.
+2. **Name**: Give your app a unique name (e.g., "Svahnar-Agent").
+3. **Homepage URL**: You can use your company URL (e.g., `https://svahnar.com`).
+4. **Webhook**: You can uncheck "Active" for now unless you have a specific webhook workflow.
+
+</Step>
+
+<Step>
+
+### Configure Permissions
+
+In the **Permissions** section of your app settings, grant the following access:
+
+* **Repository permissions:**
+* `Contents`: **Read and Write** (Required for reading/writing files)
+* `Issues`: **Read and Write** (Required for issue management)
+* `Pull requests`: **Read and Write** (Required for PRs)
+* `Metadata`: **Read-only** (Mandatory)
+* `Commit statuses`: **Read-only**
+
+
+
+</Step>
+
+<Step>
+
+### Install & Get Credentials
+
+1. **Install App:** Go to the **Install App** tab in your sidebar and install it on the specific repository you want the agent to access.
+2. **Get App ID:** On the **General** tab, find and copy the **App ID** (e.g., `123456`).
+3. **Generate Private Key:** Scroll down to "Private keys" and click **Generate a private key**. This will download a `.pem` file. Open this file with a text editor and copy the *entire* content (including `-----BEGIN RSA PRIVATE KEY-----`).
+
+</Step>
+</Steps>
+
 ---
 
-A multifunction GitHub tool to read, write, update, delete files, list files, create issues, and open pull requests in your provided repository.
+## 📚 Practical Recipes (Examples)
 
-## Authentication
+### Recipe 1: Basic Tool Configuration
 
-Tool config must include `repo` (owner/repo), `APP_ID` and `PRIVATE_KEY` (GitHub App private key). Optionally provide `Branch`.
-
-## Operations
-
-- `read_file`: Return file contents.
-- `write_file`: Create a new file (supply `file_query`).
-- `update_file`: Update file using `update_file_query` format.
-- `delete_file`: Delete a file.
-- `list_files_in_bot_branch`: List files in the bot branch.
-- Issue and PR operations are supported as well.
-
-## Usage
-1. Create a Github App
-[Follow the instructions here](https://docs.github.com/en/apps/creating-github-apps/registering-a-github-app/registering-a-github-app) to create and register a Github app. Make sure your app has the following repository permissions:
-
-- Commit statuses (read only)
-- Contents (read and write)
-- Issues (read and write)
-- Metadata (read only)
-- Pull requests (read and write)
-- Once the app has been registered, you must give your app permission to access each of the repositories you whish it to act upon. Use the App settings on github.com here.
-
-2. Required parameters
-Before initializing your agent, the following environment variables need to be set:
-
-- GITHUB_APP_ID- A six digit number found in your app's general settings
-- GITHUB_APP_PRIVATE_KEY- The private key present in .pem file, full text of that file content as a string.
-- GITHUB_REPOSITORY- The name of the Github repository you want your bot to act upon. Must follow the format `username/reponame`. Make sure the app has been added to this repository first!
-- Optional: GITHUB_BRANCH- The branch where the bot will make its commits. Defaults to main.
-
-
-## YAML usage
+> **Use Case:** Configuring the agent to access a specific repository.
 
 ```yaml showLineNumbers
 tools:
   tool_assigned:
     - name: "GitHubTool"
       config:
-        repo: "owner/repo"
-        PRIVATE_KEY: "${GITHUB_PRIVATE_KEY}"
+        # The repository format must be "owner/repo_name"
+        repo: "svahnar/docs-repo"
+        
+        # Your 6-digit App ID
         APP_ID: "123456"
-        Branch: "main"
+        
+        # Storing the PEM key in an environment variable is recommended
+        PRIVATE_KEY: "${GITHUB_PRIVATE_KEY}"
+        
+        # Optional: Defaults to 'main' if omitted
+        Branch: "main" 
+
 ```
 
-Invocation payload examples
+---
 
-Read a file
+## 🚑 Troubleshooting
 
-```yaml showLineNumbers
-payload:
-	operation: "read_file"
-	file_path: "README.md"
-```
+* **"Resource not accessible by integration"**
+    * Ensure you have **Installed** the app on the specific repository (Step 3 above). Creating the app is not enough; it must be installed.
+    * Check that your **Permissions** (Contents, Issues) are set to "Read and Write".
 
-Create a new file
 
-```yaml showLineNumbers
-payload:
-	operation: "write_file"
-	file_query: "/docs/newfile.md\nNew content here"
-```
+* **Authentication Failed**
+    * Verify the `PRIVATE_KEY`. It must include the header `-----BEGIN RSA PRIVATE KEY-----` and footer `-----END RSA PRIVATE KEY-----`.
+    * Ensure the `APP_ID` matches the app you created.
 
-### More details
 
-This tool uses a GitHub App private key for authentication. Keep keys secure and avoid embedding them directly in YAML stored in source control. Responses may include SystemMessage objects instructing the agent not to call the tool again when a write/create operation completes.
-
-## Agent integration example
-
-```yaml showLineNumbers
-create_vertical_agent_network:
-  agent-1:
-    agent_name: "repo_agent"
-    LLM_config:
-      params:
-        model: "gpt-5-mini"
-    tools:
-      tool_assigned:
-        - name: "GitHubTool"
-          config:
-            repo: "owner/repo"
-            PRIVATE_KEY: "${GITHUB_PRIVATE_KEY}"
-    agent_function:
-      - "Perform repository read/write operations as requested."
-```
-
+* **File Not Found**
+    * Check the `Branch` in your configuration. If your repo uses `master` instead of `main`, you must specify it in the config.
+    * Ensure the `file_path` includes the full relative path (e.g., `src/components/App.tsx`).

@@ -7,133 +7,133 @@ import React from 'react';
 
 import { Steps, Step } from '../../src/components/Steps/Steps.tsx';
 
-In this guide, we will learn how to create a simple agent using the Svahnar Agentic AI Framework. This example walks through configuring a basic `Web_search` agent using YAML configuration. The agent will use a large language model (LLM), integrated tools, and predefined tasks to search the internet for information.
+Learn how to build your first autonomous agent that can search the internet using the SVAHNAR framework.
 
-## Creating web search agent
+This guide walks you through configuring a basic **Web Search** agent. The agent will use a Large Language Model (LLM) to reason, tools to access live data, and a natural language instruction to execute its task.
 
-Below is an example YAML configuration for the `Web_search` agent:
+## 💡 Core Concepts
 
-```yaml showLineNumbers create_first_agent.yaml
-create_vertical_agent_network:
-  agent-1:
-    agent_name: "Web_search"
-    LLM_config:
-        params:
-          model: "gpt-5"
-          max_tokens: 1000
-          request_timeout: 600
-    tools:
-      tool_assigned:
-        - name: "Tavily"
-          config:
-            max_results: 5
-    agent_function:
-      - "Your function is to search the web or internet for information"
-    incoming_edge:
-      - "Start"
-    outgoing_edge: []
-```
+Before writing the configuration, it is helpful to understand the structure of a SVAHNAR agent.
 
-This configuration creates a simple agent named `Web_search`, which performs a specific function—searching the web for information—using the specified configurations. Let’s go through the steps below to understand how to implement this.
+### 1. The Agent Network
+Every agent lives inside a network container. The top-level key `create_agent_network` defines this boundary. Think of it as the "team" that your agent belongs to.
 
+Even a single agent exists inside a `create_agent_network` block. This allows you to easily scale from one agent to many without rewriting your code.
 
+### 2. The Agent "Anatomy"
+A simple agent requires four key components to function:
+* **LLM Config:** The "Brain" (e.g., GPT-5).
+* **Tools:** The "Hands" (e.g., Web Search).
+* **Function:** The "Mission" (Instructions in plain English).
+* **Edges:** The "Flow" (When to start and stop).
 
+---
 
-<Steps titleSize="h2">
+## ⚙️ Configuration Steps
 
-<Step title="Initialize the Agent Network">
-To begin, initialize the **Agentic Network** by defining the top-level key `create_vertical_agent_network`. This key acts as a container for all agents in your network.
+Follow these steps to build your agent from scratch using YAML.
 
-Next, define your first agent. Use a unique identifier (e.g., `agent-1`) and specify the agent name. For this example, the agent is called `Web_search`.
+<Steps>
+<Step>
+
+### Initialize the Network
+
+First, define the network container and your agent's ID.
+
+* **`create_agent_network`**: The root of your configuration.
+* **`agent-1`**: A unique ID for the agent within this network.
+* **`agent_name`**: A human-readable name (e.g., "Web_search").
 
 ```yaml showLineNumbers
-create_vertical_agent_network:
+create_agent_network:
   agent-1:
     agent_name: "Web_search"
 ```
-
-This creates the foundational structure of your network. The `agent_name` provides a human-readable unique identifier for the agent.
-
-For detailed information, refer to [Initialization Documentation](/docs/AgenticNetwork/Configuration/Initialization).
-
+:::info
+For deep dives on network structure, see  [Initialization](/docs/AgenticNetwork/Configuration/Initialization).
+:::
 
 </Step>
-<Step title="Configure the LLM for Reasoning">
-The next step is to configure the **Large Language Model (LLM)** that powers your agent. Configure the model, specific variant, and other hyperparameters. For example:
+<Step>
 
-```yaml showLineNumbers
+### Configure the "Brain" (LLM)
+Next, specify which model powers the agent. You can control parameters like max_tokens (response length) and request_timeout (patience).
+
+```YAML showLineNumbers
 LLM_config:
-    params:
-      model: "gpt-5"
-      max_tokens: 1000
-      request_timeout: 600
+  params:
+    model: "gpt-5"
+    max_tokens: 1000
+    request_timeout: 600
 ```
 
-Here’s what these parameters mean:
-- **model**: Specifies the model variant (`gpt-5` in this case).
-- **max_tokens**: Sets the maximum response length.
-- **request_timeout**: Defines the maximum duration (in seconds) for requests to the LLM.
-
-This configuration ensures that your agent generates concise, factual results for web searches.
-
-For more details, visit [LLM Configuration Documentation](/docs/AgenticNetwork/Configuration/LLM).
-
+:::info
+See the full list of supported models in [LLM Configuration](/docs/AgenticNetwork/Configuration/LLM).
+:::
 
 </Step>
-<Step title="Integrate Tools with the Agent">
-You can enhance the agent's functionality by assigning external tools. In this case, we integrate the `Tavily` tool for web searches and configure it to limit the number of results to 5:
 
-```yaml showLineNumbers
+<Step>
+
+### Equip Tools
+Give your agent capabilities beyond standard text generation. Here, we assign the Tavily tool to enable internet access.
+``` YAML showLineNumbers
 tools:
   tool_assigned:
     - name: "Tavily"
       config:
         max_results: 5
+        API_key: abcd # or API_key: ${TAVILY_API_KEY}
 ```
+max_results: Limits the search tool to the top 5 most relevant links to ensure concise answers.
 
-These settings allow the agent to retrieve and process search results efficiently within defined limits.
-
-For additional information, check out [Tools Documentation](/docs/AgenticNetwork/Configuration/Tools).
-
+:::info
+Explore other available tools in the [Tools Documentation](/docs/AgenticNetwork/Configuration/Tools).
+:::
 
 </Step>
-<Step title="Define the Agent's Function">
-Define the agent's purpose using the `agent_function` property. For the `Web_search` agent example:
 
-```yaml showLineNumbers
+<Step>
+
+### Define the Mission
+Tell the agent what to do using natural language in the agent_function block.
+``` YAML showLineNumbers
 agent_function:
   - "Your function is to search the web or internet for information"
 ```
-
-This directive clearly communicates the intended role of the agent within the network, enabling it to specialize in retrieving information.
-
-Explore more about defining agent functions at [Agent Function Documentation](/docs/AgenticNetwork/Configuration/Agent_function).
-
+:::tip
+Pro Tip Be specific. The clearer your instruction, the better the agent performs. Learn more in [Agent Function Documentation](/docs/AgenticNetwork/Configuration/Agent_function).
+:::
 
 </Step>
-<Step title="Specify Incoming and Outgoing Edges">
-Configure the data flow in your network by specifying **incoming edges** (triggers) and **outgoing edges** (connections to other agents or systems). For this agent:
 
+<Step>
+
+### Set the Flow (Edges)
+Finally, define how the agent connects to the rest of the world.
+
+#### incoming_edge: 
+We use "Start"(case-sensitive) to indicate this agent runs immediately when the application launches.
+
+#### outgoing_edge: 
+We leave this empty [] because this is a simple, standalone agent that doesn't pass work to anyone else.
 ```yaml showLineNumbers
-incoming_edge:
-  - "Start"
-outgoing_edge: []
+    incoming_edge:
+      - "Start"
+    outgoing_edge: []
 ```
-
-- The `incoming_edge` defines that the agent’s activity is triggered by the `"Start"` signal.
-- The `outgoing_edge` is left empty here, meaning the agent doesn’t send data to other network nodes.
-
-This configuration ensures that the agent operates as a stand-alone node triggered at the network’s beginning.
-
-Learn more about edges at [Incoming and Outgoing Edges Documentation](/docs/AgenticNetwork/Configuration/Edges).
-
+:::info
+To build complex workflows with multiple agents, read about [Incoming and Outgoing Edges](/docs/AgenticNetwork/Configuration/Edges).
+:::
 
 </Step>
-<Step title="Final YAML Configuration">
-Combine all the steps to finalize the YAML configuration for your simple `Web_search` agent:
+</Steps>
+## 📚 Practical Recipes (Examples)
+Full Web Search Agent
+Use Case: A standalone agent that accepts a user query, searches the web, and returns a summary.
 
 ```yaml showLineNumbers create_first_agent.yaml
-create_vertical_agent_network:
+create_agent_network:
   agent-1:
     agent_name: "Web_search"
     LLM_config:
@@ -146,6 +146,7 @@ create_vertical_agent_network:
         - name: "Tavily"
           config:
             max_results: 5
+            API_key: abcd # or API_key: ${TAVILY_API_KEY}
     agent_function:
       - "Your function is to search the web or internet for information"
     incoming_edge:
@@ -153,11 +154,12 @@ create_vertical_agent_network:
     outgoing_edge: []
 ```
 
-This configuration is now complete and ready to deploy. By using the Svahnar framework, your agent can seamlessly interact with the LLM, tools, and task structure defined in this YAML file.
-</Step>
+### 🚑 Troubleshooting
+* Agent not starting?
+  * Ensure incoming_edge is set to ["Start"] (case-sensitive). Without this, the agent waits for a signal that never comes.
 
-</Steps>
+* Search failing?
+  * Verify you have configured your Tavily API Key in your YAML configuration file or Key Vault.
 
----
-
-Once these steps are completed, you will have successfully created a simple agent named `Web_search` that utilizes a language model, an external web search tool, and pre-defined functions to gather information autonomously.
+* YAML Syntax Errors?
+  * Check your indentation. YAML is whitespace-sensitive; ensure nested keys (like params under LLM_config) are indented correctly.

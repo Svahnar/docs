@@ -61,6 +61,7 @@ const sidebars: SidebarsConfig = {
     'Agents/test_agent',
     'Agents/create_agent',
     'Agents/run_agent',
+    // 'Agents/chat_history',
     'Agents/get_agent_details',
     'Agents/list_agents',
     'Agents/update_agent_info',

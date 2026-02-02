@@ -1,81 +1,136 @@
 ---
-title: "Models and Pricing"
+title: Models & Pricing
 ---
 
 import styles from './customcss/modelList.module.css';
 
+# Models & Pricing
 
-AI models available for use in building agents.
+Select the right level of intelligence for your agents from a diverse range of state-of-the-art AI models.
 
-:::info
-**Enterprise customers can contact sales for custom AI models and fine-tuned AI models.**
-:::
+This guide outlines the available models, their credit costs, and how consumption is calculated in SVAHNAR.
 
 
-<div class="table-container">
+
+---
+
+## 💎 Available Models
+
+The following models are available for immediate use in your agent configurations.
+
+<div className="table-container">
   <table>
     <thead>
       <tr>
-        <th></th>
-        <th>Model</th>
-        <th>Credits Charged</th>
+        <th>Provider</th>
+        <th>Model Name (Config ID)</th>
+        <th>Credits Per Run</th>
       </tr>
     </thead>
     <tbody>
+      {/* OpenAI Models */}
       <tr>
-        <td rowspan="5">OpenAI</td>
-        <td>gpt-4o-mini</td>
+        <td rowspan="5"><strong>OpenAI</strong></td>
+        <td><code>gpt-4o-mini</code></td>
         <td>1</td>
       </tr>
       <tr>
-        <td>gpt-4o</td>
+        <td><code>gpt-4o</code></td>
         <td>15</td>
       </tr>
       <tr>
-        <td>GPT-5-nano</td>
+        <td><code>GPT-5-nano</code></td>
         <td>1</td>
       </tr>
       <tr>
-        <td>GPT-5-mini</td>
+        <td><code>GPT-5-mini</code></td>
         <td>3</td>
       </tr>
       <tr>
-        <td>GPT-5</td>
+        <td><code>GPT-5</code></td>
         <td>15</td>
       </tr>
 
+      {/* LLaMA Models */}
       <tr>
-        <td rowspan="2">LLaMA</td>
-        <td>Llama 3.1 8B instruct</td>
+        <td rowspan="2"><strong>LLaMA</strong></td>
+        <td><code>Llama 3.1 8B instruct</code></td>
         <td>1</td>
       </tr>
       <tr>
-        <td>Llama 3.3 70B instruct</td>
+        <td><code>Llama 3.3 70B instruct</code></td>
         <td>2</td>
       </tr>
       
+      {/* Deepseek Models */}
       <tr>
-        <td rowspan="2"> Deepseek</td>
-        <td>Deepseek - Qwen-2.5-32B</td>
+        <td rowspan="2"><strong>Deepseek</strong></td>
+        <td><code>Deepseek - Qwen-2.5-32B</code></td>
         <td>2</td>
       </tr>
       <tr>
-        <td>Deepseek - LLama70B</td>
+        <td><code>Deepseek - LLama70B</code></td>
         <td>3</td>
       </tr>
+
+      {/* Qwen Models */}
       <tr>
-        <td rowspan="3"> Qwen</td>
-        <td>Qwen QwQ 32B (Preview)</td>
+        <td rowspan="3"><strong>Qwen</strong></td>
+        <td><code>Qwen QwQ 32B (Preview)</code></td>
         <td>1</td>
       </tr>
       <tr>
-        <td>Qwen 2.5 32B Instruct 128k</td>
+        <td><code>Qwen 2.5 32B Instruct 128k</code></td>
         <td>3</td>
       </tr>
       <tr>
-        <td>Qwen 2.5 Coder 32B Instruct 128k</td>
+        <td><code>Qwen 2.5 Coder 32B Instruct 128k</code></td>
         <td>3</td>
       </tr>
     </tbody>
   </table>
 </div>
+
+:::tip Enterprise
+**Need custom solutions?** Enterprise customers can contact sales for access to fine-tuned models or custom deployments.
+:::
+
+---
+
+## 📚 Practical Recipes
+
+### Setting the Model in Config
+
+To use a specific model, copy the **Model Name** from the table above and paste it into the `model` parameter of your YAML configuration.
+
+> **Use Case:** Configuring an agent to use a cost-effective model for simple tasks.
+
+```yaml showLineNumbers
+create_agent_network:
+  agent-1:
+    agent_name: simple_task_agent
+    LLM_config:
+        params:
+          # Paste the Model Name here
+          model: gpt-4o-mini
+    tools: []
+    agent_function:
+      - Reply to the user's greeting.
+```
+
+## 💡 Core Concepts
+
+Before selecting a model, it is important to understand how SVAHNAR calculates usage.
+
+### 1. What is a "Run"?
+In a multi-agent network, pricing is calculated based on **Runs**. 
+A **Run** occurs whenever an agent is triggered to perform a task or participate in a conversation.
+
+### 2. How are credits consumed?
+Credits are deducted strictly on a **pay-per-run** basis.
+* If an agent uses **gpt-4o-mini**, 1 credit is deducted for that turn.
+* If an agent uses **GPT-5**, 15 credits are deducted for that turn.
+
+:::info
+In a complex workflow where multiple agents interact, the total cost is the sum of the credits required for each agent's individual participation.
+:::

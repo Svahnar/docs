@@ -1,0 +1,54 @@
+# Agent Service Chat History Formatting Guide
+
+When interacting with the Agent Service API (e.g., `/api/v1/run-agent`), you must provide the `chat_history` in a specific, clean format. The service does not accept the raw, nested JSON output it produces directly as history; you must process it first.
+
+## Expected Format
+The `chat_history` field must be a list of dictionaries with the following structure:
+
+```json
+[
+  {
+    "role": "user",
+    "content": "User's query here"
+  },
+  {
+    "role": "assistant",
+    "content": "Agent_1 - Response content here..."
+  }
+]
+```
+
+## Processing Rules
+To convert the raw output from the Agent Service into this format, follow these rules:
+
+1.  **User Messages**: Map directly to `{"role": "user", "content": "..."}`.
+2.  **Assistant Messages**:
+    *   The Agent Service returns a complex JSON object (often with a `response` key containing a list of agent actions).
+    *   You must **extract only the final text responses**.
+    *   **Filter Tool Calls**: Ignore any messages that start with `"Initiated tool call"` or `"From tool got the data"`. These should not be sent back as context which is not required by your agents.
+    *   **Prefix Agent Names**: Since multiple agents (e.g., "Agent_1", "Supervisor") may contribute, prefix the content with the agent's name: `"{AgentName} - {Message}"`.
+
+## Using the SDK
+The `svahnar` Python SDK provides a helper method `generate_chat_history` to simplify the creation of the chat history.
+
+```python
+from svahnar import Svahnar
+
+client = Svahnar()
+
+# For the first query, chat_history is None
+history = client.agents.generate_chat_history(
+    query="hello",
+    response=response_data,
+    chat_history=None
+)
+
+# For subsequent queries, pass the previous history
+new_history = client.agents.generate_chat_history(
+    query="new query",
+    response=new_response_data,
+    chat_history=history
+)
+```
+**Note:** For the first query there won't be any chat_history so it will be `None`.
+

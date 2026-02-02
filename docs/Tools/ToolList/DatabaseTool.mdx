@@ -1,70 +1,100 @@
----
-title: "DatabaseTool"
-sidebarTitle: List of Tools
----
+import { Steps, Step } from '@site/src/components/Steps/Steps';
 
-Execute SQL queries against a configured SQL database. This tool supports both read and write operations (SELECT, INSERT, UPDATE, DELETE, DDL).
+# Database Tool (Read/Write)
 
-## Usage
+Empower your agents to execute SQL queries directly against your database to fetch data, update records, or manage schemas.
 
-Provide a `db_uri` (SQLAlchemy-compatible) in the tool config and pass a `query` string payload.
+This tool allows for **full read and write access**. If you only need to fetch data, consider using the [Database Read-Only](/docs/Tools/ToolList/DatabaseToolReadOnly) tool instead.
 
-### Example payload
+## 💡 Core Concepts
 
-```json
-{ "query": "SELECT id, name FROM users LIMIT 10" }
-```
+To use this tool effectively, it helps to understand how SVAHNAR interacts with your database.
 
-### Notes
+### 1. How does the Database Tool work?
+The agent uses your connection string (`db_uri`) to connect to your database. It can execute any valid SQL query you authorize.
+* **Read Operations:** For `SELECT` queries, it returns the results as structured JSON data.
+* **Write Operations:** For `INSERT`, `UPDATE`, `DELETE`, etc., it automatically commits the transaction and returns the number of rows affected.
 
-- For write operations the tool commits the transaction and returns the number of rows affected.
-- On errors the tool returns an error message and attempts to include the database schema to help debugging.
+-----
 
-## YAML usage
+## ⚙️ Configuration Steps
 
-Assign the DatabaseTool to an agent and pass a `db_uri` in `config`:
+Follow these steps to configure your agent for database access.
+
+<Steps>
+  <Step>
+
+### Prepare Your Connection String
+
+  You need a valid SQLAlchemy connection string (URI) for your database.
+  
+  **Format:** `dialect+driver://username:password@host:port/database`
+
+  **Examples:**
+  * **PostgreSQL:** `postgresql+psycopg2://user:pass@localhost/mydatabase`
+  * **MySQL:** `mysql+pymysql://user:pass@localhost/mydatabase`
+  * **SQLite:** `sqlite:///example.db`
+
+  </Step>
+
+  <Step>
+
+### Configure the Agent
+
+  In your agent configuration YAML, you will assign the `DatabaseTool` and provide the `db_uri` in the config block.
+
+  :::warning Security Note
+  This tool permits data modification (UPDATE/DELETE). Ensure the database user provided in the URI has appropriate permissions. If possible, restrict the user's privileges at the database level to only the tables necessary.
+  :::
+
+  </Step>
+</Steps>
+
+-----
+
+## 📚 Practical Recipes
+
+### Recipe 1: Full Access Database Agent
+
+> **Use Case:** An admin assistant agent that can look up user details and update their subscription status.
 
 ```yaml showLineNumbers
-tools:
-  tool_assigned:
-    - name: "DatabaseTool"
-      config:
-        db_uri: "postgresql+psycopg2://user:pass@db.example.com:5432/mydb"
-```
-
-Invocation payload example (read):
-
-```yaml showLineNumbers
-payload:
-	query: "SELECT id, name FROM users LIMIT 10"
-```
-
-Invocation payload example (write):
-
-```yaml showLineNumbers
-payload:
-	query: "UPDATE users SET active=true WHERE last_login &lt; '2025-01-01'"
-```
-
-### More details
-
-This tool uses SQLModel / SQLAlchemy under the hood. For write operations the tool commits the transaction. When an exception occurs the tool attempts to include the database schema to help you debug and fix the query.
-
-## Agent integration example
-
-```yaml showLineNumbers
-create_vertical_agent_network:
+create_agent_network:
   agent-1:
-    agent_name: "db_query_agent"
+    agent_name: db_admin_agent
     LLM_config:
-      params:
-        model: "gpt-5-mini"
+        params:
+          model: gpt-4o
     tools:
       tool_assigned:
-        - name: "DatabaseTool"
+        - name: DatabaseTool
           config:
-            db_uri: "postgresql+psycopg2://user:pass@db.example.com:5432/mydb"
+            # Your database connection string
+            db_uri: "postgresql+psycopg2://admin:securepass@db-prod.svahnar.com:5432/users_db"
     agent_function:
-      - "Run SQL queries against the reporting database."
+      - "You are a database admin. You can search for users by email and update their subscription_level."
+      - "If a query fails, analyze the schema and retry for once"
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+
 ```
+
+---
+
+## 🚑 Troubleshooting
+
+* **"Missing required field: 'db_uri'"**
+    * Ensure the `db_uri` is correctly indented under the `config:` block in your YAML file.
+
+
+* **Connection Refused / Timeout**
+    * Verify that the SVAHNAR agent has network access to your database host.
+    * Check firewall rules and whitelist the agent's IP if necessary.
+    * For dedicated IP addresses, please contact SVAHNAR support to get a list of IPs to whitelist in your firewall (Only for Teams and Enterprise plans).
+
+
+* **Agent gets stuck in a loop**
+    * If the DB schema is too large for the LLM's context window, try to reduce the number of tables the agent has access to (if possible).
+
 
