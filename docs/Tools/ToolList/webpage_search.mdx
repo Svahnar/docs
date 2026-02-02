@@ -1,32 +1,129 @@
+
+
+import { Steps, Step } from '@site/src/components/Steps/Steps';
+
+# Webpage Search
+
+Enable your agents to **browse the web** by scraping and extracting textual content from specific URLs.
+
+This guide will help you configure the Webpage Search tool to allow your agents to read articles, documentation, or any public web content for analysis and summarization.
+
+## 💡 Core Concepts
+
+To use this tool effectively, it is helpful to understand how it processes data.
+
+### 1. How does Webpage Search work?
+
+The tool acts as a bridge between your agent and the internet. When an agent provides a URL, the tool uses a **WebBaseLoader** to:
+
+1. Fetch the HTML content of the page.
+2. Parse the HTML to extract readable text.
+3. Return the content wrapped in `<Document>` tags, including metadata like the page title.
+
+### 2. Input Flexibility
+
+The tool is designed to be forgiving with inputs. While the standard requirement is a `urls` field, the system automatically handles:
+
+* **Aliases:** It accepts `url` if the agent forgets the plural `urls`.
+* **Nested Payloads:** It automatically parses stringified JSON or nested `properties` objects, reducing errors if the LLM hallucinates a complex structure.
+
 ---
-title: "Webpage Search"
-sidebarTitle: Webpage Search
----
 
+## ⚙️ Configuration Steps
 
+Follow these steps to equip your agent with browsing capabilities.
 
-Scrape and extract textual content from web pages. Provide a `urls` field pointing to the page or pages to scrape.
+<Steps>
+<Step>
 
-## Usage
+### Assign the Tool
 
-Example payload (single URL):
+To enable this feature, you simply need to assign the `webpage_search` tool to your agent in the YAML configuration. No API keys are required for public pages.
 
-```yaml showLineNumbers
-payload:
-	urls: "https://example.com/article"
+</Step>
+
+<Step>
+
+### Understand the Payload
+
+When your agent decides to search a page, it constructs a JSON payload. You should ensure your agent's system prompt or instructions encourage it to provide the `urls` key.
+
+**Expected Payload:**
+
+```json
+{
+  "urls": "https://example.com/article"
+}
+
 ```
 
-Example YAML for assigning the tool to an agent:
+</Step>
 
-```yaml showLineNumbers
-tools:
-	tool_assigned:
-		- name: "webpage_search"
+<Step>
+
+### Review the Output
+
+The tool returns the data in a structured XML-like format to help the LLM distinguish between different sources if multiple pages are scraped.
+
+**Output Format:**
+
+```xml
+<Document name="Page Title Example">
+   ... Extracted text content from the webpage ...
+</Document>
+
 ```
 
-The tool returns extracted document content grouped per page, with basic metadata when available.
+</Step>
+</Steps>
 
-### Notes
+---
 
-- Under the hood it uses a WebBaseLoader to fetch and parse pages. Large pages may be truncated by downstream tooling.
+## 📚 Practical Recipes (Examples)
 
+### Recipe 1: Research & Summarizer Agent
+
+> **Use Case:** An agent that takes a URL from a user, reads the content, and provides a summary.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: Researcher_Agent
+    LLM_config:
+      params:
+        model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: webpage_search
+          config: {} # No extra config needed for this tool
+    agent_function:
+      - You are a research assistant.
+      - When a user provides a link, use the webpage_search tool to read it.
+      - Summarize the key points of the content found in the URL.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+
+```
+
+### 💡 Tip: Handling Large Pages
+
+Under the hood, this tool uses a `WebBaseLoader`. If a webpage is extremely large, downstream tools or LLM context windows might truncate the text. If precise data extraction is needed from massive pages, consider breaking the task down.
+
+---
+
+## 🚑 Troubleshooting
+
+* **"Missing required field: 'urls'"**
+* The agent failed to provide the target link. Ensure your prompt explicitly instructs the agent to "pass the 'urls' argument."
+* *Note: The tool is robust enough to check for `url` (singular) as a fallback.*
+
+
+* **Empty or Garbled Output**
+* The page might be JavaScript-heavy (Single Page Application) which simple loaders sometimes struggle to scrape.
+* The website might have anti-scraping blocks (403 Forbidden).
+
+
+* **Error in scraping webpage**
+* Check if the URL is valid and publicly accessible.
+* The tool handles nested JSON errors automatically, but malformed JSON strings from the agent will still cause failures.

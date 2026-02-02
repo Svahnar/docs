@@ -1,52 +1,121 @@
+
+import { Steps, Step } from '@site/src/components/Steps/Steps';
+
+# Twilio WhatsApp
+
+Send automated WhatsApp messages directly from your agents using **Twilio**.
+
+This guide will walk you through setting up Twilio credentials, configuring your agent, and sending messages.
+
+## 💡 Core Concepts
+
+To configure this tool, you need to understand the required credentials and message structure.
+
+### 1. What credentials are required?
+To authorize the agent, you need your **Twilio Account SID** and **Auth Token**. These act as the username and password for the API.
+
+### 2. How does the message routing work?
+* **From Number (`from_`):** The WhatsApp-enabled number (or Twilio Sandbox number) sending the message.
+* **To Number (`to`):** The recipient's phone number.
+* **Body (`body_message`):** The actual text content the agent wants to send.
+
 ---
-title: "Twilio - WhatsApp"
-sidebarTitle: List of Tools
+
+## ⚙️ Configuration Steps
+
+Follow these steps to integrate Twilio WhatsApp with Svahnar.
+
+<Steps>
+  <Step>
+
+### Get Twilio Credentials
+
+  1. Log in to your [Twilio Console](https://console.twilio.com/).
+  2. Locate the **Account Info** section on the dashboard.
+  3. Copy your **Account SID** and **Auth Token**.
+
+  :::tip
+  If you are testing, enable the **Twilio WhatsApp Sandbox** in your console to send messages without waiting for business verification.
+  :::
+  </Step>
+
+  <Step>
+
+### Configure the Tool
+
+  1. Open your agent configuration YAML.
+  2. Add the `Twilio_whatsapp` tool.
+  3. Paste your credentials into the `config` section.
+
+  :::warning Format Check
+  Ensure phone numbers are in E.164 format (e.g., `whatsapp:+15550001234`).
+  :::
+  </Step>
+
+  <Step>
+
+### Define Agent Instructions
+
+  1. In the `agent_function`, explicitly tell the agent what information to send.
+  2. Example: "Send a WhatsApp message to the user with their appointment details."
+  
+  </Step>
+</Steps>
+
 ---
 
-Send WhatsApp messages using Twilio. Include Twilio credentials and message details in the payload or tool config.
+## 📚 Practical Recipes (Examples)
 
-### Required fields
+### Recipe 1: Standard Notification Agent
 
-- `to`: recipient in the format `whatsapp:+123...`
-- `from_`: sender number (Twilio WhatsApp-enabled number)
-- `body_message`: text body
-- `TWILIO_SID` and `TWILIO_AUTH_TOKEN`
-
-### Example payload
-
-```json
-{
-	"to": "whatsapp:+1415...",
-	"from_": "whatsapp:+1415...",
-	"body_message": "Hello from agent"
-}
-```
-
-### Notes
-
-- The tool may accept `content_sid` and `content_variables` for template messages.
-
-## YAML usage
+> **Use Case:** An agent that sends a confirmation message to a specific user.
 
 ```yaml showLineNumbers
-tools:
-	tool_assigned:
-		- name: Twilio_whatsapp
-			config:
-				TWILIO_SID: ${TWILIO_SID}
-				TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN}
-				from_: whatsapp:+1415...
+create_vertical_agent_network:
+  agent-1:
+    agent_name: whatsapp_notifier
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: Twilio_whatsapp
+          config:
+            # Twilio Credentials (Best practice: use environment variables)
+            TWILIO_SID: ${TWILIO_SID}
+            TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN}
+            
+            # The sender number (Twilio Sandbox or Verified Business Number)
+            from_: "whatsapp:+14155238886" 
+    agent_function:
+      - You are a notification assistant.
+      - Your goal is to send a WhatsApp message to the user: "whatsapp:+1234567890".
+      - The message body should be: "Hello! Your server deployment is complete."
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+
 ```
 
-Invocation payload:
+### 💡 Tip: Dynamic vs. Static Configuration
 
-```yaml showLineNumbers
-payload:
-	to: "whatsapp:+1415..."
-	body_message: "Hello from agent"
-```
+* **Static Config:** Place items that never change (like `TWILIO_SID` or `from_`) in the `config` block.
+* **Dynamic Payload:** The agent will automatically generate the `to` and `body_message` fields based on the conversation context.
 
-### More details
+---
 
-WhatsApp messages may require template approvals on Twilio depending on the content and recipient region.
+## 🚑 Troubleshooting
+
+* **"Missing Required Fields" Error**
+* The tool strictly requires `to`, `from_`, and `body_message`. Ensure the agent's prompt is clear enough to generate the `body_message` and that a `to` number is provided either in the prompt or the config.
+
+
+* **"Unverified Number" (Sandbox Mode)**
+* If you are using the Twilio Sandbox, you can only send messages to numbers that have **joined** your sandbox (by sending a specific code to your Twilio number).
+* To message any number, you must complete Twilio's Business Verification.
+
+
+* **Template Errors**
+* If using `content_sid` (for templates), ensure your `content_variables` match the template's expected format in Twilio.
+
 

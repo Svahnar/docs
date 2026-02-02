@@ -31,14 +31,7 @@ const config: Config = {
     defaultLocale: 'en',
     locales: ['en'],
   },
-  // Markdown config - hooks are the preferred location for handling markdown link
-  // behaviour; `onBrokenMarkdownLinks` is deprecated at the top level and will be
-  // removed in Docusaurus v4. Move it into `markdown.hooks` to silence the deprecation warning.
-  markdown: {
-    hooks: {
-      onBrokenMarkdownLinks: 'warn',
-    },
-  },
+  onBrokenMarkdownLinks: 'warn',
   presets: [
     [
       'classic',
@@ -77,7 +70,7 @@ const config: Config = {
 
   themeConfig: {
     // Replace with your project's social card
-    
+
     navbar: {
       // title: 'SVAHNAR DOCS',
       logo: {
@@ -154,7 +147,7 @@ const config: Config = {
       theme: prismThemes.vsLight,     // light mode code style
       darkTheme: prismThemes.vsDark,  // dark mode code style
 
-      
+
     },
     footer: {
       // style: 'dark',

@@ -1,50 +1,133 @@
 
+import Video from '@site/src/components/Video';
+import { Steps, Step } from '@site/src/components/Steps/Steps';
 
-Send SMS via Twilio from an agent. Provide Twilio credentials and the message payload.
+# Twilio SMS
 
-## Required fields
+Instantly send SMS notifications and alerts from your agents using **Twilio**.
 
-- `to` (recipient phone number, E.164 format)
-- `from_` (Twilio phone number)
-- `body` (message text)
-- `TWILIO_SID` and `TWILIO_AUTH_TOKEN` (in tool config or environment)
+This guide will walk you through setting up Twilio integration, configuring the required credentials, and sending your first message.
 
-### Example payload
+## 💡 Core Concepts
 
-```json
-{ "to": "+1234567890", "from_": "+1098765432", "body": "Alert: stock moved" }
-```
+To configure this tool, you need to understand two key components.
 
-### Notes
+### 1. How does the Twilio SMS Tool work?
 
-- The tool uses the Twilio Python SDK to send messages. Errors from Twilio are returned as exceptions.
+The Twilio SMS tool allows your agent to send text messages to mobile phones globally. It uses the Twilio Python SDK to dispatch a message payload containing the recipient's number (`to`), the sender's number (`from_`), and the message content (`body`).
 
-## YAML usage
+### 2. What are the Twilio Credentials?
 
-Assign Twilio SMS to an agent and include credential placeholders in `config`:
+You need three pieces of information from your Twilio console to authorize the agent:
+* **Account SID (`TWILIO_SID`):** Your unique account identifier.
+* **Auth Token (`TWILIO_AUTH_TOKEN`):** Your secret key for API access.
+* **Twilio Phone Number (`from_`):** A number purchased or assigned in your Twilio account that is capable of sending SMS.
+
+-----
+
+## ⚙️ Configuration Steps
+
+Follow these steps to integrate Twilio SMS into your agent network.
+
+<Steps>
+  <Step>
+
+### Get Twilio Credentials
+
+  1. Log in to your [Twilio Console](https://console.twilio.com/).
+  2. Copy your **Account SID** and **Auth Token** from the dashboard.
+  3. Navigate to **Phone Numbers** and copy the active number you wish to send messages from.
+
+  </Step>
+
+  <Step>
+
+### Configure Agent Tools
+
+  1.  **Assign the Tool**:
+      * In your agent's YAML configuration, add `Twilio_sms` to the `tool_assigned` list.
+  2.  **Set Credentials**:
+      * Add your credentials in the `config` block.
+      * *Security Note:* It is highly recommended to use environment variables (e.g., `${TWILIO_SID}`) rather than hardcoding secrets directly in the YAML.
+
+  :::info
+  You can pre-define the `to` and `from_` numbers in the config if your agent always messages the same recipient or uses the same sender ID.
+  :::
+  </Step>
+
+  <Step>
+
+### Define Agent Function
+
+  1. Give your agent a clear instruction on when to send an SMS.
+  2. Example: *"Send an SMS alert to the user if the stock price drops below $100."*
+  3. Ensure the agent knows where to find the recipient's phone number if it is not hardcoded (e.g., from user input or a database).
+
+  </Step>
+</Steps>
+
+-----
+
+## 📚 Practical Recipes (Examples)
+
+### Recipe 1: Basic SMS Notification Agent
+
+> **Use Case:** An agent that sends a critical alert to a specific admin number when triggered.
 
 ```yaml showLineNumbers
-tools:
-	tool_assigned:
-		- name: Twilio_sms
-			config:
-				TWILIO_SID: ${TWILIO_SID}
-				TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN}
-				to: +91xxxxxxxxxxx
-				from_: +91xxxxxxxxxx
+create_vertical_agent_network:
+  agent-1:
+    agent_name: alert_agent
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: Twilio_sms
+          config:
+            # Twilio Credentials (use env vars for security)
+            TWILIO_SID: ${TWILIO_SID}
+            TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN}
+            # The Twilio number sending the SMS
+            from_: "+15550109988"
+            # Optional: Hardcode the recipient if it's always the same
+            to: "+15550199999"
+    agent_function:
+      - You are a monitoring assistant. When asked to send an alert, use the Twilio tool to send the message immediately.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+
 ```
 
-Invocation payload example:
+### 💡 Tip: Dynamic Payloads
 
-```yaml showLineNumbers
-payload:
-	to: +1234567890
-	from_: +1098765432
-	body: Alert: stock moved
-```
+If you don't hardcode `to`, `from_`, or `body` in the config, the agent will dynamically generate them based on the context.
 
-### More details
+* **Dynamic Recipient:** "Send a text to +1555... saying 'Hello'."
+* **Dynamic Body:** "Text the admin the current summary of the report."
 
-Provide live Twilio credentials via environment variables or a secure secrets manager. The tool returns the Twilio message SID on success.
+---
+
+## 🚑 Troubleshooting
+
+* **Missing Required Fields**
+* Ensure the agent or the config provides all three: `to` (recipient), `from_` (sender), and `body` (message text).
+* Error: `ValueError: Missing required fields: 'to', 'from_', or 'body'`
+
+
+* **Authentication Failed**
+* Verify your `TWILIO_SID` and `TWILIO_AUTH_TOKEN` are correct.
+* Ensure environment variables are loaded correctly if using `${...}` syntax.
+
+
+* **Invalid Phone Numbers**
+* Use **E.164 format** for all phone numbers (e.g., `+1234567890` or `+919876543210`).
+* Ensure the `from_` number is a valid, active Twilio number capable of sending SMS.
+
+
+* **Message Not Sent**
+* The tool returns the **Twilio SID** on success. If you don't see an SID in the logs, the message likely failed at the API level. Check the agent logs for exception details.
+
 
 

@@ -1,61 +1,140 @@
----
-title: "Wikipedia"
-sidebarTitle: List of Tools
----
-Wikipedia is a free online encyclopedia, created and edited by volunteers around the world and hosted by the Wikimedia Foundation.
 
-This tool search wikipedia for summaries and article content using the Wikipedia API wrapper. Provide a `query` string and optional parameters like `top_k_results` or `lang`.
 
-## Example payload
+import { Steps, Step } from '@site/src/components/Steps/Steps';
+
+# Wikipedia
+
+Empower your agents to access the world's knowledge by searching **Wikipedia** for article summaries and historical data.
+
+This guide will walk you through configuring the Wikipedia tool, including how to customize search depth and language settings.
+
+## 💡 Core Concepts
+
+To configure this tool, you need to understand how it handles queries and parameters.
+
+### 1. How does the Wikipedia Tool work?
+
+This tool acts as a wrapper around the Wikipedia API. When your agent sends a `query`, the tool searches for relevant articles, retrieves the most pertinent pages, and returns a concise summary of the content.
+
+### 2. Configuration Parameters
+
+Unlike simpler tools, you can pre-configure how this tool behaves in your YAML setup:
+
+* **`top_k_results`**: Controls how many search results/snippets to return (e.g., `3`).
+* **`lang`**: Sets the language for the Wikipedia search (e.g., `en` for English, `es` for Spanish).
+
+---
+
+## ⚙️ Configuration Steps
+
+Follow these steps to integrate Wikipedia search into your agentic network.
+
+<Steps>
+<Step>
+
+### Assign & Configure Tool
+
+In your agent's YAML configuration, add "Wikipedia" to the `tool_assigned` list. You can optionally define the language and number of results here.
+
+**Example Config:**
+
+```yaml
+config:
+  top_k_results: 3
+  lang: en
+
+```
+
+</Step>
+
+<Step>
+
+### Define the Payload
+
+Your agent needs to send a specific JSON payload to trigger the search. Ensure your agent's system prompt encourages it to generate a `query`.
+
+**Expected Payload:**
 
 ```json
-{ "query": "Reinforcement learning" }
+{
+  "query": "Reinforcement learning"
+}
+
 ```
 
-### Notes
+</Step>
 
-- The tool returns a concise article summary and can include additional metadata when available.
+<Step>
 
-## YAML usage
+### Test the Output
 
-Example of assigning the Wikipedia tool to an agent with optional params:
+The tool returns text summaries.
 
-```yaml showLineNumbers
-tools:
-	tool_assigned:
-		- name: "Wikipedia"
-			config:
-				top_k_results: 3
-				lang: en
-```
+* **Success:** A string containing the summary of the requested topic.
+* **Usage:** The agent uses this text to answer user questions or perform further reasoning.
+</Step>
 
-Invocation payload (what the agent sends to the tool at runtime):
+</Steps>
 
-```yaml showLineNumbers
-payload:
-	query: "Reinforcement learning"
-```
+---
 
-### More details
+## 📚 Practical Recipes (Examples)
 
-The Wikipedia wrapper fetches article summaries and can optionally return extended metadata. Use `top_k_results` to control the number of snippets returned and `lang` to select the language edition.
+### Recipe 1: General Knowledge Assistant
 
-## Agent integration example
+> **Use Case:** An agent that answers "Who," "What," and "When" questions using English Wikipedia.
 
 ```yaml showLineNumbers
 create_agent_network:
-	agent-1:
-		agent_name: "wiki_lookup"
-		LLM_config:
-			params:
-				model: "gpt-5-mini"
-		tools:
-			tool_assigned:
-				- name: "Wikipedia"
-					config:
-						top_k_results: 3
-						lang: en
-		agent_function:
-			- "Fetch a concise summary from Wikipedia for the given query."
+  agent-1:
+    agent_name: "Wiki_Lookup_Agent"
+    LLM_config:
+      params:
+        model: "gpt-4o-mini"
+    tools:
+      tool_assigned:
+        - name: "Wikipedia"
+          config:
+            top_k_results: 1
+            lang: en
+    agent_function:
+      - "You are a helpful encyclopedia assistant."
+      - "When asked about a topic, use the Wikipedia tool to fetch a summary."
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+
 ```
 
+### Recipe 2: International Researcher
+
+> **Use Case:** An agent configured to search for concepts specifically in French Wikipedia.
+
+```yaml showLineNumbers
+tools:
+  tool_assigned:
+    - name: "Wikipedia"
+      config:
+        top_k_results: 5
+        lang: fr
+
+```
+
+### 💡 Tip: Merging Logic
+
+The tool automatically merges the runtime payload (the `query` from the agent) with your static YAML configuration. This means you can hardcode the `lang` in your YAML while letting the agent dynamically decide the `query`.
+
+---
+
+## 🚑 Troubleshooting
+
+* **"Missing required field: 'query'"**
+* The agent attempted to call the tool without specifying what to search for. Update your agent's instructions to explicitly mention providing a `query` string.
+
+
+* **RuntimeError / Connection Issues**
+* This usually indicates a failure to reach the Wikipedia API. Check your internet connection or verify if the Wikipedia API is currently down.
+
+
+* **Irrelevant Results**
+* If the summary returned is not helpful, consider increasing `top_k_results` in the config to give the agent a broader set of snippets to read.

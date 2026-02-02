@@ -1,17 +1,120 @@
+import { Steps, Step } from '@site/src/components/Steps/Steps';
 
-The S3 connector lets you point the Knowledge Repository at an S3-compatible bucket (including Svahnar S3) so documents can be imported directly from your cloud storage. Uploaded documents are copied into Svahnar's storage for RAG indexing and retrieval.
+# AWS S3
 
-## When to use
+Connect your Knowledge Repository directly to **Amazon S3** (or Svahnar S3) to ingest documents automatically.
 
-- Large archives of documents already stored in S3
-- Regular sync from production backups
+This connector allows you to point to a specific file or folder in a cloud bucket, copying the documents into Svahnar's storage for RAG (Retrieval-Augmented Generation) indexing and retrieval.
 
-## Usage
-- You have to provide file/folder path of your S3 file (pdf)
-- AWS credentials like access key id, access key secret (use Keyvault for it)
-- AWS region name e.g- us-east-1
+## 💡 Core Concepts
+
+Before configuring the connector, understand how the data flows.
+
+### 1. Storage Sync vs. Indexing
+
+When you connect an S3 bucket, Svahnar does two things:
+
+1. **Copies** the targeted files from your S3 bucket into Svahnar's secure storage.
+2. **Indexes** these files so your AI agents can search and retrieve information from them during conversations.
+
+### 2. Security & Access
+
+Documents imported via this connector become part of your Knowledge Repository.
+
+* **RAG Access:** Agents with access to this Knowledge Base can read these files.
+* **User Download:** Users with appropriate permissions can download the copied files, unless specific storage policies prevent it.
+
+---
+
+## ⚙️ Configuration Steps
+
+Follow these steps to securely link your S3 bucket.
+
+<Steps>
+<Step>
+
+### Prepare AWS Credentials
+
+To access your bucket, Svahnar needs valid AWS credentials.
+
+1. Log in to your AWS Console.
+2. Create an IAM User with **Read** access (`s3:GetObject`, `s3:ListBucket`) to the target bucket.
+3. Generate an **Access Key ID** and **Secret Access Key**.
+
+:::tip Use Keyvault
+For security, do not hardcode your Secret Key. Store it in the **Svahnar Keyvault** and reference it in your configuration.
+:::
+
+</Step>
+
+<Step>
+
+### Identify Target Resource
+
+Decide exactly what you want to import:
+
+* **Specific File:** Points to a single document (e.g., `documents/policy_2024.pdf`).
+* **Folder:** Points to a prefix (e.g., `backups/production/`). All valid documents within this folder will be imported.
+</Step>
+<Step>
+
+### Configure Connector
+
+Provide the following details in your configuration:
+
+* **S3 Path:** The file key or folder prefix.
+* **Region:** The AWS region where your bucket resides (e.g., `us-east-1`).
+* **Credentials:** Your Access Key and Secret Key.
+</Step>
+
+</Steps>
+
+---
+
+## 📚 Practical Recipes (Examples)
+
+### Recipe 1: Knowledge Base Sync
+
+> **Use Case:** Automatically ingesting a folder of PDF manuals from an S3 bucket into the Knowledge Repository.
+
+```yaml showLineNumbers
+knowledge_repository:
+  name: "Engineering_Docs"
+  connectors:
+    - type: "s3_connector"
+      config:
+        # AWS Region
+        region_name: "us-east-1"
+        
+        # Path to specific file or folder prefix
+        s3_path: "manuals/v2/release_notes/"
+        
+        # Credentials (Reference Keyvault for the secret)
+        aws_access_key_id: "AKIAIOSFODNN7EXAMPLE" 
+        aws_secret_access_key: "${KEYVAULT.AWS_SECRET_KEY}"
+
+```
+
+### 💡 Tip: Large Archives
+
+This connector is ideal for:
+
+* **Large Archives:** Importing legacy document stores without manual uploading.
+* **Regular Syncs:** If your production system dumps logs or reports to S3, this connector keeps your AI agents up-to-date with the latest data.
+
+---
+
+## 🚑 Troubleshooting
+
+* **Access Denied (403)**
+* Verify the IAM user has `s3:GetObject` permissions for the specific files.
+* If syncing a folder, ensure `s3:ListBucket` is also allowed.
 
 
-## Notes
+* **File Not Found**
+* Check the `s3_path`. S3 paths are case-sensitive.
+* Ensure there is no leading slash (`/`) in the path (e.g., use `myfolder/doc.pdf` instead of `/myfolder/doc.pdf`).
 
-- Documents copied into Svahnar S3 can be downloaded by user (who have permission) unless the original connector or storage policy prevents downloads.
+
+* **Region Mismatch**
+* If you see "Bucket not found" errors, verify that the `region_name` matches exactly where the bucket was created (e.g., `us-west-2` vs `us-east-1`).
