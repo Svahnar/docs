@@ -15,15 +15,15 @@ To configure this tool, you need to understand the required credentials and mess
 To authorize the agent, you need your **Twilio Account SID** and **Auth Token**. These act as the username and password for the API.
 
 ### 2. How does the message routing work?
-* **From Number (`from_`):** The WhatsApp-enabled number (or Twilio Sandbox number) sending the message.
+* **From Number (`from`):** The WhatsApp-enabled number (or Twilio Sandbox number) sending the message.
 * **To Number (`to`):** The recipient's phone number.
-* **Body (`body_message`):** The actual text content the agent wants to send.
+* **Prefixes:** The tool automatically handles the `whatsapp:` prefix, so you can provide numbers in E.164 format (e.g., `+15550001234`) or with the prefix included.
 
 ---
 
 ## ⚙️ Configuration Steps
 
-Follow these steps to integrate Twilio WhatsApp with Svahnar.
+Follow these steps to integrate Twilio WhatsApp with SVAHNAR.
 
 <Steps>
   <Step>
@@ -81,12 +81,14 @@ create_vertical_agent_network:
       tool_assigned:
         - name: Twilio_whatsapp
           config:
-            # Twilio Credentials (Best practice: use environment variables)
+            # Twilio Credentials (Best practice: use SVAHNAR Key Vault)
             TWILIO_SID: ${TWILIO_SID}
             TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN}
             
             # The sender number (Twilio Sandbox or Verified Business Number)
-            from_: "whatsapp:+14155238886" 
+            from: "whatsapp:+14155238886"
+            CONTENT_SID: "" #OPTIONAL: Use this for template messages
+            CONTENT_VARIABLES:  #OPTIONAL: Use this for template messages
     agent_function:
       - You are a notification assistant.
       - Your goal is to send a WhatsApp message to the user: "whatsapp:+1234567890".
@@ -99,7 +101,7 @@ create_vertical_agent_network:
 
 ### 💡 Tip: Dynamic vs. Static Configuration
 
-* **Static Config:** Place items that never change (like `TWILIO_SID` or `from_`) in the `config` block.
+* **Static Config:** Place items that never change (like `TWILIO_SID` or `from`) in the `config` block.
 * **Dynamic Payload:** The agent will automatically generate the `to` and `body_message` fields based on the conversation context.
 
 ---
@@ -107,15 +109,19 @@ create_vertical_agent_network:
 ## 🚑 Troubleshooting
 
 * **"Missing Required Fields" Error**
-* The tool strictly requires `to`, `from_`, and `body_message`. Ensure the agent's prompt is clear enough to generate the `body_message` and that a `to` number is provided either in the prompt or the config.
+    * The tool strictly requires `to`, `from`. Ensure the agent's prompt is clear enough to generate the messages and that a `to` number is provided either in the prompt or the config.
 
 
 * **"Unverified Number" (Sandbox Mode)**
-* If you are using the Twilio Sandbox, you can only send messages to numbers that have **joined** your sandbox (by sending a specific code to your Twilio number).
-* To message any number, you must complete Twilio's Business Verification.
+    * If you are using the Twilio Sandbox, you can only send messages to numbers that have **joined** your sandbox (by sending a specific code to your Twilio number).
+    * To message any number, you must complete Twilio's Business Verification.
 
 
 * **Template Errors**
-* If using `content_sid` (for templates), ensure your `content_variables` match the template's expected format in Twilio.
+    * If using `CONTENT_SID` (for templates), ensure your `CONTENT_VARIABLES` match the template's expected format in Twilio.
+
+:::tip
+If you are using the template message, you need to provide `CONTENT_SID` and `CONTENT_VARIABLES`. and require to use JSON format for the `CONTENT_VARIABLES` check out our [JSON to YAML conversion guide](/docs/additional/YAML_Conversion_Guide).
+:::
 
 

@@ -2,9 +2,9 @@ import { Steps, Step } from '@site/src/components/Steps/Steps';
 
 # AWS S3
 
-Connect your Knowledge Repository directly to **Amazon S3** (or Svahnar S3) to ingest documents automatically.
+Connect your Knowledge Repository directly to **Amazon S3** (or SVAHNAR S3) to ingest documents automatically.
 
-This connector allows you to point to a specific file or folder in a cloud bucket, copying the documents into Svahnar's storage for RAG (Retrieval-Augmented Generation) indexing and retrieval.
+This connector allows you to point to a specific file or folder in a cloud bucket, copying the documents into SVAHNAR's storage for RAG (Retrieval-Augmented Generation) indexing and retrieval.
 
 ## 💡 Core Concepts
 
@@ -12,9 +12,9 @@ Before configuring the connector, understand how the data flows.
 
 ### 1. Storage Sync vs. Indexing
 
-When you connect an S3 bucket, Svahnar does two things:
+When you connect an S3 bucket, SVAHNAR does two things:
 
-1. **Copies** the targeted files from your S3 bucket into Svahnar's secure storage.
+1. **Copies** the targeted files from your S3 bucket into SVAHNAR's secure storage.
 2. **Indexes** these files so your AI agents can search and retrieve information from them during conversations.
 
 ### 2. Security & Access
@@ -35,14 +35,14 @@ Follow these steps to securely link your S3 bucket.
 
 ### Prepare AWS Credentials
 
-To access your bucket, Svahnar needs valid AWS credentials.
+To access your bucket, SVAHNAR needs valid AWS credentials.
 
 1. Log in to your AWS Console.
 2. Create an IAM User with **Read** access (`s3:GetObject`, `s3:ListBucket`) to the target bucket.
 3. Generate an **Access Key ID** and **Secret Access Key**.
 
 :::tip Use Keyvault
-For security, do not hardcode your Secret Key. Store it in the **Svahnar Keyvault** and reference it in your configuration.
+For security, do not hardcode your Secret Key. Store it in the **SVAHNAR Key Vault** and reference it in your configuration.
 :::
 
 </Step>

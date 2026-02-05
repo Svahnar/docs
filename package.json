@@ -4,10 +4,10 @@
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",
-    "start": "docusaurus start",
+    "start": "NODE_OPTIONS=--localstorage-file=.docusaurus/site-storage.json docusaurus start",
     "swizzle": "docusaurus swizzle",
     "build:ci": "docusaurus build",
-    "build": "docusaurus build",
+    "build": "NODE_OPTIONS=--localstorage-file=.docusaurus/site-storage.json docusaurus build",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",
     "serve": "docusaurus serve",

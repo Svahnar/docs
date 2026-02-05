@@ -6,14 +6,13 @@ import { Steps, Step } from '@site/src/components/Steps/Steps';
 
 Empower your agents with real-time web knowledge using **Tavily**, the search engine built specifically for AI.
 
-This guide covers how to configure Tavily for web searching, aggregated answers, and raw content retrieval.
 
 ## 💡 Core Concepts
 
 To effectively use Tavily, you should understand how it interacts with your agent.
 
 ### 1. What is Tavily?
-Tavily is a search API optimized for LLMs (RAG). Unlike traditional search engines, it returns structured JSON data—including concise answers, raw text content, and images—rather than just a list of links.
+Tavily is a search API optimized for LLMs. Unlike traditional search engines, it returns concise answers.
 
 ### 2. Configuration Parameters
 You can customize the search behavior in the `config` block:
@@ -45,7 +44,7 @@ Follow these steps to enable web search capabilities for your agents.
 
   Hardcoding keys is risky. We recommend using the **Key Vault**.
 
-  1. Navigate to the **Key Vault** section in Svahnar.
+  1. Navigate to the **Key Vault** section in SVAHNAR Platform.
   2. Add a new secret named `TAVILY_API_KEY`.
   3. Paste your Tavily API Key as the value.
 
@@ -121,18 +120,12 @@ tools:
 
 ## 🚑 Troubleshooting
 
-* **ValueError: API_key must be provided**
-* The tool cannot find the API key. Ensure you have either passed it directly in the `config` or referenced a valid Key Vault variable (e.g., `${TAVILY_API_KEY}`).
+* **API_key must be provided**
+    * The tool cannot find the API key. Ensure you have either passed it directly in the `config` or referenced a valid Key Vault variable (e.g., `${TAVILY_API_KEY}`).
 
-
-* **ValueError: The 'query' field must be provided**
-* The agent attempted to call the tool without a search term.
-* **Fix:** Update your `agent_function` to explicitly state: *"You must provide a search query string when using the Tavily tool."*
-
-
-* **RuntimeError / 400 Errors**
-* This often indicates an issue with the Tavily service or Rate Limits.
-* Check your billing status on the Tavily dashboard.
-* Ensure you aren't exceeding the `max_results` limit for your plan.
+* **Other Errors**
+    * Check with the Tavily service or Rate Limits.
+    * Check your billing status on the Tavily dashboard.
+    * Ensure you aren't exceeding the `max_results` limit for your plan.
 
 

@@ -96,7 +96,7 @@ Give your worker agents the specific tools they need to do their jobs.
         - name: "Twilio_sms"
           config:
             to: "+1234567890"   # Replace with recipient
-            from_: "+1987654321" # Replace with Twilio number
+            from: "+1987654321" # Replace with Twilio number
 
 ```
 :::info
@@ -186,7 +186,7 @@ create_agent_network:
         - name: "Twilio_sms"
           config:
             to: "<recipient_phone_number>"
-            from_: "<twilio_phone_number>"
+            from: "<twilio_phone_number>"
     agent_function:
       - "Your function is to send SMS messages to the user with the given message."
     incoming_edge:

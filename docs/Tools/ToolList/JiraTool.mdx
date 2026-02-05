@@ -1,7 +1,7 @@
 import Video from '@site/src/components/Video';
 import { Steps, Step } from '@site/src/components/Steps/Steps';
 
-# JiraTool
+# Jira Tool
 
 Seamlessly integrate your agents with **Atlassian Jira** to manage projects, track issues, and automate agile workflows.
 
@@ -41,7 +41,7 @@ Follow these steps to set up the Jira integration.
   1. Log in to your [Atlassian Account Settings](https://id.atlassian.com/manage-profile/security).
   2. Navigate to **Security** -> **Create and manage API tokens**.
   3. Click **Create API token**.
-  4. Give it a label (e.g., "Svahnar Agent") and copy the generated token.
+  4. Give it a label (e.g., "SVAHNAR Agent") and copy the generated token.
 
   :::warning
   Save this token immediately. You will not be able to see it again after you close the window.
@@ -63,7 +63,7 @@ Follow these steps to set up the Jira integration.
 
 ### Configure Tool in YAML
 
-  Add the `JiraTool` to your agent's tool list. It is recommended to use environment variables for sensitive keys.
+  Add the `JiraTool` to your agent's tool list. It is recommended to use SVAHNAR Key Vault for sensitive keys.
 
   ```yaml
   tools:
@@ -78,18 +78,7 @@ Follow these steps to set up the Jira integration.
 
 </Step>
 
-<Step>
 
-### Verify Operations
-
-Ensure your agent is aware of the operations it can perform. While the tool handles the logic, prompting the agent correctly ensures it uses the right payload.
-
-**Common Payload Examples:**
-
-* **Search:** `{ "operation": "JQL Query", "query": "project = MYPROJ" }`
-* **Create:** `{ "operation": "Create Issue", "query": {"summary": "fix bug", "project": {"key": "MYPROJ"}} }`
-
-</Step>
 </Steps>
 
 ---
@@ -125,25 +114,25 @@ create_agent_network:
 
 ```
 
-### 💡 Tip: Using Environment Variables
+### 💡 Tip: Using Key Vault
 
-For security, never hardcode your API Key in the YAML file if you are sharing your code. Use the `${VARIABLE_NAME}` syntax and set the variable in your environment (e.g., `.env` file).
+For security, never hardcode your API Key in the YAML file if you are sharing your code. Use the `${SECRET_NAME}` syntax.
 
 ---
 
 ## 🚑 Troubleshooting
 
-* **401 Unauthorized Error**
-* Check that `jira_username` matches the email used to generate the API token.
-* Ensure the `jira_api_key` was copied correctly without extra spaces.
+* **Unauthorized Error**
+    * Check that `jira_username` matches the email used to generate the API token.
+    * Ensure the `jira_api_key` was copied correctly without extra spaces.
 
 
-* **404 Not Found**
-* Verify the `jira_instance_url` includes `https://` and ends with `.net` (no trailing slashes like `/jira`).
+* **Not Found Error**
+    * Verify the `jira_instance_url` includes `https://` and ends with `.net` (no trailing slashes like `/jira`).
 
 
 * **Agent fails to find issues**
-* The agent might be generating invalid JQL. Try asking the agent to "List projects first" to ensure it knows the valid Project Keys (e.g., `MYPROJ`) before running a search query.
+    * The agent might be generating invalid JQL. Try asking the agent to "List projects first" to ensure it knows the valid Project Keys (e.g., `MYPROJ`) before running a search query.
 
 
 

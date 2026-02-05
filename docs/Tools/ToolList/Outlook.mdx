@@ -1,11 +1,11 @@
 import Video from '@site/src/components/Video';
 import { Steps, Step } from '@site/src/components/Steps/Steps';
 
-# Outlook
+# Outlook & Calendar
 
 Empower your agents to manage emails and calendars directly through **Microsoft Outlook**.
 
-This guide will walk you through setting up your Azure Active Directory (AD) application, configuring the Svahnar tool, and authenticating your user.
+This guide will walk you through setting up your Azure Active Directory (AD) application, configuring the SVAHNAR tool, and authenticating your user.
 
 ## 💡 Core Concepts
 
@@ -24,12 +24,12 @@ The Outlook tool interacts with the Microsoft Graph API to perform common mailbo
 | `schedule_meet` | Create calendar events and invite attendees. |
 | `event_for_week` | specific events for a specific date range. |
 
-### 2. Authentication Lifecycle
+### 2. Authentication
 
-This tool uses **OAuth 2.0** with **Refresh Tokens**.
+This tool uses **OAuth 2.0**
 
-* **First Run:** You must explicitly click **Authenticate** in the tool configuration UI to generate the initial tokens.
-* **Maintenance:** Access tokens are refreshed automatically, but the long-lived refresh token may expire approximately every **90 days**. If the tool stops working, simply re-run the Authenticate flow.
+* **First Run:** You must explicitly click **Authenticate** in the tool configuration UI to generate the initial tokens. (check step 4)
+* **Maintenance:** Tokens may expire approximately every **90 days**. If the tool stops working, simply re-run the Authenticate flow.
 
 ---
 
@@ -76,9 +76,9 @@ Follow these steps to connect your Microsoft Outlook tenant.
 
 <Step>
 
-### Configure & Authenticate in Svahnar
+### Configure & Authenticate in SVAHNAR
 
-1. Open your Svahnar Agent Configuration.
+1. Open your SVAHNAR Agent Configuration.
 2. Add the **Outlook** tool and enter your Azure credentials:
 * `tenant_id`
 * `client_id`
@@ -125,23 +125,19 @@ create_vertical_agent_network:
 
 ```
 
-### 💡 Tip: Environment Variables
+### 💡 Tip: SVAHNAR Key Vault
 
-For security, never hardcode your Client Secret in plain text files. Use environment variables (like `${client_secret}`) or the Svahnar Secrets Manager.
+For security, never hardcode your Client Secret in plain text files. Use SVAHNAR Key Vault (like `${client_secret}`).
 
 ---
 
 ## 🚑 Troubleshooting
 
 * **"Token not found" or Authentication Errors**
-* Ensure you have clicked the **Authenticate** button in the UI at least once.
-* Check if 90 days have passed since the last authentication; if so, re-authenticate.
+    * Ensure you have clicked the **Authenticate** button in the UI at least once.
+    * Check if 90 days have passed since the last authentication; if so, re-authenticate.
 
 
 * **Permission Denied (403)**
-* Verify that you added the correct **Delegated permissions** (`Mail.Read`, `Mail.Send`, etc.) in the Azure Portal.
-* Ensure you clicked **Grant admin consent** if your organization requires it.
-
-
-* **Refresh Token Invalid**
-* If the `offline_access` permission is missing, Microsoft will not issue a refresh token, and the connection will fail after 1 hour.
+    * Verify that you added the correct **Delegated permissions** (`Mail.Read`, `Mail.Send`, etc.) in the Azure Portal.
+    * Ensure you clicked **Grant admin consent** if your organization requires it.

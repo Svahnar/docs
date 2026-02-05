@@ -31,7 +31,14 @@ const config: Config = {
     defaultLocale: 'en',
     locales: ['en'],
   },
-  onBrokenMarkdownLinks: 'warn',
+  // Markdown config - hooks are the preferred location for handling markdown link
+  // behaviour; `onBrokenMarkdownLinks` is deprecated at the top level and will be
+  // removed in Docusaurus v4. Move it into `markdown.hooks` to silence the deprecation warning.
+  markdown: {
+    hooks: {
+      onBrokenMarkdownLinks: 'warn',
+    },
+  },
   presets: [
     [
       'classic',
