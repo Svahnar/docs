@@ -1,32 +1,81 @@
+
+
+import { Steps, Step } from '@site/src/components/Steps/Steps';
+
+# Webpage Search
+
+Enable your agents to **browse the web** by extracting textual content from specific URLs.
+
+This guide will help you configure the Webpage Search tool to allow your agents to read articles, documentation, or any public web content for analysis and summarization.
+
+## 💡 Core Concepts
+
+To use this tool effectively, it is helpful to understand how it processes data.
+
+### 1. How does Webpage Search work?
+
+The tool acts as a bridge between your agent and the internet. When an agent provides a URL, the tool fetch the content of the page.
+
 ---
-title: "Webpage Search"
-sidebarTitle: Webpage Search
+
+## ⚙️ Configuration Steps
+
+Follow these steps to equip your agent with browsing capabilities.
+
+<Steps>
+<Step>
+
+### Assign the Tool
+
+To enable this feature, you simply need to assign the `webpage_search` tool to your agent in the YAML configuration. No API keys are required for public pages.
+
+</Step>
+
+</Steps>
+
 ---
 
+## 📚 Practical Recipes (Examples)
 
+### Recipe 1: Research & Summarizer Agent
 
-Scrape and extract textual content from web pages. Provide a `urls` field pointing to the page or pages to scrape.
-
-## Usage
-
-Example payload (single URL):
+> **Use Case:** An agent that takes a URL from a user, reads the content, and provides a summary.
 
 ```yaml showLineNumbers
-payload:
-	urls: "https://example.com/article"
+create_vertical_agent_network:
+  agent-1:
+    agent_name: Researcher_Agent
+    LLM_config:
+      params:
+        model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: webpage_search
+    agent_function:
+      - You are a research assistant.
+      - When a user provides a link, use the webpage_search tool to read it.
+      - Summarize the key points of the content found in the URL.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+
 ```
 
-Example YAML for assigning the tool to an agent:
+### 💡 Note: Handling Large Pages
 
-```yaml showLineNumbers
-tools:
-	tool_assigned:
-		- name: "webpage_search"
-```
+If a webpage is extremely large, downstream tools or LLM context windows might truncate the text.
 
-The tool returns extracted document content grouped per page, with basic metadata when available.
+---
 
-### Notes
+## 🚑 Troubleshooting
 
-- Under the hood it uses a WebBaseLoader to fetch and parse pages. Large pages may be truncated by downstream tooling.
+* **"Missing required field: 'urls'"**
+    * The agent failed to provide the target link. Ensure your prompt explicitly instructs the agent to "pass the 'urls' argument."
 
+
+* **Empty or Garbled Output**
+    * The website might have anti-scraping blocks (403 Forbidden).
+
+
+* **Error in scraping webpage**
+  * Check if the URL is valid and publicly accessible.

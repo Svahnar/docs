@@ -1,65 +1,96 @@
+import Video from '@site/src/components/Video';
+import { Steps, Step } from '@site/src/components/Steps/Steps';
+
+# Jira Tool
+
+Seamlessly integrate your agents with **Atlassian Jira** to manage projects, track issues, and automate agile workflows.
+
+This guide will walk you through generating your Atlassian API credentials and configuring the Jira tool for your agents.
+
+## 💡 Core Concepts
+
+To configure this tool effectively, you need to understand how the agent interacts with Jira.
+
+### 1. Operations & Payloads
+
+The JiraTool is versatile. Your agent acts as a Jira user that can perform specific **Operations**. The agent determines which operation to perform based on the user's intent:
+
+* **`JQL Query`**: Search for issues using Jira Query Language (e.g., "Find all bugs in the PROJ project").
+* **`Create Issue`**: Create new tasks, bugs, or stories by passing a fields dictionary.
+* **`Get Projects`**: List all projects accessible to the user.
+* **`Create confluence page`**: Create pages directly via the Jira/Confluence API connection.
+
+### 2. Authentication
+
+The tool requires three specific pieces of information to connect to your specific Jira instance:
+* **Instance URL**: The web address of your Jira site.
+* **Username**: The email address you use to log in.
+* **API Key**: A security token generated from your Atlassian account (not your password).
+
+-----
+
+## ⚙️ Configuration Steps
+
+Follow these steps to set up the Jira integration.
+
+<Steps>
+  <Step>
+
+### Generate Atlassian API Token
+
+  1. Log in to your [Atlassian Account Settings](https://id.atlassian.com/manage-profile/security).
+  2. Navigate to **Security** -> **Create and manage API tokens**.
+  3. Click **Create API token**.
+  4. Give it a label (e.g., "SVAHNAR Agent") and copy the generated token.
+
+  :::warning
+  Save this token immediately. You will not be able to see it again after you close the window.
+  :::
+  </Step>
+
+  <Step>
+
+### Prepare Configuration Details
+
+  Gather the following details for your agent configuration:
+
+  * **`jira_username`**: Your email (e.g., `jira-user@example.com`).
+  * **`jira_api_key`**: The token you just copied.
+  * **`jira_instance_url`**: Your full domain (e.g., `https://your-domain.atlassian.net`).
+  </Step>
+
+  <Step>
+
+### Configure Tool in YAML
+
+  Add the `JiraTool` to your agent's tool list. It is recommended to use SVAHNAR Key Vault for sensitive keys.
+
+  ```yaml
+  tools:
+    tool_assigned:
+      - name: "JiraTool"
+        config:
+          jira_username: "jira-user@example.com"
+          jira_api_key: "${JIRA_API_KEY}"
+          jira_instance_url: "[https://your-domain.atlassian.net](https://your-domain.atlassian.net)"
+
+```
+
+</Step>
+
+
+</Steps>
+
 ---
-title: "JiraTool"
-sidebarTitle: List of Tools
----
 
-Interact with Atlassian Jira for searches, issue creation, modifying, deleting, and other API calls.
+## 📚 Practical Recipes (Examples)
 
-## Operations
+### Recipe 1: The Issue Manager Agent
 
-- `JQL Query`: Run a JQL string to search issues.
-- `Get Projects`: Retrieve projects accessible to the authenticated user.
-- `Create Issue`: Create a new issue (pass issue fields dict).
-- `Create confluence page`: Create a Confluence page via the Jira/Confluence API.
-- `Others`: Perform rest of jira operations.
-
-### Example payloads
-
-JQL Query:
-
-```json
-{ "operation": "JQL Query", "query": "project = MYPROJ AND status = \"To Do\"" }
-```
-
-Create Issue:
-
-```json
-{
-  "operation": "Create Issue",
-  "query": {"summary":"New task","description":"Please do this","issuetype":{"name":"Task"},"project":{"key":"MYPROJ"}}
-}
-```
-
-### Authentication
-
-Provide `jira_username`, `jira_api_key`, and `jira_instance_url` in the tool config or environment.
-
-## YAML usage
+> **Use Case:** An agent dedicated to finding existing tickets and creating new ones based on chat instructions.
 
 ```yaml showLineNumbers
-tools:
-  tool_assigned:
-    - name: "JiraTool"
-      config:
-        jira_username: "jira-user@example.com"
-        jira_api_key: "${JIRA_API_KEY}"
-        jira_instance_url: "https://your-domain.atlassian.net"
-```
-
-Invocation payload (JQL query):
-
-```yaml showLineNumbers
-payload:
-  operation: "JQL Query"
-  query: "project = MYPROJ AND assignee = currentUser()"
-```
-
-
-
-## Agent integration example
-
-```yaml showLineNumbers
-create_vertical_agent_network:
+create_agent_network:
   agent-1:
     agent_name: "issue_manager"
     LLM_config:
@@ -69,9 +100,39 @@ create_vertical_agent_network:
       tool_assigned:
         - name: "JiraTool"
           config:
+            # Replace with your actual credentials or ENV variables
             jira_username: "jira-user@example.com"
             jira_api_key: "${JIRA_API_KEY}"
-            jira_instance_url: "https://your-domain.atlassian.net"
+            jira_instance_url: "[https://your-domain.atlassian.net](https://your-domain.atlassian.net)"
     agent_function:
-      - "Search or create Jira issues based on user instructions."
+      - "You are a project manager."
+      - "Use the JiraTool to search for issues using JQL queries."
+      - "If a user asks to create a task, form the correct JSON payload with summary and description."
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+
 ```
+
+### 💡 Tip: Using Key Vault
+
+For security, never hardcode your API Key in the YAML file if you are sharing your code. Use the `${SECRET_NAME}` syntax.
+
+---
+
+## 🚑 Troubleshooting
+
+* **Unauthorized Error**
+    * Check that `jira_username` matches the email used to generate the API token.
+    * Ensure the `jira_api_key` was copied correctly without extra spaces.
+
+
+* **Not Found Error**
+    * Verify the `jira_instance_url` includes `https://` and ends with `.net` (no trailing slashes like `/jira`).
+
+
+* **Agent fails to find issues**
+    * The agent might be generating invalid JQL. Try asking the agent to "List projects first" to ensure it knows the valid Project Keys (e.g., `MYPROJ`) before running a search query.
+
+
+

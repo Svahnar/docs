@@ -1,78 +1,143 @@
----
-title: "Outlook"
-sidebarTitle: "Outlook"
----
+import Video from '@site/src/components/Video';
+import { Steps, Step } from '@site/src/components/Steps/Steps';
 
-# Outlook 
+# Outlook & Calendar
 
-This document describes the `Outlook` tool function that your LLM can call to interact with Microsoft Outlook / Microsoft Graph for common mailbox and calendar actions.
+Empower your agents to manage emails and calendars directly through **Microsoft Outlook**.
 
+This guide will walk you through setting up your Azure Active Directory (AD) application, configuring the SVAHNAR tool, and authenticating your user.
 
+## 💡 Core Concepts
 
-## Introduction
+To configure this tool effectively, you need to understand the underlying capabilities and the authentication flow.
 
-This tool lets users to build agents which can communicate with their outlook tenant and perform desired operations like viewing mail from someone or last 7 days mail, create event etc.
-It's a powerful tool which saves lot of user's time letting them to interact with outlook in human understandable language.
-:::info
-Note:- For **first-time** use open the tool config UI and click the **Authenticate** button to complete OAuth and populate the refresh token vault. This is required so the tool can obtain access tokens on behalf of users.
+### 1. What can this tool do?
 
-Access tokens cached by the tool expire (in Azure AD refresh flow) roughly **90 days** for the long-lived refresh token scenario your workflow uses. If tokens expire, re-run the Authenticate flow from the tool config.
-:::
----
+The Outlook tool interacts with the Microsoft Graph API to perform common mailbox and calendar actions. Your agent can call the following operations:
 
-## Where to get Azure AD values
+| Operation | Description |
+| --- | --- |
+| `important_mail` | Retrieve messages flagged as high importance. |
+| `mail_from_address` | specific messages from a specific sender. |
+| `content_search_in_mail` | Perform a free-text search across the mailbox. |
+| `send_mail` | Send emails on behalf of the user. |
+| `schedule_meet` | Create calendar events and invite attendees. |
+| `event_for_week` | specific events for a specific date range. |
 
-Use the Azure Portal ([https://portal.azure.com](https://portal.azure.com)) in the following places:
+### 2. Authentication
 
-* **Tenant ID** — In Azure Active Directory → **Overview** → **Tenant ID** (GUID).
-* **Client ID (Application ID)** — Azure AD → App registrations → select your app → **Application (client) ID**.
-* **Client Secret** — Azure AD → App registrations → select your app → Certificates & secrets → **New client secret**. Copy the value immediately — you won't be able to view it again.
-* **Required API permissions (delegated)** — Under your app registration, add Microsoft Graph delegated permissions such as:
+This tool uses **OAuth 2.0**
 
-  * `Mail.Read` (or `Mail.ReadWrite` depending on needs)
-  * `Mail.Send`
-  * `Calendars.Read` / `Calendars.ReadWrite`
-  * `offline_access` (to allow refresh tokens)
-
-After adding delegated permissions you may need an admin consent step depending on your tenant policy.
+* **First Run:** You must explicitly click **Authenticate** in the tool configuration UI to generate the initial tokens. (check step 4)
+* **Maintenance:** Tokens may expire approximately every **90 days**. If the tool stops working, simply re-run the Authenticate flow.
 
 ---
 
-## Supported operations
+## ⚙️ Configuration Steps
 
-| Operation                | Short description                                         |
-| ------------------------ | --------------------------------------------------------- |
-| `important_mail`         | Return messages flagged high importance                   |
-| `mail_from_address`      | Return messages from a sender                             |
-| `content_search_in_mail` | Search mail content (free-text)                           |
-| `send_mail`              | Send an email on behalf of user                           |
-| `event_for_week`         | Return events for a date range                            |
-| `all_event`              | Return all events (detailed) - subject, bodyPreview, etc. |
-| `all_calendar`           | List all calendars for user                               |
-| `schedule_meet`          | Create a calendar event / meeting                         |
+Follow these steps to connect your Microsoft Outlook tenant.
+
+<Steps>
+<Step>
+
+### Create Azure App Registration
+
+1. Log in to the [Azure Portal](https://portal.azure.com).
+2. Navigate to **Azure Active Directory** -> **App registrations** -> **New registration**.
+3. Register your app and note the **Application (client) ID** and **Directory (tenant) ID**.
+
+</Step>
+
+<Step>
+
+### Generate Client Secret
+
+1. In your App Registration, go to **Certificates & secrets**.
+2. Click **New client secret**.
+3. **Crucial:** Copy the **Value** immediately. You will not be able to see it again.
+
+</Step>
+
+<Step>
+
+### Configure API Permissions
+
+1. Go to **API permissions** -> **Add a permission** -> **Microsoft Graph** -> **Delegated permissions**.
+2. Add the following permissions:
+* `Mail.Read` (or `Mail.ReadWrite`)
+* `Mail.Send`
+* `Calendars.Read` (or `Calendars.ReadWrite`)
+* `offline_access` (Required for refresh tokens)
 
 
+3. If your tenant requires it, click **Grant admin consent**.
 
-These are the operations supported by this tool.
+</Step>
+
+<Step>
+
+### Configure & Authenticate in SVAHNAR
+
+1. Open your SVAHNAR Agent Configuration.
+2. Add the **Outlook** tool and enter your Azure credentials:
+* `tenant_id`
+* `client_id`
+* `client_secret`
+
+
+3. Save the configuration.
+4. **Action Required:** Click the **Authenticate** button in the tool UI. This will launch a pop-up to log in with your Microsoft account and store the secure tokens in your Keyvault.
+
+</Step>
+</Steps>
 
 ---
 
-## Example: YAML config
+## 📚 Practical Recipes (Examples)
+
+### Recipe 1: Executive Assistant Agent
+
+> **Use Case:** An agent that manages your schedule and highlights important emails.
 
 ```yaml showLineNumbers
-tools:
+create_vertical_agent_network:
+  agent-1:
+    agent_name: executive_assistant
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
       tool_assigned:
         - name: Outlook
           config:
+            # Azure AD Credentials
             tennant_id: ${tenant_id}
             client_id: ${client_id}
             client_secret: ${client_secret}
+    agent_function:
+      - You are an executive assistant.
+      - Check my calendar for the week using 'event_for_week'.
+      - Scan for 'important_mail' and summarize urgent items.
+      - If I ask to schedule a meeting, use 'schedule_meet' and ensure all details (subject, time, attendees) are correct before confirming.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+
 ```
+
+### 💡 Tip: SVAHNAR Key Vault
+
+For security, never hardcode your Client Secret in plain text files. Use SVAHNAR Key Vault (like `${client_secret}`).
 
 ---
 
-## Authentication & token lifecycle
+## 🚑 Troubleshooting
 
-* **First run:** you must trigger the OAuth Authenticate flow in your tool config UI so the refresh token is stored in the key vault. Without this, the tool cannot derive access tokens for a user.
-* **Token expiry:** if a token expires or the refresh token is rotated/invalidated, re-run the Authenticate flow in the tool config UI. In this setup, tokens may require re-authentication approximately every **90 days**.
+* **"Token not found" or Authentication Errors**
+    * Ensure you have clicked the **Authenticate** button in the UI at least once.
+    * Check if 90 days have passed since the last authentication; if so, re-authenticate.
 
+
+* **Permission Denied (403)**
+    * Verify that you added the correct **Delegated permissions** (`Mail.Read`, `Mail.Send`, etc.) in the Azure Portal.
+    * Ensure you clicked **Grant admin consent** if your organization requires it.

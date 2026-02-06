@@ -1,61 +1,116 @@
+
+
+import { Steps, Step } from '@site/src/components/Steps/Steps';
+
+# Wikipedia
+
+Empower your agents to access the world's knowledge by searching **Wikipedia** for article summaries and historical data.
+
+This guide will walk you through configuring the Wikipedia tool, including how to customize search depth and language settings.
+
+## 💡 Core Concepts
+
+To configure this tool, you need to understand how it handles queries and parameters.
+
+### 1. How does the Wikipedia Tool work?
+
+This tool acts as a wrapper around the Wikipedia API. When your agent sends a `query`, the tool searches for relevant articles, retrieves the most pertinent pages, and returns a concise summary of the content.
+
+### 2. Configuration Parameters
+
+Unlike simpler tools, you can pre-configure how this tool behaves in your YAML setup:
+
+* **`top_k_results`**: Controls how many search results/snippets to return (e.g., `3`).
+* **`lang`**: Sets the language for the Wikipedia search (e.g., `en` for English, `es` for Spanish).
+
 ---
-title: "Wikipedia"
-sidebarTitle: List of Tools
----
-Wikipedia is a free online encyclopedia, created and edited by volunteers around the world and hosted by the Wikimedia Foundation.
 
-This tool search wikipedia for summaries and article content using the Wikipedia API wrapper. Provide a `query` string and optional parameters like `top_k_results` or `lang`.
+## ⚙️ Configuration Steps
 
-## Example payload
+Follow these steps to integrate Wikipedia search into your agentic network.
 
-```json
-{ "query": "Reinforcement learning" }
+<Steps>
+<Step>
+
+### Assign & Configure Tool
+
+In your agent's YAML configuration, add "Wikipedia" to the `tool_assigned` list. You can optionally define the language and number of results here.
+
+**Example Config:**
+
+```yaml
+config:
+  top_k_results: 3
+  lang: en
 ```
 
-### Notes
+</Step>
 
-- The tool returns a concise article summary and can include additional metadata when available.
 
-## YAML usage
 
-Example of assigning the Wikipedia tool to an agent with optional params:
+<Step>
+
+### Test the Output
+
+The tool returns text summaries.
+
+* **Usage:** The agent uses this text to answer user questions or perform further reasoning and fulfill the user request.
+</Step>
+
+</Steps>
+
+---
+
+## 📚 Practical Recipes (Examples)
+
+### Recipe 1: General Knowledge Assistant
+
+> **Use Case:** An agent that answers "Who," "What," and "When" questions using English Wikipedia.
+
+```yaml showLineNumbers
+create_agent_network:
+  agent-1:
+    agent_name: "Wiki_Lookup_Agent"
+    LLM_config:
+      params:
+        model: "gpt-4o-mini"
+    tools:
+      tool_assigned:
+        - name: "Wikipedia"
+          config:
+            top_k_results: 1
+            lang: en
+    agent_function:
+      - "You are a helpful encyclopedia assistant."
+      - "When asked about a topic, use the Wikipedia tool to fetch a summary."
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+
+```
+
+### Recipe 2: International Researcher
+
+> **Use Case:** An agent configured to search for concepts specifically in French Wikipedia.
 
 ```yaml showLineNumbers
 tools:
-	tool_assigned:
-		- name: "Wikipedia"
-			config:
-				top_k_results: 3
-				lang: en
+  tool_assigned:
+    - name: "Wikipedia"
+      config:
+        top_k_results: 5
+        lang: fr
+
 ```
 
-Invocation payload (what the agent sends to the tool at runtime):
+---
 
-```yaml showLineNumbers
-payload:
-	query: "Reinforcement learning"
-```
+## 🚑 Troubleshooting
 
-### More details
 
-The Wikipedia wrapper fetches article summaries and can optionally return extended metadata. Use `top_k_results` to control the number of snippets returned and `lang` to select the language edition.
+* **RuntimeError / Connection Issues**
+    * This usually indicates a failure to reach the Wikipedia API. Verify if the Wikipedia API is currently down.
 
-## Agent integration example
 
-```yaml showLineNumbers
-create_vertical_agent_network:
-	agent-1:
-		agent_name: "wiki_lookup"
-		LLM_config:
-			params:
-				model: "gpt-5-mini"
-		tools:
-			tool_assigned:
-				- name: "Wikipedia"
-					config:
-						top_k_results: 3
-						lang: en
-		agent_function:
-			- "Fetch a concise summary from Wikipedia for the given query."
-```
-
+* **Irrelevant Results**
+    * If the summary returned is not helpful, consider increasing `top_k_results` (default is 3) in the config to give the agent a broader set of snippets to read.

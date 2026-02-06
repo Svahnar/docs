@@ -1,64 +1,132 @@
+import Video from '@site/src/components/Video';
+import { Steps, Step } from '@site/src/components/Steps/Steps';
+
+# Knowledge Repo
+
+Empower your agents with **semantic search** capabilities over your Knowledge Repositories.
+
+This guide will walk you through configuring the Knowledge Repository tool to enable Agentic-Retrieval-Augmented Generation (A-RAG).
+
+## 💡 Core Concepts
+
+To configure this tool, you need to understand how the search and scoping work.
+
+
+### 1. Search Scoping (Filtering)
+
+You can restrict the search to specific data subsets using IDs:
+
+* **Knowledge Repo ID (`k_repo_id`):** Restricts search to a specific repository UUID.
+* **Document ID (`doc_id`):** Restricts search to a specific document UUID within a repository.
+
+:::info Access Control
+The tool automatically enforces permission checks. If a `k_repo_id` is provided, the tool verifies that the current user (the creator of the agent) has permission to access that specific repository.
+:::
+
+:::warning
+> If your Knowledge repository is global, anyone with the UUID can access it.
+:::danger
+ If your Knowledge repository is private, only the creator can access it. If a user already has permission to access an agent associated with the Knowledge repository in your organization, you do not need to configure permissions separately for the Knowledge repository. The user’s agent permissions are automatically inherited by the associated Knowledge repository.
+:::
+
 ---
-title: "KnowledgeRepo"
-sidebarTitle: List of Tools
+
+## ⚙️ Configuration Steps
+
+Follow these steps to integrate the Knowledge Repository tool.
+
+<Steps>
+
+<Step>
+
+### Configure Tool in Agent
+
+Add the `KnowledgeRepo` tool to your agent's configuration. You must map the credentials to the `config` block.
+
+**Required Configuration Parameters:**
+
+* `QDRANT_COLLECTION_NAME`
+* `QDRANT_URL`
+* `KR_API_KEY`
+
+:::tip SVAHNAR Key Vault
+We strongly recommend using `${VARIABLE_NAME}` syntax to reference SVAHNAR Key Vault rather than hardcoding sensitive keys in your YAML.
+:::
+
+</Step>
+
+<Step>
+
+### define Agent Function
+
+Instruct your agent on *when* to use this tool.
+
+* **Example Instruction:** "If the user asks about internal policies, use the KnowledgeRepo tool to find the answer."
+* **Query Input:** The agent will automatically generate the `query` string based on the user's conversation.
+</Step>
+
+</Steps>
+
 ---
 
-Performs a semantic search over your knowledge repository backed by Qdrant and embeddings.
+## 📚 Practical Recipes (Examples)
 
-## Usage
+### Recipe 1: Basic Global Search of Knowledge Repository
 
-Provide `QDRANT_COLLECTION_NAME`, `QDRANT_URL`, `KR_API_KEY`, and `OPENAI_API_KEY` in the tool config. Pass a `query` string to search the repository.
-
-```json
-{ "query": "How to configure SVAHNAR agent network" }
-```
-
-### Returns
-
-Top matching text snippets from the knowledge repository (by default the top 3 results).
-
-## YAML usage
-
-```yaml showLineNumbers
-tools:
-  tool_assigned:
-    - name: "KnowledgeRepo"
-      config:
-        QDRANT_COLLECTION_NAME: "my_qdrant_collection"
-        QDRANT_URL: "https://qdrant.example.com"
-        KR_API_KEY: "${KR_API_KEY}"
-        OPENAI_API_KEY: "${OPENAI_API_KEY}"
-```
-
-Invocation payload:
-
-```yaml showLineNumbers
-payload:
-	query: "How to configure SVAHNAR agent network"
-	k_repo_id: "<repo-uuid>" # optional to scope the search
-```
-
-### More details
-
-This tool uses OpenAI embeddings to create a query vector and Qdrant to perform the nearest-neighbor search; result ordering and quality rely on the embedding model selected.
-
-## Agent integration example
+> **Use Case:** An agent that searches the entire Knowledge Repository without restriction.
 
 ```yaml showLineNumbers
 create_vertical_agent_network:
   agent-1:
-    agent_name: "knowledge_searcher"
+    agent_name: researcher_agent
     LLM_config:
       params:
-        model: "gpt-5-mini"
+        model: gpt-5-mini
     tools:
       tool_assigned:
-        - name: "KnowledgeRepo"
+        - name: KnowledgeRepo
           config:
-            QDRANT_COLLECTION_NAME: "my_qdrant_collection"
-            QDRANT_URL: "https://qdrant.example.com"
-            KR_API_KEY: "${KR_API_KEY}"
-            OPENAI_API_KEY: "${OPENAI_API_KEY}"
+            k_repo_id: UUID
     agent_function:
-      - "Search the knowledge repository for relevant passages and return top snippets."
+      - "Search the knowledge repository for relevant passages and answer the user's question."
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+
 ```
+
+### Recipe 2: Scoped Search of Knowledge Repository (Specific Document)
+
+> **Use Case:** An agent restricted to searching a specific document within a Knowledge Repository (e.g., "HR Policies" only).
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: hr_policy_bot
+    LLM_config:
+      params:
+        model: gpt-5-mini
+    tools:
+      tool_assigned:
+        - name: KnowledgeRepo
+          config:
+            k_repo_id: "550e8400-e29b-41d4-a716-446655440000"
+            doc_id: "550e8400-e29b-41d4-a716-446655440000"
+    agent_function:
+      - "You are an HR assistant. Use the KnowledgeRepo tool to answer policy questions."
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+
+```
+
+---
+
+## 🚑 Troubleshooting
+
+* **"Invalid Knowledge Repository ID" Error**
+    * Ensure the `k_repo_id` provided is a valid UUID format.
+
+* **"You do not have permission to access..."**
+    * This occurs if the `k_repo_id` exists but belongs to a different user/organization, and is not marked as `is_global`.
+    * Verify the ownership of the Knowledge Repository you are trying to access.

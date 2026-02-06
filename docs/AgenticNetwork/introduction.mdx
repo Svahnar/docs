@@ -5,52 +5,59 @@ sidebar_position: 1
 
 import Image from '@site/src/components/Image';
 
-The **Svahnar Agentic AI Framework** is a powerful framework designed to empower not only developers but also non-technical users to create intelligent, autonomous, and effective AI agents. The framework enables you to deploy **Agentic AI systems**, which can **think**, **learn**, and **act** independently to achieve defined goals and purposes.
+# Introduction to SVAHNAR
 
-With the **Svahnar Agentic AI Framework**, you can:
+The **SVAHNAR Agentic AI Framework** is designed to empower both developers and non-technical users to build intelligent, autonomous AI systems.
 
-- **Connect** to leading Foundation Models.
-- **Integrate** with various tools.
-- **Define** specific Do's and Don'ts for AI agents.
+Unlike traditional automation, SVAHNAR enables you to deploy **Agentic AI**—systems that can **think**, **learn**, and **act** independently to achieve your goals.
 
-Whether you're building **automated workflows**, **decision-making systems**, or **state-of-the-art AI agents**, the Svahnar Agentic AI Framework simplifies the process of designing, deploying, and using Agentic AI solutions.
+With this framework, you can:
+* **Connect** to leading Foundation Models (LLMs).
+* **Integrate** seamlessly with external tools and APIs.
+* **Define** strict guardrails (Do's and Don'ts) for safety.
 
----
+-----
 
-## What Is Agentic AI?
+## 💡 Core Concepts
 
-Agentic AI refers to computational systems that operate with a level of **autonomy**, **intelligence**, and **purpose**. Unlike traditional AI systems that simply process inputs and respond with outputs based on predefined rules, Agentic AI is designed to:
+Before building, it is helpful to understand what sets Agentic AI apart from standard automation.
 
-- **Perceive** its environment, tools, knowledge repositories, other AI agents, and outside information by collecting and understanding data.
-- **Reason** and make plans. By working with other AI agents, it figures out how to solve problems and handles simple tasks like creating content or giving recommendations or complex tasks like working with multiple tools or systems.
-- **Act** on its plans to reach goals. It uses external tools and safeguards to make sure its actions are accurate, controlled, and achieve what's intended.
-- **Learn** and improve over time by using feedback from its actions to get better at making decisions and performing tasks.
+### What is Agentic AI?
 
-<Image src="https://content.svahnar.com/docs.svahnar.com/AI-Agent.jpg" helpText="AI Agent Diagram" />
+Traditional AI waits for a prompt to give an answer. **Agentic AI** operates with autonomy and purpose. It is designed to:
 
+1.  **Perceive:** Collects and understands data from its environment, tools, and knowledge repositories.
+2.  **Reason:** Plans a path to a solution. It figures out which tools to use and breaks down complex problems into manageable steps.
+3.  **Act:** Executes its plans using external tools (like APIs, Databases, or Search) while adhering to defined safeguards.
+4.  **Learn:** Improves over time by utilizing feedback loops to refine its decision-making.
 
-This makes Agentic AI particularly useful for use cases where independent decision-making, dynamic workflows, or autonomous control systems are required.
+<Image 
+  src="https://content.svahnar.com/docs.svahnar.com/AI-Agent.jpg" 
+  helpText="Diagram illustrating the Perceive, Reason, Act, and Learn loop of Agentic AI" 
+/>
 
----
+-----
 
-## YAML Configuration for Svahnar Agentic Network
+## ⚙️ Configuration Approach
 
-The **Svahnar Agentic AI Framework** offers a convenient way to create agentic networks using **YAML configuration files** and **SVAHNAR Console**. YAML (Yet Another Markup Language) provides a human-readable way to define the structure, data, and behaviors of your Agentic AI network. Creating an Agentic AI system using YAML ensures simplicity, clarity, and flexibility.
+SVAHNAR uses a **YAML-first approach**. 
 
-### Starting Your YAML Configuration
+We chose YAML (Yet Another Markup Language) because it is human-readable. This allows everyone to "read" the structure of an AI agent and understand its behavior without needing to deal with complex code.
 
-Every YAML configuration file for creating a Svahnar Agentic Network must include the **top-level key**:
+:::tip Power & Flexibility
+You do not lose features or flexibility by using YAML. You retain the same level of granular control as you would with Python or JavaScript.
+:::
 
-```yaml showLineNumbers starting_point.yaml
-create_vertical_agent_network:
-```
+:::info Agent Console 
+You can also use our **Agent Console** to create Agents without writing YAML files directly.
 
-This top-level key serves as the **starting point** for defining every aspect of the Agentic AI network. Within this key, you will organize all the critical components required to configure and operate the agentic network effectively, including:
+Log in to the [SVAHNAR Platform](https://platform.svahnar.com/) and navigate to the **Agent Console** on the top bar to create your first Agent.
+:::
 
-- **Connecting to Foundation models**
-- **Data and tools integration**
-- **Defining agent functions**
-- **Orchestration of agent interactions**
+### The Foundation Key
 
-The YAML-based approach enables you to craft fully customized, repeatable, and scalable Agentic AI frameworks with ease. By nesting configurations under the `create_vertical_agent_network` key, you ensure that all components are logically structured and easy to manage.
+Every Agentic Network you build begins with a single, top-level key. This tells the framework that you are defining a network of agents.
 
+```yaml showLineNumbers title="starting_point.yaml"
+create_agent_network:
+  # All your agent configurations, tools, and logic reside here

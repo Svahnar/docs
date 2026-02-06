@@ -1,16 +1,77 @@
 
+import { Steps, Step } from '@site/src/components/Steps/Steps';
 
-Use the URL connector to import content directly from web pages. The connector crawls and ingests publicly-accessible web content and stores it in the Knowledge Repository for retrieval-augmented generation (RAG) queries.
+# URL Connector
 
-## When to use
+Automatically ingest and index content from web pages to power your **Knowledge Repository**.
 
-- Quick ingestion of public documentation, blogs, or knowledge bases
-- Periodic scraping of frequently-updated pages
+This connector crawls publicly accessible URLs, extracting both text and data from images (via OCR) to prepare it for Agentic-Retrieval-Augmented Generation (A-RAG).
 
-## Usage
-- Just provide the URL in form `https://yoururl.com`. It will extract the page content if images are there then that will also be extracted.
-- For images it will use OCR to extract data
+## 💡 Core Concepts
 
-## Notes
+To use this connector effectively, understand how it processes web content.
 
-- Ensure the target URLs allow crawling and scraping.
+### 1. What does the URL Connector do?
+
+Unlike the *Webpage Search* tool (which an agent uses actively during a conversation), the **URL Connector** is used to *pre-load* knowledge. It crawls a target URL, scrapes the content, and stores it in your Knowledge Repository. This allows agents to answer questions based on that content later.
+
+---
+
+## ⚙️ Configuration Steps
+
+Follow these steps to add a web source to your Knowledge Repository.
+
+<Steps>
+<Step>
+
+### Prepare the Source
+
+Identify the URL you wish to ingest. This works best for:
+
+* Public documentation sites.
+* Company docs, blogs, or news pages.
+* Static knowledge bases.
+</Step>
+<Step>
+
+### Add Connector
+
+In your Knowledge Repository configuration, select the **URL** connector type.
+
+* **Input:** Provide the full URL string (e.g., `https://docs.svahnar.com`).
+</Step>
+<Step>
+
+### Ingestion Process
+
+Once triggered, the system will:
+
+1. **Crawl:** Access the page.
+2. **Extract:** Scrape HTML text and perform OCR on `<img>` tags.
+3. **Index:** Chunk the data and store embeddings in the Knowledge Repository.
+
+</Step>
+</Steps>
+
+
+
+---
+
+## 🚑 Troubleshooting
+
+* **Content not appearing in RAG**
+    * Check if the URL is behind a login or firewall. The connector requires **public access**.
+    * Ensure the website allows crawling. Some sites block bots via `robots.txt` or Cloudflare challenges.
+
+
+* **Poor OCR Results**
+    * OCR accuracy depends on image resolution. Low-quality screenshots may yield gibberish.
+    * Ensure the images on the target URL are not lazy-loaded in a way that prevents the crawler from seeing them.
+
+
+* **Ingestion Failures**
+    * Verify the URL format includes the protocol (must be `https://` or `http://`).
+
+## 💰 Additional Credit Consumption
+
+Extracted information is processed into pages of size A4 (8.5" x 11"). Each page consumes one credit.

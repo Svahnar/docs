@@ -1,73 +1,98 @@
----
-title: "AWS SES - Send Email"
-sidebarTitle: List of Tools
----
+import { Steps, Step } from '@site/src/components/Steps/Steps';
 
-Send emails via AWS Simple Email Service (SES). The tool supports both plain text and HTML bodies.
+# AWS SES (Send Email)
 
-## Required fields
+Empower your agents to send transactional and marketing emails at scale using **AWS Simple Email Service (SES)**.
 
-- `sender_email` (string)
-- `recipients` (string or list)
-- `subject` (string)
-- `body_text` (string) or `body`
+This guide will help you configure the AWS SES tool, manage credentials, and send both plain text and HTML emails.
 
-Optional fields: `body_html`, `AWS_REGION`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `sender_name`.
+## 💡 Core Concepts
 
-### Example payload
+To use this tool effectively, you need to understand the AWS prerequisites.
 
-```json
-{
-  "sender_email": "me@example.com",
-  "recipients": ["you@example.com"],
-  "subject": "Test",
-  "body_text": "Hello from SVAHNAR agent"
-}
-```
+### 1. What is AWS SES?
+Amazon Simple Email Service (SES) is a cloud-based email sending service. Your agent uses this to send notifications, reports, or transactional emails programmatically.
 
-Returns the SES Message ID on success.
+### 2. The "Sandbox" Limitation
+By default, new AWS accounts are in the **SES Sandbox**.
+* You can only send email **from** verified addresses.
+* You can only send email **to** verified addresses.
+* You must request a production access limit increase from AWS to email unverified recipients.
 
-## YAML usage
+-----
 
-Assign the SES tool to an agent and provide AWS config via environment or tool config:
+## ⚙️ Configuration Steps
 
-```yaml showLineNumbers
-tools:
-  tool_assigned:
-    - name: AWS_SES_send_email
-      config:
-        AWS_REGION: us-east-1
-```
+Follow these steps to authorize and configure the email capability.
 
-Invocation payload example:
+<Steps>
+  <Step>
 
-```yaml showLineNumbers
-payload:
-  sender_email: "me@example.com"
-  recipients:
-    - "you@example.com"
-  subject: "Test"
-  body_text: "Hello from SVAHNAR agent"
-```
+### Prepare AWS Credentials
 
-### More details
+  1. Log in to your AWS Console and navigate to **IAM**.
+  2. Create a User with `AmazonSESFullAccess` (or a custom policy allowing `ses:SendEmail`).
+  3. Generate an **Access Key ID** and **Secret Access Key**.
+  4. Navigate to the **SES Console** and verify the "Identity" (email address) you plan to send from (e.g., `notifications@yourcompany.com`).
 
-SES requires verified sender emails or domains in most AWS accounts. If you are in SES sandbox, ensure recipient addresses are verified as well. The tool returns the AWS Message ID on success and raises a meaningful error for common failures (invalid credentials, unverified sender, quota issues).
+  </Step>
 
-## Agent integration example
+  <Step>
+
+### Configure Tool in YAML
+
+  You need to provide your sender details and AWS credentials in the tool configuration.
+
+  * **sender_email**: The verified email address the agent will send *from*.
+  * **sender_name**: (Optional) The "Friendly Name" that appears in the inbox (e.g., "Support Team").
+  * **AWS_REGION**: The region where your SES identity is verified (e.g., `us-east-1`).
+
+  :::warning Security Note
+  For production environments, ensure your AWS Access Keys are managed securely according to your deployment standards (e.g., SVAHNAR Key Vault), rather than hardcoded in plain text if possible.
+  :::
+
+  </Step>
+
+  <Step>
+
+### Agent Instructions
+
+  Once configured, you simply tell the agent what to send. The agent will dynamically generate:
+  * **recipients**: Who to email.
+  * **subject**: The subject line.
+  * **body_text** & **body_html**: The content of the email.
+
+  </Step>
+</Steps>
+
+-----
+
+## 📚 Practical Recipes
+
+### Recipe 1: Basic Notification Agent
+
+> **Use Case:** An agent that sends a simple text alert to a user.
 
 ```yaml showLineNumbers
 create_vertical_agent_network:
   agent-1:
-    agent_name: emailer
+    agent_name: alert_bot
     LLM_config:
       params:
-        model: gpt-5-mini
+        model: gpt-5-nano
     tools:
       tool_assigned:
         - name: AWS_SES_send_email
           config:
-            AWS_REGION: us-east-1
+            sender_email: "alerts@svahnar.com"
+            sender_name: "SVAHNAR Alerts"
+            AWS_REGION: "us-east-1"
+            AWS_ACCESS_KEY_ID: "YOUR_ACCESS_KEY"
+            AWS_SECRET_ACCESS_KEY: "YOUR_SECRET_KEY"
     agent_function:
-      - "Send email notifications using AWS SES."
-```
+      - You are a monitoring assistant.
+      - If the user asks to send an alert, extract the email address and send a summary.
+      - Ensure you send the email to the specific recipient provided.
+    incoming_edge:
+      - Start
+    outgoing_edge: []

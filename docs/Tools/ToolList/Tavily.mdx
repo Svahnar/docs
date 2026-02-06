@@ -1,75 +1,131 @@
-Tavily is the real‑time search engine for AI agents and RAG workflows
 
-Search the web using Tavily. This tool performs web searches and can return aggregated answers, raw content, and images depending on the provided parameters.
+import Video from '@site/src/components/Video';
+import { Steps, Step } from '@site/src/components/Steps/Steps';
 
-## Usage
+# Tavily
 
-Provide an `API_key` and a `query` string (or include the API key in environment variables). The tool accepts additional parameters like `max_results`, `include_answer`, `include_raw_content`, and `search_depth`.
+Empower your agents with real-time web knowledge using **Tavily**, the search engine built specifically for AI.
 
-You can pass api key directly to api key field in agent node or you can place placeholder name (Note:- Name of placeholder should match with the name of key defined in key vault)
+
+## 💡 Core Concepts
+
+To effectively use Tavily, you should understand how it interacts with your agent.
+
+### 1. What is Tavily?
+Tavily is a search API optimized for LLMs. Unlike traditional search engines, it returns concise answers.
+
+### 2. Configuration Parameters
+You can customize the search behavior in the `config` block:
+* **`max_results`**: Limit the number of search results returned (e.g., `5`).
+* **`include_answer`**: Set to `True` to get a short, synthesized answer to the query.
+* **`include_raw_content`**: Set to `True` if you need the full text of the scraped pages.
+* **`search_depth`**: Choose between `basic` (faster) or `advanced` (deeper search).
+
+---
+
+## ⚙️ Configuration Steps
+
+Follow these steps to enable web search capabilities for your agents.
+
+<Steps>
+  <Step>
+
+### Get your API Key
+
+  1. Sign up at [tavily.com](https://tavily.com/).
+  2. Create a new API Key in your dashboard.
+  3. Copy the key (it starts with `tvly-`).
+
+  </Step>
+
+  <Step>
+
+### Set up Key Vault (Recommended)
+
+  Hardcoding keys is risky. We recommend using the **Key Vault**.
+
+  1. Navigate to the **Key Vault** section in SVAHNAR Platform.
+  2. Add a new secret named `TAVILY_API_KEY`.
+  3. Paste your Tavily API Key as the value.
+
+  :::tip
+  This allows you to reference the key in your YAML as `${TAVILY_API_KEY}`.
+  :::
+
+  </Step>
+
+  <Step>
+
+### Configure the Tool
+
+  Add the tool to your agent's configuration. You must ensure the agent has a clear instruction to use it.
+
+  **Minimal Configuration:**
+  ```yaml
+  tools:
+    tool_assigned:
+      - name: Tavily
+        config:
+          API_key: ${TAVILY_API_KEY}
+
+```
+
+</Step>
+</Steps>
+
+---
+
+## 📚 Practical Recipes
+
+### Recipe 1: Standard Web Search Agent
+
+> **Use Case:** An agent that performs broad searches to answer general questions.
+
+```yaml showLineNumbers
+create_agent_network:
+  agent-1:
+    agent_name: "web_search_agent"
+    LLM_config:
+      params:
+        model: "gpt-5-mini"
+    tools:
+      tool_assigned:
+        - name: Tavily
+          config:
+            API_key: ${TAVILY_API_KEY}
+            max_results: 5
+    agent_function:
+      - "Search the web for authoritative resources about the user's query."
+
+```
+
+### Recipe 2: Advanced RAG Fetcher
+
+> **Use Case:** An agent capable of deep research that needs direct answers and raw content for analysis.
 
 ```yaml showLineNumbers
 tools:
-	tool_assigned:
-		- name: Tavily
-			config:
-				API_key: tvly-w35dfg-
+  tool_assigned:
+    - name: Tavily
+      config:
+        API_key: ${TAVILY_API_KEY}
+        max_results: 3
+        include_answer: True
+        include_raw_content: True
+        search_depth: "advanced"
+
 ```
 
-### Using Key-vault (Recomnended)
+---
 
-```yaml showLineNumbers
-tools:
-	tool_assigned:
-		- name: Tavily
-			config:
-				API_key: ${TAVILY_API_KEY}
-```
+## 🚑 Troubleshooting
 
-### Notes
+* **API_key must be provided**
+    * The tool cannot find the API key. Ensure you have either passed it directly in the `config` or referenced a valid Key Vault variable (e.g., `${TAVILY_API_KEY}`).
 
+* **Other Errors**
+    * Check with the Tavily service or Rate Limits.
+    * Check your billing status on the Tavily dashboard.
+    * Ensure you aren't exceeding the `max_results` limit for your plan.
 
-## YAML usage
-
-If you want to configure Tavily in an agent, include the API key and any desired options in the `config` block:
-
-```yaml showLineNumbers
-tools:
-	tool_assigned:
-		- name: "Tavily"
-			config:
-				API_key: ${TAVILY_API_KEY}
-				max_results: 5
-				include_answer: True
-```
-
-Invocation payload:
-
-```yaml showLineNumbers
-payload:
-	query: "latest research on retrieval augmented generation"
-```
-
-### More details
-
-Tavily is intended for broad web searches and may return both short answers and raw source content. Because it reaches the public web, be mindful of rate limits and API billing.
-
-## Agent integration example
-
-```yaml showLineNumbers
-create_vertical_agent_network:
-	agent-1:
-		agent_name: "web_search_agent"
-		LLM_config:
-			params:
-				model: "gpt-5-mini"
-		tools:
-			tool_assigned:
-				- name: Tavily
-					config:
-						API_key: ${TAVILY_API_KEY}
-						max_results: 5
-		agent_function:
-			- "Search the web for authoritative resources about the query."
-```
 

@@ -24,6 +24,8 @@ const config: Config = {
 
   onBrokenLinks: 'warn',
 
+  clientModules: ['./src/client-modules/sidebar-scroll.ts'],
+
   // Even if you don't use internationalization, you can use this field to set
   // useful metadata like html lang. For example, if your site is Chinese, you
   // may want to replace "en" with "zh-Hans".
@@ -72,11 +74,12 @@ const config: Config = {
         ],
       },
     ],
+    // 'docusaurus-markdown-source-plugin',
   ],
 
   themeConfig: {
     // Replace with your project's social card
-    
+
     navbar: {
       // title: 'SVAHNAR DOCS',
       logo: {
@@ -153,7 +156,7 @@ const config: Config = {
       theme: prismThemes.vsLight,     // light mode code style
       darkTheme: prismThemes.vsDark,  // dark mode code style
 
-      
+
     },
     footer: {
       // style: 'dark',

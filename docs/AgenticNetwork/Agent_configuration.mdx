@@ -1,53 +1,95 @@
 ---
-title: "Understand Agent Fields and Validation Rules"
-sidebarTitle: "Agent Configuration"
+title: "Agent Configuration"
+sidebar_label: "Agent Configuration"
 ---
-Here's a table summarizing the main fields for each agent:
+
+# Agent Configuration
+
+Master the blueprint of your agentic network by understanding the core configuration fields and validation rules.
+
+This guide provides a comprehensive reference for every field available when defining an agent in **SVAHNAR**, along with the strict logic rules required for a successful deployment.
+
+## 💡 Core Concepts
+
+The configuration of an agent defines its identity, intelligence, and connectivity. It tells the system **who** the agent is (Name/Role), **how** it thinks (LLM Config), and **where** it fits in the network (Edges).
+
+### Key Components:
+* **Identity:** `agent_name` and `Role`.
+* **Intelligence:** `LLM_config` and `agent_function`.
+* **Connectivity:** `incoming_edge` and `outgoing_edge`.
+
+---
+
+## ⚙️ Field Reference
 
 ### Agent Fields
 
-| Field            | Type    | Description                                                                   | Required | Example                   |
-|------------------|---------|-------------------------------------------------------------------------------|----------|---------------------------|
-| agent_name       | string  | Unique name for the agent                                                     | Yes      | "example_agent"           |
-| LLM_config       | array   | Configuration of the LLM(s) used by the agent                                 | Yes      | See LLM Configurations    |
-| Role             | string  | Role of the agent (`normal` or `supervisor`)                                  | No       | "supervisor"              |
-| agent_function   | string  | List of functions the agent performs                                          | Yes      | "Your goal is to send a request to the API endpoint with the given parameters. Make sure you check the parameters before sending the request. Parameters are: "param1": "value1", "param2": "value2"          |
-| incoming_edge    | array   | List of agents or `Start` connected to this agent                             | Yes      | ["Start"]                 |
-| outgoing_edge    | array   | List of agents connected from this agent                                      | Yes      | ["agent-2"]               |
-| tools            | object  | Tools assigned to the agent                                                   | No       | [See Tool Configuration](/docs/AgenticNetwork/Configuration/Tools)    |
+These are the top-level properties required to define an agent.
+
+| Field | Type | Required | Description | Example |
+| :--- | :--- | :--- | :--- | :--- |
+| **agent_name** | `string` | **Yes** | A unique identifier for the agent within the network. | `"research_agent"` |
+| **LLM_config** | `array` | **Yes** | Configuration settings for the AI model driving this agent. | *(See LLM Configurations below)* |
+| **Role** | `string` | Yes (for Supervisor Agents) | Defines if the agent acts as a manager. Values: `normal` or `supervisor`. | `"supervisor"` |
+| **agent_function** | `string` | **Yes** | The prompt or system instruction that defines the agent's goal. | `"Your goal is to extract email addresses..."` |
+| **incoming_edge** | `array` | **Yes** | A list of agents (or `"Start"`) that trigger this agent. | `["Start"]` |
+| **outgoing_edge** | `array` | **Yes** (if exists) | A list of agents that this agent triggers next. | `["writer_agent"]` |
+| **tools** | `object` | Yes (for non-supervisor/normal agents) | External capabilities assigned to the agent. | [See Tool Configuration](/docs/AgenticNetwork/Configuration/Tools) |
 
 ### LLM Configurations
 
-Each entry in `LLM_config` includes:
+The `LLM_config` block dictates the "brain" of the agent.
 
-| Field    | Type   | Description                                   | Required | Example           |
-|----------|--------|-----------------------------------------------|----------|-------------------|
-| provider | string | LLM provider (`ChatOpenAI`, `ChatNvidia`)     | No  - Only for Enterprise (BYOAI)     | "ChatOpenAI"      |
-| params   | object | Provider-specific parameters                  | Yes      | See below         |
+:::info Enterprise Feature
+The **`provider`** field (BYOAI - Bring Your Own AI) is strictly for **Enterprise users**. Standard users should omit this field and use the default SVAHNAR models.
+:::
 
-`BYOAI (Bring Your Own AI) is only available for Enterprise users.`
+| Field | Type | Required | Description | Example |
+| :--- | :--- | :--- | :--- | :--- |
+| **provider** | `string` | No* | The AI provider (e.g., `ChatOpenAI`, `ChatNvidia`). *Enterprise only.* | `"ChatOpenAI"` |
+| **params** | `object` | **Yes** | Specific parameters for the chosen model. | *(See Parameters below)* |
 
-**Parameters**:
+**Parameters Object:**
 
-| Field           | Type    | Allowed Values                      | Required | Example           |
-|-----------------|---------|-------------------------------------|----------|-------------------|
-| model           | string  | "gpt-5", "gpt-5-mini"             | Yes      | "gpt-5-mini"     |
-| max_tokens      | integer | Minimum: 1                          | No       | 500               |
-| request_timeout | integer | Minimum: 1                          | No       | 30                |
+| Field | Type | Required | Description | Allowed Values |
+| :--- | :--- | :--- | :--- | :--- |
+| **model** | `string` | **Yes** | The specific model version to use. | `"gpt-5"`, `"gpt-5-mini"` |
+| **max_tokens** | `int` | No | The maximum length of the generated response. | (e.g., `4000`) |
+| **request_timeout** | `int` | No | The timeout limit in seconds. | (e.g., `600`) |
 
-### Validation Rules
+---
 
-- **Top-Level Key**: Must only contain `create_vertical_agent_network`.
-- **Agent Names**: Each agent's `agent_name` must be unique.
-- **Edges**:
-  - `incoming_edge` can contain `Start` (only once across all agents).
-  - `outgoing_edge` must not contain `Start`.
-  - Edges must reference valid agent names.
-- **Supervisor Limitations**:
-  - `supervisor` agents can only connect to agents defined earlier in the YAML file.
-- **LLMs**:
-  - Ensure and `params` matches the allowed models.
-- **Start Node**:
-  - Exactly one agent must have `Start` in its `incoming_edge`.
+## 🛑 Validation Rules
 
+To ensure your network deploys without errors, your configuration must adhere to these rules.
 
+:::info Note
+If you are creating an agent using the SVAHNAR SDK, you can use the [validate function](/docs/Agents/validate_config) to validate your agent configuration. If you're using the Agent Console, this validation is performed automatically.
+:::
+
+### 1. Structure & Naming
+* **Top-Level Key:** The YAML file must start with `create_agent_network`.
+* **Uniqueness:** Every `agent_name` must be unique across the entire file.
+
+### 2. Edges & Connectivity
+* **The Start Node:**
+    * Exactly **one** agent must have `"Start"` in its `incoming_edge`.
+* **The End Node:**
+    * `outgoing_edge` must **never** contain `"Start"`.
+* **Validity:** All agents listed in edges must exist in the `agent_name` definitions.
+    * All agent names must be in **camelCase** or **snake_case**.
+
+### 3. Role Constraints
+* **Supervisors:** An agent with `Role: "supervisor"` **cannot** have tools assigned to it.
+
+### 4. Model Compliance
+* Ensure your `LLM_config` parameters match the allowed model list (e.g., `gpt-5`).
+
+---
+
+## 📚 Practical Recipes (Example)
+
+### Recipe: Standard Agent Configuration
+
+> **Use Case:** A standard agent connected to the start node, using the GPT-5 Mini model.
+Check [single agent configuration](/docs/AgenticNetwork/Create_simple_agent) and [multi agent configuration](/docs/AgenticNetwork/Create_agentic_network)

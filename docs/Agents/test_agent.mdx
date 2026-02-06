@@ -31,6 +31,36 @@ response = client.agents.test(
 
 print(response)
 ```
+### With Chat History
+
+When you need to test how the agent handles follow-up questions or context, provide the `agent_history`.
+
+:::tip
+You can learn how to generate the chat history object automatically or manually in the **[Chat History Guide](./chat_history.mdx)**.
+:::
+
+```python title="Python" showLineNumbers
+from svahnar import Svahnar
+from pathlib import Path
+
+client = Svahnar()
+
+# Example pre-existing history
+history = [
+    {"role": "user", "content": "Who is the CEO of OpenAI?"},
+    {"role": "assistant", "content": "information search agent - Sam Altman is the CEO of OpenAI."}
+]
+
+response = client.agents.test(
+    yaml_file=Path("agent.yaml"),
+    message="How old is he?",
+    agent_history=history,
+    timeout=600
+)
+
+print(response)
+```
+
 ## With YAML string
 
 You can use a YAML string to test the agent. This is useful for quick tests or when you don't want to create a separate YAML file.
@@ -41,7 +71,7 @@ from svahnar import Svahnar
 client = Svahnar()
 
 response = client.agents.test(
-    yaml_string="""create_vertical_agent_network:
+    yaml_string="""create_agent_network:
   agent-1:
     agent_name: information search agent
     agent_function:
@@ -68,6 +98,7 @@ print(response)
 
 - **`yaml_string`**: The YAML configuration string that defines the agent's context and settings.
 - **`message`**: The input data or message you want to send to the agent for processing. Currently it only supports string input.
+- **`agent_history`**: Optional. List of prior messages; defaults to empty list.
 - **`timeout`**: The maximum time (in seconds) to wait for the agent to respond. This is useful for complex agents that may take longer to process.
 
 ### Response

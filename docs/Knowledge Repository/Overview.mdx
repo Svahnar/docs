@@ -1,39 +1,159 @@
+import Video from '@site/src/components/Video';
+import { Steps, Step } from '@site/src/components/Steps/Steps';
+
+# Knowledge Repository
+
+Empower your agents with **semantic search** capabilities by connecting them to your documents.
+
+This guide will walk you through configuring the **KnowledgeRepo** tool to enable Agentic-Retrieval-Augmented Generation (A-RAG), allowing your agents to give answers grounded in your specific data.
+
+## 💡 Core Concepts
+
+To configure this tool, you need to understand how data ingestion and search scoping work.
+
+### 1. How it works
+The Knowledge Repository (KR) indexes your documents so agents can retrieve, analyze, and answer queries based on that content rather than hallucinating. 
+
+1.  **Ingest:** Upload documents (PDFs) directly or use SVAHNAR Connectors.
+2.  **Index:** The repository preprocesses content (including OCR for image-based PDFs) for semantic search.
+3.  **Query:** Agents fetch relevant information to produce accurate answers.
+
+### 2. Supported Data Sources
+You can upload files manually or use **Connectors** to index external sources automatically:
+* [URL](/docs/Knowledge%20Repository/Connectors/URL.mdx)
+* [AWS S3](/docs/Knowledge%20Repository/Connectors/AWS%20S3)
+* [Confluence](/docs/Knowledge%20Repository/Connectors/Confluence)
+* [SharePoint](/docs/Knowledge%20Repository/Connectors/Sharepoint)
+
+### 3. Search Scoping (Filtering)
+You can restrict the search to specific data subsets using IDs:
+
+* **Knowledge Repo ID (`k_repo_id`):** Restricts search to a specific repository UUID.
+* **Document ID (`doc_id`):** Restricts search to a specific document UUID within a repository.
+
+:::info Access Control
+**Permissions are inherited.** If a user has permission to access an agent associated with a Knowledge Repository in your organization, they automatically inherit access to that repository. You do not need to configure separate permissions.
+:::
+
 ---
-title: Knowledge Repository
+
+## ⚙️ Configuration Steps
+
+Follow these steps to integrate the Knowledge Repository with your agent.
+
+<Steps>
+<Step>
+
+### Prepare your Repository
+
+Before configuring the agent, ensure your documents are uploaded and indexed.
+
+1.  Navigate to the **Knowledge Repository** section in the SVAHNAR dashboard.
+2.  Create a new Repository or identify an existing one.
+3.  Upload your PDFs or configure a Connector (e.g., AWS S3, Confluence).
+4.  Copy the **Repository UUID** (and optional **Document UUID** if scoping is required).
+
+:::tip Best Practice
+Upload canonical, versioned copies of documents when possible to avoid indexing transient drafts.
+:::
+</Step>
+
+<Step>
+
+### Configure Tool in Agent
+
+Add the `KnowledgeRepo` tool to your agent's configuration YAML.
+
+**Key Configuration Parameter:**
+* `k_repo_id`: The unique UUID of the repository you want this agent to search.
+
+</Step>
+
+<Step>
+
+### Define Agent Function
+
+Instruct your agent on *when* to use this tool in the `agent_function` section.
+
+* **Example Instruction:** "If the user asks about internal HR policies, use the KnowledgeRepo tool to find the answer."
+* **Query Input:** The agent will automatically generate the `query` string based on the user's natural language question.
+
+</Step>
+</Steps>
+
 ---
 
-The Knowledge Repository lets you add documents (PDFs only) to a centralized knowledge store so agents can interact with that content.
+## 📚 Practical Recipes (Examples)
 
-## Key capabilities
+### Recipe 1: Basic Global Search
 
-- Retrieval-Augmented Generation (RAG): Documents you add are indexed so the LLM can retrieve, analyze, and answer queries grounded in the document content rather than hallucinating. RAG enables concise, accurate answers drawn from the source material.
-- Central storage on Svahnar S3: Uploaded documents are stored in Svahnar S3 (except confluence and sharepoint). Users can download stored documents unless a specific connector or storage policy forbids downloading (for example, some external connectors do not permit exporting files).
-- Querying instead of reading: Instead of manually reading long documents, upload them to the Knowledge Repository and ask natural-language questions. The agent will answer queries about the document contents.
-- Cloud connectors: You can connect documents that already live in cloud services using Svahnar connectors so they are indexed without manual re-upload.
-- OCR capabilities:- It will perform OCR on pdfs created from images to extract textual data from it
+> **Use Case:** An agent that searches an entire Knowledge Repository to answer questions.
 
-### How it works (short)
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: researcher_agent
+    LLM_config:
+      params:
+        model: gpt-5-mini
+    tools:
+      tool_assigned:
+        - name: KnowledgeRepo
+          config:
+            # The UUID of your Knowledge Repository
+            k_repo_id: "550e8400-e29b-41d4-a716-446655440000"
+    agent_function:
+      - "Search the knowledge repository for relevant passages and answer the user's question."
+    incoming_edge:
+      - Start
+    outgoing_edge: []
 
-1. Ingest: Upload documents directly or connect external sources (URL, S3, Confluence, SharePoint).
-2. Index: The repository preprocesses and indexes content for semantic search and retrieval.
-3. Query: Agents use RAG to fetch relevant passages and produce accurate answers that reference the original documents.
+```
 
-## Storage & downloads
+### Recipe 2: Scoped Search (Specific Document)
 
-Documents are persisted in Svahnar S3. Most documents are downloadable by users from the platform. Note: certain connectors (or source systems) restrict exporting content; when you use those connectors, downloading may not be available.
+> **Use Case:** An agent restricted to searching a specific document within a repository (e.g., searching only the "Employee Handbook").
 
-## Connectors
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: hr_policy_bot
+    LLM_config:
+      params:
+        model: gpt-5-mini
+    tools:
+      tool_assigned:
+        - name: KnowledgeRepo
+          config:
+            k_repo_id: "550e8400-e29b-41d4-a716-446655440000"
+            # Restrict search to this specific document UUID
+            doc_id: "123e4567-e89b-12d3-a456-426614174000"
+    agent_function:
+      - "You are an HR assistant. Use the KnowledgeRepo tool to answer policy questions found in the handbook."
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
 
-You can connect external document sources so the Knowledge Repository indexes them automatically. As of now, Svahnar supports the following connectors:
+---
 
-- [URL](/docs/Knowledge%20Repository/Connectors/URL.mdx)
-- [AWS S3](/docs/Knowledge%20Repository/Connectors/AWS%20S3)
-- [Confluence](/docs/Knowledge%20Repository/Connectors/Confluence)
-- [SharePoint](/docs/Knowledge%20Repository/Connectors/Sharepoint)
+## 🚑 Troubleshooting
 
-Tips and best practices
+* **"Invalid Knowledge Repository ID" Error**
+  * Ensure the `k_repo_id` provided is a valid UUID format.
+  * Check for whitespace characters pasted accidentally into the YAML.
 
-- Upload canonical, versioned copies of documents when possible to avoid indexing transient drafts.
-- For private or sensitive data, verify connector permissions and storage policies before ingestion.
-- Use clear filenames and metadata—this improves retrieval relevance.
 
+* **"You do not have permission to access..."**
+  * This occurs if the `k_repo_id` exists but belongs to a different organization and is not marked as `is_global`.
+  * **Private Repos:** Only the creator and authorized organization members can access them. verify the ownership of the Knowledge Repository.
+
+
+* **Poor Search Results**
+  * Ensure the documents have finished **Indexing**. Large PDFs may take a few moments to process (especially if OCR is required).
+  * Verify that the documents contain text and are not just flattened images without OCR processing.
+
+
+## 💰 Additional Credit Consumption
+
+The KnowledgeRepo tool consumes credits based on the number of pages in the documents it indexes. Each page (up to legal size) consumes one credit.

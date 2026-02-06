@@ -5,301 +5,229 @@ sidebarTitle: "Create Agentic Network"
 
 import { Steps, Step } from '@site/src/components/Steps/Steps';
 
+# Create an Agentic Network
 
-In this guide, we'll learn how to create an **Agentic Network** using the Svahnar Agentic AI Framework. This network will consist of multiple agents working together to perform complex tasks, such as fetching stock market news and sending SMS notifications. We'll walk through the YAML configuration step by step, explaining each component and how they interconnect.
+Orchestrate multiple agents to work together as a cohesive unit by building a **Agent Network**.
 
-## Example YAML Configuration
+In this guide, you will build a network where a **Supervisor** agent manages two worker agents to fetch stock news and send SMS notifications.
 
-Below is the example YAML configuration for the Agentic Network:
+## 💡 Core Concepts
+
+Before writing the YAML, it is helpful to visualize how these agents interact.
+
+
+
+### 1. The Architecture
+In a agent network, one agent acts as the **Supervisor** (the brain), and other agents act as **Workers** (the hands).
+* **Supervisor:** Receives the user's request, breaks it down, and delegates tasks.
+* **Workers:** Execute specific tasks (e.g., searching news, sending SMS) and report back to the Supervisor.
+
+### 2. The "Edges" (Wiring)
+Edges define the communication flow.
+* **Incoming Edge:** Who can talk to this agent?
+* **Outgoing Edge:** Who can this agent talk to?
+* **Start Signal:** The Supervisor must have `"Start"` in its `incoming_edge` to initiate the workflow.
+
+---
+
+## ⚙️ Configuration Steps
+
+Follow these steps to build the Stock News Network from scratch.
+
+<Steps>
+  <Step>
+
+### Initialize the Network Skeleton
+
+Define the top-level key `create_agent_network` and establish the identities of your agents.
 
 ```yaml showLineNumbers
-create_vertical_agent_network:
+create_agent_network:
   agent-1:
     agent_name: "Stock_news_searcher"
+  agent-2:
+    agent_name: "sms_sender"
+  agent-3:
+    agent_name: "my_supervisor"
+    Role: "supervisor" # Crucial: Marks this agent as the orchestrator
+
+```
+
+</Step>
+
+<Step>
+
+### Configure the "Brains" (LLM)
+
+Every agent needs an LLM configuration to reason and make decisions. You can use different models for different agents, but we will use a consistent config here.
+
+```yaml showLineNumbers
     LLM_config:
         params:
           model: "gpt-5-mini"
           max_tokens: 1000
           request_timeout: 600
+
+```
+
+:::info
+**Pro Tip:** You might assign a smarter, more expensive model (like `gpt-5`) to the Supervisor for complex reasoning, and smaller models to workers for simple tasks.
+:::
+</Step>
+
+<Step>
+
+### Equip the Workers (Tools)
+
+Give your worker agents the specific tools they need to do their jobs.
+
+1. **News Searcher:** Needs `YahooFinanceNewsTool`.
+2. **SMS Sender:** Needs `Twilio_sms`.
+
+```yaml showLineNumbers
+    # Inside agent-1 (Searcher)
     tools:
       tool_assigned:
         - name: "YahooFinanceNewsTool"
-    agent_function:
-      - "Your function is to search the web or the internet for the latest news about given companies and the stock market, including all relevant news articles and official filings."
-    incoming_edge:
-      - "my_supervisor"
-    outgoing_edge:
-      - "my_supervisor"
 
-  agent-2:
-    agent_name: "sms_sender"
-    LLM_config:
-        params:
-          model: "gpt-5-mini"
-          max_tokens: 1000
-          request_timeout: 600
+    # Inside agent-2 (SMS Sender)
     tools:
       tool_assigned:
         - name: "Twilio_sms"
           config:
-            to: "<recipient_phone_number>"
-            from_: "<twilio_phone_number>"
-    agent_function:
-      - "You can send SMS messages to the user using Twilio."
-    incoming_edge:
-      - "my_supervisor"
-    outgoing_edge:
-      - "my_supervisor"
+            to: "+1234567890"   # Replace with recipient
+            from: "+1987654321" # Replace with Twilio number
 
-  agent-3:
-    agent_name: "my_supervisor"
-    Role: "supervisor"
-    LLM_config:
-        params:
-          model: "gpt-5-mini"
-          max_tokens: 1000
-          request_timeout: 600
-    agent_function:
-      - "You are the supervisor of the agents defined in outgoing edges."
+```
+:::info
+**YahooFinanceNewsTool** is currently unavailable. Alternatively, you can use Tavily.
+:::
+</Step>
+
+<Step>
+
+### Define Responsibilities (Prompts)
+
+Use the `agent_function` to tell each agent exactly what it should do.
+
+* **Supervisor:** "Your function is to coordinate the agents defined in outgoing edges (`Stock_news_searcher`, `sms_sender`) to answer the user request. Stock_news_searcher for searching the latest news and sms_sender for sending the SMS messages."
+* **Searcher:** "Your function is to search the web or the internet for the latest news about given companies and the stock market, including all relevant news articles and official filings."
+* **Sender:** "Your function is to send SMS messages to the user with the given message."
+
+:::tip
+Be explicit in the Supervisor's function about *how* it should use the workers.
+:::
+</Step>
+
+<Step>
+
+### Wire the Connections (Edges)
+
+This is the most critical step. You must define the flow of control.
+
+1. **Supervisor:** Needs `incoming_edge: ["Start"]` to begin in this scenario. It needs `outgoing_edge` to *both* workers.
+2. **Workers:** Need `incoming_edge` from the Supervisor and `outgoing_edge` back to the Supervisor.
+
+The user instructs the Supervisor agent, which is why it is connected to the Start node. The Supervisor must interact with the workers to get the job done.
+
+Each worker only needs to take input from the Supervisor and respond back to the Supervisor.
+
+```yaml showLineNumbers
+    # Inside agent-3 (Supervisor)
     incoming_edge:
       - "Start"
-      - "Stock_news_searcher"
+      - "Stock_news_searcher" # To receive results back
       - "sms_sender"
     outgoing_edge:
-      - "Stock_news_searcher"
+      - "Stock_news_searcher" # To delegate tasks
       - "sms_sender"
+
 ```
-
-This configuration defines an Agentic Network with three agents:
-
-- **agent-1 ("Stock_news_searcher")**: Searches for the latest stock market news.
-- **agent-2 ("sms_sender")**: Sends SMS messages with the news updates.
-- **agent-3 ("my_supervisor")**: Supervises the agents and coordinates their activities.
-
-
-
-<Steps titleSize="h2">
-<Step title="Initialize the Agentic Network">
-
-Begin by defining the top-level key `create_vertical_agent_network` to initialize the Agentic Network. Under this key, you'll define each agent with a unique identifier.
-
-```yaml showLineNumbers
-create_vertical_agent_network:
-  agent-1:
-    agent_name: "Stock_news_searcher"
-  agent-2:
-    agent_name: "sms_sender"
-  agent-3:
-    agent_name: "my_supervisor"
-    Role: "supervisor"
-```
-
-This sets up the basic structure of your network, establishing each agent by a unique `agent_name`.
-
-The `Role` of `"supervisor"` for `my_supervisor` indicates that this agent oversees and coordinates other agents.
-
-For detailed information, refer to the [Initialization Documentation](/docs/AgenticNetwork/Configuration/Initialization).
-
-</Step>
-<Step title="Configure LLMs for Each Agent">
-
-Each agent requires an LLM configuration to handle reasoning:
-
-```yaml showLineNumbers
-LLM_config:
-    params:
-      model: "gpt-5-mini"
-      max_tokens: 1000
-      request_timeout: 600
-```
-
-- **model**: Indicates the model variant to use.
-- **max_tokens**: Sets the maximum length of the response.
-- **request_timeout**: The maximum time to wait for a response from the LLM.
-
-Apply this configuration to each agent to ensure consistent reasoning capabilities.
-
-For more details, visit the [LLM Configuration Documentation](/docs/AgenticNetwork/Configuration/LLM).
-
-
-</Step>
-<Step title="Assign Tools to Agents">
-
-Agents can be equipped with tools to enhance their functionality.
-
-- **Stock_news_searcher** uses the `YahooFinanceNewsTool` to fetch financial news.
-
-  ```yaml showLineNumbers
-  tools:
-    tool_assigned:
-      - name: "YahooFinanceNewsTool"
-  ```
-
-- **sms_sender** uses the `Twilio_sms` tool to send SMS messages.
-
-  ```yaml showLineNumbers
-  tools:
-    tool_assigned:
-      - name: "Twilio_sms"
-        config:
-          to: "<recipient_phone_number>"
-          from_: "<twilio_phone_number>"
-  ```
-
-  **Note**: Replace `<recipient_phone_number>` and `<twilio_phone_number>` with actual phone numbers formatted with the country code (e.g., "+1234567890").
-
-These tools enable agents to interact with external services, such as fetching data or communicating with users.
-
-For additional information, check out the [Tools Documentation](/docs/AgenticNetwork/Configuration/Tools).
-
-</Step>
-<Step title="Define Agent Functions">
-
-
-Specify the purpose and role of each agent using `agent_function` and, if applicable, `Role`.
-
-- **Stock_news_searcher**:
-
-  ```yaml showLineNumbers
-  agent_function:
-    - "Your function is to search the web or the internet for the latest news about given companies and the stock market, including all relevant news articles and official filings."
-  ```
-
-- **sms_sender**:
-
-  ```yaml showLineNumbers
-  agent_function:
-    - "You can send SMS messages to the user using Twilio."
-  ```
-
-- **my_supervisor**:
-
-  ```yaml showLineNumbers
-  agent_function:
-    - "You are the supervisor of the agents defined in outgoing edges."
-  ```
-
-Explore more about defining agent functions at [Agent Function Documentation](/docs/AgenticNetwork/Configuration/Agent_function).
-
-</Step>
-<Step title="Establish Inter-Agent Communication with Edges">
-
-
-Configure how agents communicate and trigger each other using `incoming_edge` and `outgoing_edge`.
-
-- **Stock_news_searcher**:
-
-  ```yaml showLineNumbers
-  incoming_edge:
-    - "my_supervisor"
-  outgoing_edge:
-    - "my_supervisor"
-  ```
-
-- **sms_sender**:
-
-  ```yaml showLineNumbers
-  incoming_edge:
-    - "my_supervisor"
-  outgoing_edge:
-    - "my_supervisor"
-  ```
-
-- **my_supervisor**:
-
-  ```yaml showLineNumbers
-  incoming_edge:
-    - "Start"
-    - "Stock_news_searcher"
-    - "sms_sender"
-  outgoing_edge:
-    - "Stock_news_searcher"
-    - "sms_sender"
-  ```
-
-Explanation:
-
-- **Incoming Edges**: Define which agents or signals trigger this agent.
-- **Outgoing Edges**: Define which agents this agent can communicate with after execution.
-
-The supervisor agent (`my_supervisor`) starts the process and coordinates between the agents.
-
-Learn more about edges at the [Incoming and Outgoing Edges Documentation](/docs/AgenticNetwork/Configuration/Edges).
-
-</Step>
-<Step title="Finalize the YAML Configuration">
-
-
-Combine all the components to finalize your Agentic Network configuration:
-
-```yaml showLineNumbers
-create_vertical_agent_network:
-  agent-1:
-    agent_name: "Stock_news_searcher"
-    LLM_config:
-        params:
-          model: "gpt-5-mini"
-          max_tokens: 1000
-          request_timeout: 600
-    tools:
-      tool_assigned:
-        - name: "YahooFinanceNewsTool"
-    agent_function:
-      - "Your function is to search the web or the internet for the latest news about given companies and the stock market, including all relevant news articles and official filings."
-    incoming_edge:
-      - "my_supervisor"
-    outgoing_edge:
-      - "my_supervisor"
-
-  agent-2:
-    agent_name: "sms_sender"
-    LLM_config:
-        params:
-          model: "gpt-5-mini"
-          max_tokens: 1000
-          request_timeout: 600
-    tools:
-      tool_assigned:
-        - name: "Twilio_sms"
-          config:
-            to: "<recipient_phone_number>"
-            from_: "<twilio_phone_number>"
-    agent_function:
-      - "You can send SMS messages to the user using Twilio."
-    incoming_edge:
-      - "my_supervisor"
-    outgoing_edge:
-      - "my_supervisor"
-
-  agent-3:
-    agent_name: "my_supervisor"
-    Role: "supervisor"
-    LLM_config:
-        params:
-          model: "gpt-5-mini"
-          max_tokens: 1000
-          request_timeout: 600
-    agent_function:
-      - "You are the supervisor of the agents defined in outgoing edges."
-    incoming_edge:
-      - "Start"
-      - "Stock_news_searcher"
-      - "sms_sender"
-    outgoing_edge:
-      - "Stock_news_searcher"
-      - "sms_sender"
-```
-
-Your Agentic Network is now fully configured and ready to deploy. The agents will work together as follows:
-
-- The **supervisor agent** initiates the process upon the `Start` signal.
-- It delegates tasks to the **Stock_news_searcher** and **sms_sender** agents through the specified edges.
-- The **Stock_news_searcher** retrieves the latest stock market news.
-- The **sms_sender** sends the news updates via SMS to the specified recipient.
 
 </Step>
 </Steps>
 
 ---
 
-By following these steps, you've successfully created an Agentic Network composed of multiple agents collaborating to perform complex tasks. This setup can be extended or modified to suit different use cases, demonstrating the flexibility and power of the Svahnar Agentic AI Framework.
+## 📚 Practical Recipes
+
+### Recipe: Stock News & SMS Network
+
+> **Use Case:** A supervisor coordinates a stock research agent to find stock news and a comms agent to text the summary to a user.
+
+```yaml showLineNumbers
+create_agent_network:
+  agent-1:
+    agent_name: "Stock_news_searcher"
+    LLM_config:
+        params:
+          model: "gpt-5-mini"
+          max_tokens: 1000
+          request_timeout: 600
+    tools:
+      tool_assigned:
+        - name: "YahooFinanceNewsTool"
+    agent_function:
+      - "Your function is to search the web or the internet for the latest news about given companies and the stock market, including all relevant news articles and official filings."
+    incoming_edge:
+      - "my_supervisor"
+    outgoing_edge:
+      - "my_supervisor"
+
+  agent-2:
+    agent_name: "sms_sender"
+    LLM_config:
+        params:
+          model: "gpt-5-mini"
+          max_tokens: 1000
+          request_timeout: 600
+    tools:
+      tool_assigned:
+        - name: "Twilio_sms"
+          config:
+            to: "<recipient_phone_number>"
+            from: "<twilio_phone_number>"
+    agent_function:
+      - "Your function is to send SMS messages to the user with the given message."
+    incoming_edge:
+      - "my_supervisor"
+    outgoing_edge:
+      - "my_supervisor"
+
+  agent-3:
+    agent_name: "my_supervisor"
+    Role: "supervisor"
+    LLM_config:
+        params:
+          model: "gpt-5-mini"
+          max_tokens: 1000
+          request_timeout: 600
+    agent_function:
+      - "Your function is to coordinate the agents defined in outgoing edges (`Stock_news_searcher`, `sms_sender`) to answer the user request."
+    incoming_edge:
+      - "Start"
+      - "Stock_news_searcher"
+      - "sms_sender"
+    outgoing_edge:
+      - "Stock_news_searcher"
+      - "sms_sender"
+
+```
+
+---
+
+## 🚑 Troubleshooting
+
+* **Workflow never starts**
+  * Check if the Supervisor agent (`Role: supervisor`) includes `"Start"` in its `incoming_edge` list.
+
+
+* **Supervisor doesn't call workers**
+  * Verify the `outgoing_edge` list in the Supervisor matches the exact `agent_name` of the workers.
+  * Ensure the Supervisor's `agent_function` clearly describes *when* to use the workers.
+
+
+* **"Tool not found" error**
+  * Ensure the tool names in `tool_assigned` match the exact system names (e.g., `Twilio_sms`, not `TwilioSMS`).
+
+
