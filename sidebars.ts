@@ -104,7 +104,6 @@ const sidebars: SidebarsConfig = {
         'Tools/ToolList/DatabaseToolReadOnly',
         'Tools/ToolList/GitHubTool',
         'Tools/ToolList/JiraTool',
-        'Tools/ToolList/KnowledgeRepo',
         'Tools/ToolList/Outlook',
         'Tools/ToolList/Pinecone',
         'Tools/ToolList/Tavily',
@@ -121,7 +120,6 @@ const sidebars: SidebarsConfig = {
       defaultStyle: true,
     },
     'Knowledge Repository/Overview',
-    'Knowledge Repository/Upload files',
     {
       type: 'category',
       label: 'Connectors',

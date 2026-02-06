@@ -1,26 +1,23 @@
 ---
-title: Knowledge Repository
+title: Knowledge Repository 
 ---
 
-The Knowledge Repository lets you add documents (PDFs only) to a centralized knowledge store so agents can interact with that content.
+The Knowledge Repository (KR) lets you add documents (PDFs only) to a knowledge repository so agents can interact with that content.
 
 ## Key capabilities
 
-- Retrieval-Augmented Generation (RAG): Documents you add are indexed so the LLM can retrieve, analyze, and answer queries grounded in the document content rather than hallucinating. RAG enables concise, accurate answers drawn from the source material.
-- Central storage on SVAHNAR S3: Uploaded documents are stored in SVAHNAR S3 (except confluence and sharepoint). Users can download stored documents unless a specific connector or storage policy forbids downloading (for example, some external connectors do not permit exporting files).
-- Querying instead of reading: Instead of manually reading long documents, upload them to the Knowledge Repository and ask natural-language questions. The agent will answer queries about the document contents.
-- Cloud connectors: You can connect documents that already live in cloud services using SVAHNAR connectors so they are indexed without manual re-upload.
+- Documents you add are indexed so the Agents can retrieve, analyze, and answer queries grounded in the document content rather than hallucinating. KRs enables concise, accurate answers drawn from the source material.
+-  Users can download stored documents unless a specific connector (except confluence and sharepoint) from a KR.
+
+- You can connect documents that already live in cloud services using SVAHNAR connectors so they are indexed without manual re-upload.
 - OCR capabilities:- It will perform OCR on pdfs created from images to extract textual data from it
 
 ### How it works (short)
 
 1. Ingest: Upload documents directly or connect external sources (URL, S3, Confluence, SharePoint).
 2. Index: The repository preprocesses and indexes content for semantic search and retrieval.
-3. Query: Agents use RAG to fetch relevant passages and produce accurate answers that reference the original documents.
+3. Query: Agents use KR to fetch relevant passages and produce accurate answers that reference the original documents.
 
-## Storage & downloads
-
-Documents are persisted in SVAHNAR S3. Most documents are downloadable by users from the platform. Note: certain connectors (or source systems) restrict exporting content; when you use those connectors, downloading may not be available.
 
 ## Connectors
 
@@ -34,6 +31,3 @@ You can connect external document sources so the Knowledge Repository indexes th
 Tips and best practices
 
 - Upload canonical, versioned copies of documents when possible to avoid indexing transient drafts.
-- For private or sensitive data, verify connector permissions and storage policies before ingestion.
-- Use clear filenames and metadata—this improves retrieval relevance.
-
