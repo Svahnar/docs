@@ -5,7 +5,7 @@ import { Steps, Step } from '@site/src/components/Steps/Steps';
 
 Automatically ingest and index content from web pages to power your **Knowledge Repository**.
 
-This connector crawls publicly accessible URLs, extracting both text and data from images (via OCR) to prepare it for Retrieval-Augmented Generation (RAG) queries.
+This connector crawls publicly accessible URLs, extracting both text and data from images (via OCR) to prepare it for Agentic-Retrieval-Augmented Generation (A-RAG).
 
 ## 💡 Core Concepts
 
@@ -13,11 +13,7 @@ To use this connector effectively, understand how it processes web content.
 
 ### 1. What does the URL Connector do?
 
-Unlike the *Webpage Search* tool (which an agent uses actively during a conversation), the **URL Connector** is used to *pre-load* knowledge. It crawls a target URL, scrapes the content, and stores it in your vector database. This allows agents to answer questions based on that content later.
-
-### 2. Intelligent OCR
-
-This connector goes beyond simple text scraping. If the crawler encounters images (such as charts, screenshots, or infographics) on the webpage, it uses **Optical Character Recognition (OCR)** to extract the text embedded within those images, ensuring no context is lost.
+Unlike the *Webpage Search* tool (which an agent uses actively during a conversation), the **URL Connector** is used to *pre-load* knowledge. It crawls a target URL, scrapes the content, and stores it in your Knowledge Repository. This allows agents to answer questions based on that content later.
 
 ---
 
@@ -33,7 +29,7 @@ Follow these steps to add a web source to your Knowledge Repository.
 Identify the URL you wish to ingest. This works best for:
 
 * Public documentation sites.
-* Company blogs or news pages.
+* Company docs, blogs, or news pages.
 * Static knowledge bases.
 </Step>
 <Step>
@@ -57,40 +53,25 @@ Once triggered, the system will:
 </Step>
 </Steps>
 
----
 
-## 📚 Practical Recipes (Examples)
-
-### Recipe 1: Documentation Knowledge Base
-
-> **Use Case:** Creating a knowledge base from a product's documentation site so agents can answer technical support questions.
-
-```yaml showLineNumbers
-knowledge_repository:
-  name: "Product_Docs_KB"
-  connectors:
-    - type: "URL"
-      config:
-        # The crawler will start here
-        url: "https://docs.example.com/introduction"
-        # Optional: recurring schedule for updates
-        refresh_schedule: "daily" 
-
-```
 
 ---
 
 ## 🚑 Troubleshooting
 
 * **Content not appearing in RAG**
-* Check if the URL is behind a login or firewall. The connector requires **public access**.
-* Ensure the website allows crawling. Some sites block bots via `robots.txt` or Cloudflare challenges.
+    * Check if the URL is behind a login or firewall. The connector requires **public access**.
+    * Ensure the website allows crawling. Some sites block bots via `robots.txt` or Cloudflare challenges.
 
 
 * **Poor OCR Results**
-* OCR accuracy depends on image resolution. Low-quality screenshots may yield gibberish.
-* Ensure the images on the target URL are not lazy-loaded in a way that prevents the crawler from seeing them.
+    * OCR accuracy depends on image resolution. Low-quality screenshots may yield gibberish.
+    * Ensure the images on the target URL are not lazy-loaded in a way that prevents the crawler from seeing them.
 
 
 * **Ingestion Failures**
-* Verify the URL format includes the protocol (must be `https://` or `http://`).
+    * Verify the URL format includes the protocol (must be `https://` or `http://`).
+
+## 💰 Additional Credit Consumption
+
+Extracted information is processed into pages of size A4 (8.5" x 11"). Each page consumes one credit.

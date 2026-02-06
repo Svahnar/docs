@@ -2,9 +2,9 @@ import { Steps, Step } from '@site/src/components/Steps/Steps';
 
 # AWS S3
 
-Connect your Knowledge Repository directly to **Amazon S3** (or SVAHNAR S3) to ingest documents automatically.
+Connect your Knowledge Repository directly to **Amazon S3** to ingest documents automatically.
 
-This connector allows you to point to a specific file or folder in a cloud bucket, copying the documents into SVAHNAR's storage for RAG (Retrieval-Augmented Generation) indexing and retrieval.
+This connector allows you to point to a specific file or folder in a cloud bucket.
 
 ## 💡 Core Concepts
 
@@ -21,8 +21,8 @@ When you connect an S3 bucket, SVAHNAR does two things:
 
 Documents imported via this connector become part of your Knowledge Repository.
 
-* **RAG Access:** Agents with access to this Knowledge Base can read these files.
-* **User Download:** Users with appropriate permissions can download the copied files, unless specific storage policies prevent it.
+* **Knowledge Repository Access:** Agents with access to this Knowledge Base can read these files.
+
 
 ---
 
@@ -54,7 +54,7 @@ For security, do not hardcode your Secret Key. Store it in the **SVAHNAR Key Vau
 Decide exactly what you want to import:
 
 * **Specific File:** Points to a single document (e.g., `documents/policy_2024.pdf`).
-* **Folder:** Points to a prefix (e.g., `backups/production/`). All valid documents within this folder will be imported.
+* **Folder:** Points to a prefix (e.g., `backups/production/`). All valid documents within this folder will be indexed.
 </Step>
 <Step>
 
@@ -71,50 +71,31 @@ Provide the following details in your configuration:
 
 ---
 
-## 📚 Practical Recipes (Examples)
-
-### Recipe 1: Knowledge Base Sync
-
-> **Use Case:** Automatically ingesting a folder of PDF manuals from an S3 bucket into the Knowledge Repository.
-
-```yaml showLineNumbers
-knowledge_repository:
-  name: "Engineering_Docs"
-  connectors:
-    - type: "s3_connector"
-      config:
-        # AWS Region
-        region_name: "us-east-1"
-        
-        # Path to specific file or folder prefix
-        s3_path: "manuals/v2/release_notes/"
-        
-        # Credentials (Reference Keyvault for the secret)
-        aws_access_key_id: "AKIAIOSFODNN7EXAMPLE" 
-        aws_secret_access_key: "${KEYVAULT.AWS_SECRET_KEY}"
-
-```
 
 ### 💡 Tip: Large Archives
 
 This connector is ideal for:
 
 * **Large Archives:** Importing legacy document stores without manual uploading.
-* **Regular Syncs:** If your production system dumps logs or reports to S3, this connector keeps your AI agents up-to-date with the latest data.
+* **Regular Syncs:** If your production system dumps logs or reports to S3, this connector keeps your AI agents up-to-date with the latest data. (Note: For Enterprise users, regular syncs are available as a paid feature.)
 
 ---
 
 ## 🚑 Troubleshooting
 
 * **Access Denied (403)**
-* Verify the IAM user has `s3:GetObject` permissions for the specific files.
-* If syncing a folder, ensure `s3:ListBucket` is also allowed.
+  * Verify the IAM user has `s3:GetObject` permissions for the specific files.
+  * If syncing a folder, ensure `s3:ListBucket` is also allowed.
 
 
 * **File Not Found**
-* Check the `s3_path`. S3 paths are case-sensitive.
-* Ensure there is no leading slash (`/`) in the path (e.g., use `myfolder/doc.pdf` instead of `/myfolder/doc.pdf`).
+  * Check the `s3_path`. S3 paths are case-sensitive.
+  * Ensure there is no leading slash (`/`) in the path (e.g., use `myfolder/doc.pdf` instead of `/myfolder/doc.pdf`).
 
 
 * **Region Mismatch**
-* If you see "Bucket not found" errors, verify that the `region_name` matches exactly where the bucket was created (e.g., `us-west-2` vs `us-east-1`).
+  * If you see "Bucket not found" errors, verify that the `region_name` matches exactly where the bucket was created (e.g., `us-west-2` vs `us-east-1`).
+
+## 💰 Additional Credit Consumption
+
+The KnowledgeRepo tool consumes credits based on the number of pages in the documents it indexes. Each page (up to legal size) consumes one credit.

@@ -51,11 +51,17 @@
   padding-right: 12px;
 }
 
+.menu__link--active {
+  background-color: rgba(255, 103, 0, 0.1) !important;
+  color: #ff6700 !important;
+  font-weight: 600 !important;
+}
+
 /* Override link styles in markdown content */
 .markdown a {
   color: #ff6700;              /* SVAHNAR orange */
-  font-family: 'Palanquin', sans-serif;
-  font-weight: 5100;
+  font-family: 'Open Sans', sans-serif;
+  text-decoration: underline;
 }
 
 body {
@@ -126,6 +132,7 @@ button:hover {
   transform: scale(1.05); /* Slight zoom on hover */
 }
 
+/* Main Scrollbar (Global) */
 ::-webkit-scrollbar {
   width: 4px;
 }

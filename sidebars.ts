@@ -24,7 +24,7 @@ const sidebars: SidebarsConfig = {
   docSidebar: [
     {
       type: 'html',
-      value: '<div style="margin-top: 12px; font-size: 14px; font-weight: bold;">GET STARTED</div>',
+      value: '<div style="margin-top: 20px; margin-bottom: 8px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; color: var(--ifm-color-primary); text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.9;"><svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="16" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path><path d="M9 12H4s.55-3.03 2-5c1.62-2.2 5-3 5-3"></path><path d="M12 15v5s3.03-.55 5-2c2.2-1.62 3-5 3-5"></path></svg> GET STARTED</div>',
       defaultStyle: true,
     },
     'GetStarted/Overview',
@@ -33,7 +33,7 @@ const sidebars: SidebarsConfig = {
     
     {
       type: 'html',
-      value: '<div style="margin-top: 12px; font-size: 14px; font-weight: bold;">SVAHNAR AGENTIC AI FRAMEWORK</div>',
+      value: '<div style="margin-top: 20px; margin-bottom: 8px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; color: var(--ifm-color-primary); text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.9;"><svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="16" width="16" xmlns="http://www.w3.org/2000/svg"><rect x="9" y="3" width="6" height="6" rx="1"></rect><rect x="3" y="15" width="6" height="6" rx="1"></rect><rect x="15" y="15" width="6" height="6" rx="1"></rect><path d="M12 9v6"></path><path d="M12 15H6v0"></path><path d="M12 15h6v0"></path></svg> AI FRAMEWORK</div>',
       defaultStyle: true,
     },
     'AgenticNetwork/introduction',
@@ -54,7 +54,7 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'html',
-      value: '<div style="margin-top: 12px; font-size: 14px; font-weight: bold;">AGENTS</div>',
+      value: '<div style="margin-top: 20px; margin-bottom: 8px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; color: var(--ifm-color-primary); text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.9;"><svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="16" width="16" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="11" width="18" height="10" rx="2"></rect><circle cx="12" cy="5" r="2"></circle><path d="M12 7v4"></path><line x1="8" y1="16" x2="8" y2="16"></line><line x1="16" y1="16" x2="16" y2="16"></line></svg> AGENTS</div>',
       defaultStyle: true,
     },
     'Agents/validate_config',
@@ -69,7 +69,7 @@ const sidebars: SidebarsConfig = {
 
     {
       type: 'html',
-      value: '<div style="margin-top: 12px; font-size: 14px; font-weight: bold;">Keyvault</div>',
+      value: '<div style="margin-top: 20px; margin-bottom: 8px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; color: var(--ifm-color-primary); text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.9;"><svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="16" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"></path></svg> KEYVAULT</div>',
       defaultStyle: true,
     },
     'Keyvault/Keyvault',
@@ -86,7 +86,7 @@ const sidebars: SidebarsConfig = {
 
     {
       type: 'html',
-      value: '<div style="margin-top: 12px; font-size: 14px; font-weight: bold;">Tools </div>',
+      value: '<div style="margin-top: 20px; margin-bottom: 8px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; color: var(--ifm-color-primary); text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.9;"><svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="16" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg> TOOLS</div>',
       defaultStyle: true,
     },
     'Tools/Understanding_Tools',
@@ -116,7 +116,7 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'html',
-      value: '<div style="margin-top: 12px; font-size: 14px; font-weight: bold;">Knowledge Repository</div>',
+      value: '<div style="margin-top: 20px; margin-bottom: 8px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; color: var(--ifm-color-primary); text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.9;"><svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="16" width="16" xmlns="http://www.w3.org/2000/svg"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 5V19A9 3 0 0 0 21 19V5"></path><path d="M3 12A9 3 0 0 0 21 12"></path></svg> KNOWLEDGE REPO</div>',
       defaultStyle: true,
     },
     'Knowledge Repository/Overview',
@@ -133,7 +133,7 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'html',
-      value: '<div style="margin-top: 12px; font-size: 14px; font-weight: bold;">Additional Resources</div>',
+      value: '<div style="margin-top: 20px; margin-bottom: 8px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; color: var(--ifm-color-primary); text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.9;"><svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="16" width="16" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg> RESOURCES</div>',
       defaultStyle: true,
     },
     'additional/YAML_Conversion_Guide',
