@@ -18,7 +18,7 @@ from svahnar import Svahnar
 
 client = Svahnar()
 
-response = client.agents.retrieve(
+response = client.agents.get(
     agent_id="8bd57aa1-a982-49ba-b6f6-91e84e5dfe9c",
 )
 print(response)
