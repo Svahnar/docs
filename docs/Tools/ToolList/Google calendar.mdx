@@ -1,0 +1,411 @@
+import Video from '@site/src/components/Video';
+import { Steps, Step } from '@site/src/components/Steps/Steps';
+
+# Google Calendar
+
+Empower your agents to search, create, and manage calendar events directly through **Google Calendar**.
+
+This guide will walk you through creating a Google Cloud OAuth app, enabling the Calendar API, and authenticating your user.
+
+## 💡 Core Concepts
+
+To configure this tool effectively, you need to understand the underlying capabilities, the payload structure, and how timezones and recurrence rules work.
+
+### 1. What can this tool do?
+
+The Google Calendar tool interacts with the **Google Calendar API v3** to manage events on the authenticated user's primary calendar.
+
+| Task | Description |
+| --- | --- |
+| `search` | Fetch upcoming events starting from a given time window. |
+| `create` | Create a new one-time calendar event with attendees, location, and description. |
+| `repeat` | Create a recurring event using an RRULE recurrence string. |
+| `add_attendees` | Add new attendees to an existing event by its Google Event ID. |
+
+Every payload must include a `task` and a `params` object:
+
+```json
+{
+  "task": "search",
+  "params": {
+    "time_min": "2023-10-27T00:00:00Z",
+    "max_results": 5
+  }
+}
+```
+
+### 2. Authentication
+
+This tool uses **Google OAuth 2.0** — a `client_id` + `client_secret` pair that drives a per-user authorization flow.
+
+* **First Run:** Each user must complete a one-time OAuth consent flow via the **Authenticate** button in the SVAHNAR tool UI. Tokens are stored securely in Redis.
+* **Token Refresh:** Google OAuth access tokens expire after 1 hour but are automatically refreshed using the stored refresh token — no user action needed.
+* **Maintenance:** If a user revokes access from their [Google Account permissions page](https://myaccount.google.com/permissions), re-authentication is required.
+
+### 3. Timezone Handling
+
+All event times must specify both a `dateTime` and a `timeZone` field inside the `start` and `end` objects. Always pass an explicit timezone — never assume UTC unless the user explicitly wants it.
+
+```json
+{
+  "dateTime": "2023-10-28T14:00:00",
+  "timeZone": "Asia/Kolkata"
+}
+```
+
+Use [IANA timezone strings](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) — not abbreviations like `IST` or offsets like `GMT+5:30`.
+
+**Common timezones:**
+
+| Region | Timezone String |
+| --- | --- |
+| India | `Asia/Kolkata` |
+| US Eastern | `America/New_York` |
+| US Pacific | `America/Los_Angeles` |
+| UK | `Europe/London` |
+| Singapore | `Asia/Singapore` |
+| UTC | `UTC` |
+
+### 4. RRULE Format for Recurring Events
+
+The `repeat` task uses the **iCalendar RRULE standard** to define recurrence patterns. The string is passed as an array inside the `recurrence` field.
+
+| Pattern | RRULE |
+| --- | --- |
+| Daily for 10 days | `RRULE:FREQ=DAILY;COUNT=10` |
+| Weekly every Monday | `RRULE:FREQ=WEEKLY;BYDAY=MO` |
+| Every weekday (Mon–Fri) | `RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR` |
+| Monthly on the 1st | `RRULE:FREQ=MONTHLY;BYMONTHDAY=1` |
+| Weekly until a specific date | `RRULE:FREQ=WEEKLY;UNTIL=20241231T000000Z` |
+| Every 2 weeks on Friday | `RRULE:FREQ=WEEKLY;INTERVAL=2;BYDAY=FR` |
+
+:::tip
+Validate your RRULE strings at [icalendar.org/rrule-tool.html](https://icalendar.org/rrule-tool.html) before using them in agent payloads. The `UNTIL` date must always be in UTC format — e.g., `20241231T000000Z`.
+:::
+
+---
+
+## 🔑 Prerequisites
+
+<Steps>
+<Step>
+
+### Create a Google Cloud Project
+
+1. Go to the [Google Cloud Console](https://console.cloud.google.com) and sign in.
+2. Click **Select a project** → **New Project**.
+3. Name it (e.g., `SVAHNAR Agent`) and click **Create**.
+
+:::note
+If you already created a Cloud project for Google Drive or Gmail, reuse the same project — just enable the Google Calendar API alongside the others.
+:::
+
+</Step>
+
+<Step>
+
+### Enable the Google Calendar API
+
+1. In your project, go to **APIs & Services** → **Library**.
+2. Search for **Google Calendar API** and click **Enable**.
+
+</Step>
+
+<Step>
+
+### Configure the OAuth Consent Screen
+
+1. Go to **APIs & Services** → **OAuth consent screen**.
+2. Select **External** (for users outside your org) or **Internal** (for Google Workspace orgs only).
+3. Fill in the app name, support email, and developer contact email.
+4. Under **Scopes**, click **Add or Remove Scopes** and add:
+   * `https://www.googleapis.com/auth/calendar` — full read/write access to Calendar
+   * Or use `https://www.googleapis.com/auth/calendar.events` for events-only access without calendar settings
+5. Save and continue. For External apps in Testing mode, add target user emails under **Test Users**.
+
+</Step>
+
+<Step>
+
+### Generate OAuth Credentials
+
+1. Go to **APIs & Services** → **Credentials** → **Create Credentials** → **OAuth client ID**.
+2. Select **Web application** as the application type.
+3. Under **Authorized redirect URIs**, add your SVAHNAR callback URL:
+```
+https://api.platform.svahnar.com/api/v1/google_auth
+```
+4. Click **Create**. Note your **Client ID** and **Client Secret**.
+
+:::tip
+If you already created OAuth credentials for Google Drive or Gmail, add this redirect URI to the same credential — Google OAuth clients support multiple redirect URIs. One Cloud project and one credential set covers all three Google tools.
+:::
+
+</Step>
+</Steps>
+
+---
+
+## ⚙️ Configuration Steps
+
+<Steps>
+<Step>
+
+### Add the Tool in SVAHNAR
+
+1. Open your **SVAHNAR Agent Configuration**.
+2. Add the **Google Calendar** tool and enter your OAuth credentials:
+   * `client_id` — from your Google Cloud OAuth client
+   * `client_secret` — from your Google Cloud OAuth client
+
+3. Save the configuration.
+
+</Step>
+
+<Step>
+
+### Authenticate
+
+1. Click the **Authenticate** button in the Google Calendar tool UI.
+2. A Google consent screen will appear — log in with the target Google account and grant Calendar access.
+3. After approval, SVAHNAR stores the access and refresh tokens in Redis automatically.
+4. All subsequent calls resolve credentials without re-authentication.
+
+</Step>
+</Steps>
+
+---
+
+## 📚 Task Reference
+
+### `search` — Fetch Upcoming Events
+
+```json
+{
+  "task": "search",
+  "params": {
+    "time_min": "2023-10-27T00:00:00Z",
+    "max_results": 5
+  }
+}
+```
+
+| Param | Required | Default | Description |
+| --- | --- | --- | --- |
+| `time_min` | No | Now | ISO 8601 UTC timestamp — fetch events starting from this time. |
+| `max_results` | No | `10` | Maximum number of events to return. |
+
+---
+
+### `create` — Create a One-Time Event
+
+```json
+{
+  "task": "create",
+  "params": {
+    "summary": "Project Sync",
+    "location": "Google Meet",
+    "description": "Discuss Q4 roadmap",
+    "start": {
+      "dateTime": "2023-10-28T14:00:00",
+      "timeZone": "Asia/Kolkata"
+    },
+    "end": {
+      "dateTime": "2023-10-28T15:00:00",
+      "timeZone": "Asia/Kolkata"
+    },
+    "attendees": [
+      {"email": "alice@example.com"},
+      {"email": "bob@example.com"}
+    ]
+  }
+}
+```
+
+| Param | Required | Description |
+| --- | --- | --- |
+| `summary` | Yes | Event title shown on the calendar. |
+| `start` | Yes | Object with `dateTime` (ISO 8601) and `timeZone` (IANA string). |
+| `end` | Yes | Object with `dateTime` (ISO 8601) and `timeZone` (IANA string). |
+| `location` | No | Location or video call link shown on the event. |
+| `description` | No | Event body / agenda text. |
+| `attendees` | No | Array of `{"email": "..."}` objects. Each attendee receives a calendar invite. |
+
+---
+
+### `repeat` — Create a Recurring Event
+
+```json
+{
+  "task": "repeat",
+  "params": {
+    "summary": "Daily Standup",
+    "start": {"dateTime": "2023-10-28T09:00:00", "timeZone": "UTC"},
+    "end": {"dateTime": "2023-10-28T09:15:00", "timeZone": "UTC"},
+    "recurrence": [
+      "RRULE:FREQ=DAILY;COUNT=10"
+    ]
+  }
+}
+```
+
+| Param | Required | Description |
+| --- | --- | --- |
+| `summary` | Yes | Event title. |
+| `start` | Yes | Start datetime and timezone of the first occurrence. |
+| `end` | Yes | End datetime and timezone of the first occurrence. |
+| `recurrence` | Yes | Array containing the RRULE string. See [RRULE table](#4-rrule-format-for-recurring-events) above. |
+
+---
+
+### `add_attendees` — Add Attendees to an Existing Event
+
+```json
+{
+  "task": "add_attendees",
+  "params": {
+    "event_id": "a1b2c3d4e5f6g7h8",
+    "new_emails": [
+      "consultant@example.com",
+      "manager@example.com"
+    ]
+  }
+}
+```
+
+| Param | Required | Description |
+| --- | --- | --- |
+| `event_id` | Yes | The Google Calendar Event ID. Returned in the response when an event is created, or visible via `search`. |
+| `new_emails` | Yes | Array of email addresses to add as attendees. Each will receive a calendar invite. |
+
+:::note
+The `event_id` is a Google-specific alphanumeric string (e.g., `a1b2c3d4e5f6g7h8`). It is not the event title, a Calendly ID, or an Outlook reference. Always source it from a prior `create` or `search` response.
+:::
+
+---
+
+## 📚 Practical Recipes (Examples)
+
+### Recipe 1: Executive Scheduling Agent
+
+> **Use Case:** An agent that checks upcoming availability and schedules meetings on request.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: executive_scheduling_agent
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: GoogleCalendar
+          config:
+            client_id: ${google_client_id}
+            client_secret: ${google_client_secret}
+    agent_function:
+      - You are an executive scheduling assistant.
+      - Use task 'search' with time_min set to now and max_results 10 to check upcoming events and surface free windows.
+      - When asked to schedule a meeting, use task 'create' — confirm summary, start/end times, timezone (default Asia/Kolkata), location, and attendees with the user before creating.
+      - After creating, always report the returned event_id — it is needed for any future updates via add_attendees.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+---
+
+### Recipe 2: Recurring Standup Scheduler Agent
+
+> **Use Case:** An agent that sets up recurring team meetings using RRULE patterns.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: standup_scheduler_agent
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: GoogleCalendar
+          config:
+            client_id: ${google_client_id}
+            client_secret: ${google_client_secret}
+    agent_function:
+      - You are a team scheduling assistant.
+      - Before creating a recurring event, confirm with the user — frequency (daily/weekly/monthly), day(s) of week, start date and time, duration, timezone, and attendees.
+      - Construct the appropriate RRULE string based on input — e.g., 'RRULE:FREQ=WEEKLY;BYDAY=MO,WE,FR' for Mon/Wed/Fri standups.
+      - Use task 'repeat' with the confirmed params and recurrence array.
+      - Report the event_id and the recurrence summary after creation for confirmation.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+---
+
+### Recipe 3: Cross-Tool — Calendly → Google Calendar Sync Agent
+
+> **Use Case:** An agent that reads confirmed Calendly bookings and mirrors them as native Google Calendar events.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: calendly_gcal_sync_agent
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: Calendly
+          config:
+            access_token: ${calendly_token}
+        - name: GoogleCalendar
+          config:
+            client_id: ${google_client_id}
+            client_secret: ${google_client_secret}
+    agent_function:
+      - You are a calendar sync agent.
+      - Use Calendly 'get_user' to resolve the user_uri, then 'list_scheduled_events' to fetch active bookings from the past 24 hours.
+      - For each event, use Calendly 'list_invitees' to get attendee names and emails.
+      - Use Google Calendar task 'create' to mirror each event — set summary to the Calendly event name, start/end from the Calendly booking, attendees from the invitee list, and match the timezone from the Calendly event.
+      - Report all synced events with their Google Calendar event_ids.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+### 💡 Tip: SVAHNAR Key Vault
+
+Never hardcode your `client_secret` in plain text files. Use SVAHNAR Key Vault references (e.g., `${google_client_secret}`) to keep credentials secure. If you use the same Google Cloud project for Drive, Gmail, and Calendar, the same `client_id` and `client_secret` apply across all three tools.
+
+---
+
+## 🚑 Troubleshooting
+
+* **`401 Unauthorized` or Token Errors**
+  * The user's OAuth tokens are missing or invalid. Click **Authenticate** again to re-run the consent flow.
+  * If the user revoked access from [Google Account Permissions](https://myaccount.google.com/permissions), re-authentication is mandatory.
+
+* **`403 Insufficient Permission` on `create`, `repeat`, or `add_attendees`**
+  * The OAuth scope granted was read-only. Verify that `calendar` or `calendar.events` is listed in your OAuth Consent Screen scopes and re-authenticate with the correct scope.
+
+* **Event Created in Wrong Timezone**
+  * Always pass `timeZone` explicitly inside both `start` and `end`. If omitted, Google defaults to the calendar's own timezone setting, which may not match the user's expectation.
+  * Use IANA strings only — `Asia/Kolkata`, not `IST` or `+05:30`.
+
+* **`add_attendees` Fails with Event Not Found**
+  * The `event_id` must be Google Calendar's own alphanumeric ID — returned in the `create` or `repeat` response, or visible in a `search` result. It is not the event title or any external reference.
+
+* **Recurring Event Not Repeating Correctly**
+  * Validate your RRULE string at [icalendar.org/rrule-tool.html](https://icalendar.org/rrule-tool.html) before passing it.
+  * The `UNTIL` date in an RRULE must be UTC — e.g., `UNTIL=20241231T000000Z`, not a local date string.
+
+* **`search` Returning Past Events**
+  * Ensure `time_min` is set to now or a future timestamp. If omitted, the API defaults to the current time — but if your system clock is behind, events may appear stale.
+  * `time_min` must be in ISO 8601 UTC format — e.g., `2023-10-27T00:00:00Z`.
+
+* **`App Not Verified` Warning on Consent Screen**
+  * Your OAuth app is in Testing mode. Add the user's email under **Test Users** in the OAuth Consent Screen to bypass the warning during development.
+  * For production with external users, submit your app for Google's verification review.

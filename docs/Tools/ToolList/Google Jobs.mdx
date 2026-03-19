@@ -1,0 +1,268 @@
+import Video from '@site/src/components/Video';
+import { Steps, Step } from '@site/src/components/Steps/Steps';
+
+# Google Jobs
+
+Empower your agents to search for live job listings across the web through **Google Jobs**, powered by SerpApi.
+
+This guide will walk you through obtaining a SerpApi key, configuring the SVAHNAR tool, and building job search workflows.
+
+## 💡 Core Concepts
+
+To configure this tool effectively, you need to understand the underlying capabilities, the SerpApi authentication model, and the available search parameters.
+
+### 1. What can this tool do?
+
+The Google Jobs tool queries **Google Jobs via SerpApi** to search real-time job listings from across the web — aggregating postings from LinkedIn, Indeed, Glassdoor, company career pages, and more — all in a single structured response.
+
+| Capability | Description |
+| --- | --- |
+| Keyword search | Search by job title, role, skills, or any keyword combination. |
+| Location filtering | Scope results to a city, state, or country. |
+| Job type filtering | Filter for full-time, part-time, or other contract types. |
+| Date filtering | Restrict results to jobs posted today, this week, or this month. |
+| Salary filtering | Filter by salary range using the `chips` parameter. |
+| Pagination | Page through large result sets using the `start` offset. |
+| Language & domain | Localize results to any country's Google domain and language. |
+
+:::note
+This tool is **read-only**. It searches and returns job listings — it does not apply to jobs, submit applications, or interact with employer systems.
+:::
+
+### 2. Authentication
+
+This tool uses a **SerpApi API Key** — a static key passed with every request to the SerpApi service, which handles the Google Jobs scraping.
+
+* **No OAuth required:** Generate a key once from the SerpApi dashboard and paste it into SVAHNAR. No per-user login flow needed.
+* **Rate limits:** SerpApi enforces monthly search credit limits based on your plan. Each tool call consumes one search credit.
+* **Maintenance:** API keys do not expire automatically. They are invalidated only if manually rotated from the SerpApi dashboard.
+
+### 3. The `chips` Parameter — Advanced Filters
+
+The `chips` parameter accepts structured filter strings for date, job type, and salary range. Multiple chips can be combined with a comma.
+
+| Filter | Chips Value | Description |
+| --- | --- | --- |
+| Posted today | `date_posted:today` | Jobs posted in the last 24 hours. |
+| Posted this week | `date_posted:week` | Jobs posted in the last 7 days. |
+| Posted this month | `date_posted:month` | Jobs posted in the last 30 days. |
+| Full-time | `employment_type:FULLTIME` | Full-time positions only. |
+| Part-time | `employment_type:PARTTIME` | Part-time positions only. |
+| Contract | `employment_type:CONTRACTOR` | Contract roles only. |
+| Internship | `employment_type:INTERN` | Internship positions only. |
+
+**Combining chips:**
+```
+date_posted:week,employment_type:FULLTIME
+```
+
+### 4. Parameter Reference
+
+| Parameter | Type | Required | Description | Example |
+| --- | --- | --- | --- | --- |
+| `q` | string | Yes | Job title or keywords to search for. | `"Python Developer"` |
+| `location` | string | No | Geographic location for the search. | `"New York, NY"` |
+| `engine` | string | No | Must always be `"google_jobs"` when specified. | `"google_jobs"` |
+| `gl` | string | No | 2-letter country code to localize results. | `"us"`, `"in"`, `"gb"` |
+| `hl` | string | No | 2-letter language code for result language. | `"en"`, `"hi"` |
+| `google_domain` | string | No | Google domain to route the query through. | `"google.com"`, `"google.in"` |
+| `uule` | string | No | Encoded location for precise geo-coordinates. | `"w+CAIQICIH..."` |
+| `chips` | string | No | Advanced filters — date, type, salary. | `"date_posted:today"` |
+| `ltype` | string | No | Job type shorthand: `1` = Full-time, `2` = Part-time. | `"1"` |
+| `start` | integer | No | Pagination offset. Use `0`, `10`, `20`... to page through results. | `10` |
+
+:::tip
+Always set `gl` and `hl` together when targeting a specific country. For India, use `gl: "in"`, `hl: "en"`, and `google_domain: "google.co.in"` to get the most relevant local listings.
+:::
+
+---
+
+## 🔑 Prerequisites
+
+<Steps>
+<Step>
+
+### Create a SerpApi Account
+
+1. Go to [https://serpapi.com](https://serpapi.com) and sign up for an account.
+2. SerpApi offers a **free tier with 100 searches/month** — sufficient for development and light agent usage.
+3. For production workloads, select a paid plan based on your expected monthly search volume.
+
+</Step>
+
+<Step>
+
+### Get Your API Key
+
+1. After signing in, go to your [SerpApi Dashboard](https://serpapi.com/dashboard).
+2. Copy the **API Key** shown on the dashboard.
+
+:::caution
+Never commit this key to version control or hardcode it in config files. Use SVAHNAR Key Vault (`${serpapi_key}`) to reference it safely.
+:::
+
+</Step>
+</Steps>
+
+---
+
+## ⚙️ Configuration Steps
+
+<Steps>
+<Step>
+
+### Add the Tool in SVAHNAR
+
+1. Open your **SVAHNAR Agent Configuration**.
+2. Add the **Google Jobs** tool and enter your SerpApi credentials:
+   * `api_key` — your SerpApi API key
+
+3. Save the configuration.
+
+</Step>
+
+<Step>
+
+### Verify the Connection
+
+To confirm your API key is working:
+
+1. Trigger a test agent run with a simple payload — e.g., `{"q": "Software Engineer", "location": "Bangalore"}`.
+2. A valid response will return a list of `job_results` with titles, companies, locations, and posting dates.
+3. If you receive an `Invalid API key` error, verify the key was copied in full from your SerpApi dashboard.
+4. If you receive a `credits exhausted` error, your monthly search quota has been reached — upgrade your SerpApi plan or wait for the next billing cycle.
+
+</Step>
+</Steps>
+
+---
+
+## 📚 Practical Recipes (Examples)
+
+### Recipe 1: Job Search & Recommendation Agent
+
+> **Use Case:** An agent that searches for relevant jobs based on the user's role, skills, and location preference.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: job_search_agent
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: GoogleJobs
+          config:
+            api_key: ${serpapi_key}
+    agent_function:
+      - You are a job search assistant.
+      - Ask the user for their target role, key skills, preferred location, and whether they want full-time or part-time.
+      - Construct a payload using 'q' for the role + skills, 'location' for their preference, and 'ltype' for job type (1=Full-time, 2=Part-time).
+      - Add 'chips' set to 'date_posted:week' to prioritize fresh listings.
+      - Return a clean summary of the top results — job title, company, location, and posting date for each.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+---
+
+### Recipe 2: Daily Fresh Listings Monitor Agent
+
+> **Use Case:** An agent that runs daily to surface the newest job postings for a saved search profile.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: daily_jobs_monitor
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: GoogleJobs
+          config:
+            api_key: ${serpapi_key}
+    agent_function:
+      - You are a daily job listings monitor.
+      - Search for jobs using the configured role and location with 'chips' set to 'date_posted:today' to retrieve only today's new postings.
+      - Deduplicate results by company name and job title.
+      - Return a formatted digest of new listings — group by company, include the job title, location, and a direct apply link if available in the response.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+---
+
+### Recipe 3: Paginated Deep Search Agent
+
+> **Use Case:** An agent that pages through multiple result sets to compile a comprehensive list of opportunities across a broad keyword.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: deep_job_search_agent
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: GoogleJobs
+          config:
+            api_key: ${serpapi_key}
+    agent_function:
+      - You are a comprehensive job search agent.
+      - Run the first search using 'start' set to 0 to get the first page of results.
+      - If the user wants more results, run subsequent searches with 'start' set to 10, 20, 30, etc. to page through listings.
+      - Aggregate results across pages and deduplicate by job title and company.
+      - Stop paginating when results begin repeating or the user's desired result count is reached.
+      - Present a final consolidated list ranked by posting date — most recent first.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+### 💡 Tip: SVAHNAR Key Vault
+
+Never hardcode your `api_key` in plain text files. Use SVAHNAR Key Vault references (e.g., `${serpapi_key}`) to keep credentials secure.
+
+### 💡 Tip: Targeting India-Specific Listings
+
+For the most relevant results when searching in India, combine these parameters:
+
+```json
+{
+  "q": "Backend Engineer",
+  "location": "Bangalore, Karnataka",
+  "gl": "in",
+  "hl": "en",
+  "google_domain": "google.co.in"
+}
+```
+
+---
+
+## 🚑 Troubleshooting
+
+* **`Invalid API key` Error**
+  * Your SerpApi key is incorrect or was not copied in full. Go to your [SerpApi Dashboard](https://serpapi.com/dashboard), copy the key again, and update it in SVAHNAR Key Vault.
+
+* **`Credits Exhausted` Error**
+  * Your monthly SerpApi search quota has been reached. Upgrade your plan at [serpapi.com/pricing](https://serpapi.com/pricing) or wait for the next billing cycle reset.
+  * To reduce credit consumption, narrow your search with specific `location`, `chips`, and `ltype` filters — broad searches with frequent pagination use credits quickly.
+
+* **Results Not Relevant to the Target Region**
+  * Set `gl`, `hl`, and `google_domain` together to localize results. Without these, SerpApi may default to US-based results regardless of the `location` string.
+  * Use `google_domain: "google.co.in"` for India, `"google.co.uk"` for the UK, and so on.
+
+* **Stale Listings Appearing**
+  * Add `chips: "date_posted:week"` or `chips: "date_posted:today"` to filter out older listings. Without a date chip, Google Jobs may surface months-old postings that are still indexed.
+
+* **`start` Pagination Returning Duplicate Results**
+  * Google Jobs pagination is not always perfectly sequential. Deduplicate results on your end using a combination of job title + company name as the unique key before presenting to the user.
+
+* **No Results Returned**
+  * The keyword + location combination may be too narrow. Try broadening `q` (e.g., `"Engineer"` instead of `"Senior Python Backend Engineer"`) or removing the `location` filter to widen the search area.
+  * Verify the `engine` field is either omitted or set exactly to `"google_jobs"` — any other value will route to a different SerpApi engine.

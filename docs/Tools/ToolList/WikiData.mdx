@@ -1,0 +1,209 @@
+import Video from '@site/src/components/Video';
+import { Steps, Step } from '@site/src/components/Steps/Steps';
+
+# Wikidata
+
+Empower your agents to look up structured, factual knowledge about people, places, events, and concepts through **Wikidata**.
+
+This guide will walk you through configuring the SVAHNAR tool and building knowledge retrieval workflows.
+
+## 💡 Core Concepts
+
+To configure this tool effectively, you need to understand what Wikidata is, what kinds of queries it answers well, and where its limits are.
+
+### 1. What can this tool do?
+
+The Wikidata tool queries the **Wikidata knowledge base** — a free, structured database of factual information maintained by the Wikimedia Foundation. It covers millions of entities: people, organizations, countries, scientific concepts, historical events, and more.
+
+| Capability | Description |
+| --- | --- |
+| Factual lookups | Answer direct factual questions about real-world entities. |
+| Entity information | Retrieve structured data about people, places, organizations, and things. |
+| Concept definitions | Look up what something is — scientific terms, historical events, works of art. |
+| Relationship queries | Find relationships between entities — capitals, nationalities, founders, dates. |
+
+:::note
+Wikidata contains **structured, encyclopedic facts** — it is not a search engine, news source, or opinion aggregator. It is best used for stable, verifiable facts about well-known entities. For current events or rapidly changing information, use web search tools instead.
+:::
+
+### 2. Authentication
+
+This tool uses the **public Wikidata API** — no authentication, API key, or credentials are required.
+
+* **No setup required:** The Wikidata API is openly accessible. There is no token, OAuth flow, or developer account needed.
+* **Rate limits:** The public API has generous rate limits sufficient for typical agent workloads. Avoid high-frequency automated bulk queries that could trigger throttling.
+
+### 3. What Wikidata Answers Well
+
+Wikidata excels at structured factual queries. Think of it as asking questions that have a single, verifiable answer:
+
+| Query Type | Example |
+| --- | --- |
+| Capital cities | `"What is the capital of Japan?"` |
+| Biographical facts | `"When was Marie Curie born?"` |
+| Country/geography | `"What is the population of Germany?"` |
+| Scientific concepts | `"What is the atomic number of carbon?"` |
+| Organizational info | `"Who founded Apple Inc.?"` |
+| Historical dates | `"When did World War II end?"` |
+| Works of art/literature | `"Who wrote Don Quixote?"` |
+| Language & classification | `"What language family does Hindi belong to?"` |
+
+:::tip
+Write queries as clear, direct questions or factual statements rather than keyword soup. `"What is the capital of France?"` returns better results than `"France capital city"`.
+:::
+
+### 4. Parameter Reference
+
+| Parameter | Type | Required | Description | Example |
+| --- | --- | --- | --- | --- |
+| `query` | string | Yes | A natural language question or keyword string about any real-world entity or concept. | `"What is the capital of France?"` |
+
+---
+
+## ⚙️ Configuration Steps
+
+<Steps>
+<Step>
+
+### Add the Tool in SVAHNAR
+
+1. Open your **SVAHNAR Agent Configuration**.
+2. Add the **Wikidata** tool.
+3. No credentials are required — the tool connects to the public Wikidata API automatically.
+4. Save the configuration.
+
+</Step>
+
+<Step>
+
+### Verify the Connection
+
+To confirm the tool is working:
+
+1. Trigger a test agent run with a simple factual query:
+```json
+{
+  "query": "What is the capital of France?"
+}
+```
+2. A valid response will return `Paris` along with structured entity data.
+3. If the tool returns an empty response, try rephrasing the query as a clearer, more direct question.
+
+</Step>
+</Steps>
+
+---
+
+## 📚 Practical Recipes (Examples)
+
+### Recipe 1: Factual Q&A Agent
+
+> **Use Case:** An agent that answers direct factual questions by grounding its responses in Wikidata's structured knowledge base rather than model memory.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: factual_qa_agent
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: Wikidata
+    agent_function:
+      - You are a factual knowledge assistant.
+      - For any question about a real-world entity, person, place, event, or concept — use Wikidata to look up the answer rather than relying on your own knowledge.
+      - Pass the user's question directly as the 'query' field.
+      - Ground your response in the Wikidata result and clearly state the source of the information.
+      - If Wikidata returns no result, acknowledge the gap and suggest the user try Wikipedia or a web search for less-structured topics.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+---
+
+### Recipe 2: Entity Enrichment Agent
+
+> **Use Case:** An agent that enriches a list of names, places, or organizations with verified structured data from Wikidata.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: entity_enrichment_agent
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: Wikidata
+    agent_function:
+      - You are an entity enrichment assistant.
+      - For each item in the user's list (people, companies, countries, etc.), run a separate Wikidata query using the entity name as 'query'.
+      - Extract key structured facts returned — founding date, headquarters, nationality, notable works, population, or whatever is relevant to the entity type.
+      - Return a structured enrichment table with one row per entity and the retrieved facts as columns.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+---
+
+### Recipe 3: Cross-Tool — Wikidata + Reddit Research Agent
+
+> **Use Case:** An agent that first grounds itself in verified facts from Wikidata, then searches Reddit for community discussion on the same topic.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: grounded_research_agent
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: Wikidata
+        - name: Reddit
+          config:
+            client_id: ${reddit_client_id}
+            client_secret: ${reddit_client_secret}
+            user_agent: ${reddit_user_agent}
+    agent_function:
+      - You are a grounded research assistant.
+      - When the user asks about a topic, first use Wikidata to retrieve verified factual background — what it is, key dates, key figures, and established facts.
+      - Then use Reddit to search for community discussion and real-world opinions on the same topic in a relevant subreddit.
+      - Present findings in two sections — 'Verified Facts' (from Wikidata) and 'Community Perspective' (from Reddit) — so the user can clearly distinguish established knowledge from opinion.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+### 💡 Tip: When to Use Wikidata vs Web Search
+
+| Use Wikidata when... | Use web search when... |
+| --- | --- |
+| The fact is stable and encyclopedic | The information changes frequently |
+| You need structured entity data | You need current news or events |
+| The entity is well-known globally | The topic is niche or regional |
+| You want a verifiable, sourced answer | You need opinion, analysis, or commentary |
+
+---
+
+## 🚑 Troubleshooting
+
+* **Empty or No Results Returned**
+  * Rephrase the query as a clear, direct question — e.g., `"Who founded Tesla?"` instead of `"Tesla founder"`.
+  * Wikidata works best for globally well-known entities. Very niche, local, or newly created entities may not have Wikidata entries yet.
+  * If the entity exists but is known by multiple names, try the most commonly used English name or the official name.
+
+* **Results Are About the Wrong Entity**
+  * Wikidata may resolve an ambiguous name to the most prominent entity with that name. Be more specific in the query — e.g., `"Paris, France"` instead of just `"Paris"` to avoid getting the Paris Hilton entry.
+  * Include disambiguating context in the query — profession, country, or domain — to improve precision.
+
+* **Factual Answer Seems Outdated**
+  * Wikidata is community-maintained and may lag behind recent changes — leadership changes, population updates, or newly renamed entities may not be current.
+  * For time-sensitive facts, verify with a web search tool after retrieving the Wikidata baseline.
+
+* **Tool Returns Data But the Answer Is Incomplete**
+  * Wikidata's coverage is uneven — major world entities are richly documented, while smaller or regional ones may have sparse entries.
+  * For richer narrative context, complement Wikidata lookups with a Wikipedia search or web search on the same topic.

@@ -1,0 +1,272 @@
+import Video from '@site/src/components/Video';
+import { Steps, Step } from '@site/src/components/Steps/Steps';
+
+# Google Drive
+
+Empower your agents to search and retrieve files from a user's **Google Drive**.
+
+This guide will walk you through creating a Google Cloud OAuth app, configuring the SVAHNAR tool, and authenticating your user.
+
+## 💡 Core Concepts
+
+### 1. What can this tool do?
+
+The Google Drive tool interacts with the **Google Drive API v3** to perform read-only file searches across a user's Drive using the Drive Query Language.
+
+| Capability | Description |
+| --- | --- |
+| File search | Query files by name, content, type, owner, modifier, date, and more. |
+| Folder filtering | Scope searches to specific folders using folder IDs. |
+| Sharing visibility | Filter by files shared with you, owned by you, or restricted. |
+
+:::note
+This tool is **read-only**. It does not support uploading, creating, updating, or deleting files. Use it for discovery and retrieval workflows.
+:::
+
+### 2. Authentication
+
+This tool uses **Google OAuth 2.0** — a `client_id` + `client_secret` pair that drives a per-user authorization flow.
+
+* **First Run:** Each user must complete a one-time OAuth consent flow via the **Authenticate** button in the SVAHNAR tool UI. This grants the agent access to their Drive and stores tokens in Redis.
+* **Token Refresh:** Google OAuth access tokens expire after 1 hour but are automatically refreshed using the stored refresh token — no user action needed.
+* **Maintenance:** If a user revokes access from their [Google Account permissions page](https://myaccount.google.com/permissions), re-authentication is required.
+
+### 3. The Drive Query Language
+
+All searches use Google's **Drive Query Language** passed as the `query` field in the payload. Queries are string expressions combining fields, operators, and values.
+
+**Key fields available:**
+
+| Field | What it targets |
+| --- | --- |
+| `name` | File or folder name |
+| `fullText` | Full-text content inside the file |
+| `mimeType` | File type (e.g., Google Doc, folder, PDF) |
+| `modifiedTime` | Last modified timestamp (ISO 8601 UTC) |
+| `starred` | Whether the file is starred |
+| `trashed` | Whether the file is in trash |
+| `owners` | Files owned by a specific email |
+| `writers` | Files where a specific email has write access |
+| `sharedWithMe` | Files shared with the authenticated user |
+| `'<folderId>' in parents` | Files inside a specific folder |
+| `visibility` | Sharing visibility (`limited`, `anyoneCanFind`, etc.) |
+
+**Combining conditions:**
+
+```
+# AND — both conditions must match
+modifiedTime > '2024-01-01T00:00:00' and mimeType contains 'image/'
+
+# OR — either condition matches
+mimeType = 'application/vnd.google-apps.document' or mimeType = 'application/pdf'
+
+# NOT — exclude matches
+not name contains 'draft'
+
+# Exact phrase in full text
+fullText contains '"quarterly report"'
+
+# Files inside a specific folder
+'1aBcDeFgHiJkLmNoPqRsTuV' in parents
+```
+
+:::tip
+Always use **single quotes** around string values in Drive queries. Double quotes are reserved for exact phrase matching inside `fullText contains`.
+:::
+
+---
+
+## 🔑 Prerequisites
+
+<Steps>
+<Step>
+
+### Create a Google Cloud Project
+
+1. Go to the [Google Cloud Console](https://console.cloud.google.com) and sign in.
+2. Click **Select a project** → **New Project**.
+3. Name it (e.g., `SVAHNAR Agent`) and click **Create**.
+
+</Step>
+
+<Step>
+
+### Enable the Google Drive API
+
+1. In your project, go to **APIs & Services** → **Library**.
+2. Search for **Google Drive API** and click **Enable**.
+
+</Step>
+
+<Step>
+
+### Configure the OAuth Consent Screen
+
+1. Go to **APIs & Services** → **OAuth consent screen**.
+2. Select **External** (for users outside your org) or **Internal** (for Google Workspace orgs only).
+3. Fill in the required fields: App name, support email, and developer contact.
+4. Under **Scopes**, click **Add or Remove Scopes** and add:
+   * `https://www.googleapis.com/auth/drive.readonly`
+5. Save and continue. For External apps in testing, add test user emails under **Test users**.
+
+:::note
+External apps remain in "Testing" mode until you publish them via Google's verification process. In Testing mode, only explicitly added test users can authorize the app.
+:::
+
+</Step>
+
+<Step>
+
+### Generate OAuth Credentials
+
+1. Go to **APIs & Services** → **Credentials** → **Create Credentials** → **OAuth client ID**.
+2. Select **Web application** as the application type.
+3. Under **Authorized redirect URIs**, add your SVAHNAR callback URL:
+```
+https://api.platform.svahnar.com/api/v1/google_auth
+```
+4. Click **Create**. Note your **Client ID** and **Client Secret**.
+
+:::caution
+Copy the Client Secret immediately — it is only shown once at creation. If lost, you must create a new credential.
+:::
+
+</Step>
+</Steps>
+
+---
+
+## ⚙️ Configuration Steps
+
+<Steps>
+<Step>
+
+### Add the Tool in SVAHNAR
+
+1. Open your **SVAHNAR Agent Configuration**.
+2. Add the **Google Drive** tool and enter your OAuth credentials:
+   * `client_id` — from your Google Cloud OAuth client
+   * `client_secret` — from your Google Cloud OAuth client
+
+3. Save the configuration.
+
+</Step>
+
+<Step>
+
+### Authenticate
+
+1. Click the **Authenticate** button in the Google Drive tool UI.
+2. A consent screen will appear — log in with the target Google account and grant Drive read-only access.
+3. After approval, SVAHNAR stores the access token and refresh token in Redis automatically.
+4. The connection is live. All subsequent calls resolve the token from Redis without re-authentication.
+
+</Step>
+</Steps>
+
+---
+
+## 📚 Query Reference
+
+| What you want to find | Query |
+| --- | --- |
+| Files named "hello" | `name = 'hello'` |
+| Files with "hello" anywhere in the name | `name contains 'hello'` |
+| Files containing the text "important" | `fullText contains 'important'` |
+| Exact phrase "quarterly report" in content | `fullText contains '"quarterly report"'` |
+| All folders | `mimeType = 'application/vnd.google-apps.folder'` |
+| All non-folders | `mimeType != 'application/vnd.google-apps.folder'` |
+| Files modified after a date | `modifiedTime > '2024-06-01T00:00:00'` |
+| Files inside a specific folder | `'<folder_id>' in parents` |
+| Files starred by the user | `starred = true` |
+| Files in trash | `trashed = true` |
+| Files shared with the user | `sharedWithMe` |
+| Files owned by a specific user | `'user@example.com' in owners` |
+| Files where a user has write access | `'user@example.com' in writers` |
+| Private/limited visibility files | `visibility = 'limited'` |
+| Images modified in the last month | `modifiedTime > '2024-05-01T00:00:00' and mimeType contains 'image/'` |
+
+---
+
+## 📚 Practical Recipes (Examples)
+
+### Recipe 1: Document Discovery Agent
+
+> **Use Case:** An agent that finds relevant documents across Drive based on topic or keyword.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: document_discovery_agent
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: GoogleDrive
+          config:
+            client_id: ${google_client_id}
+            client_secret: ${google_client_secret}
+    agent_function:
+      - You are a document discovery assistant.
+      - When the user asks for files on a topic, construct a Drive query using 'fullText contains' for content searches or 'name contains' for title searches.
+      - Combine conditions with 'and' to narrow results — for example, filter by modifiedTime to prioritize recent files.
+      - Return a structured list of matching files with their names, types, and last modified dates.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+---
+
+### Recipe 2: Shared Files Audit Agent
+
+> **Use Case:** An agent that surfaces files shared with the user or files with broad visibility for a security audit.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: shared_files_audit_agent
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: GoogleDrive
+          config:
+            client_id: ${google_client_id}
+            client_secret: ${google_client_secret}
+    agent_function:
+      - You are a Drive access auditor.
+      - Use the query 'sharedWithMe' to list all files shared with the authenticated user.
+      - Use 'visibility = "anyoneWithLink"' to find files that are broadly accessible via link.
+      - Summarize findings grouped by owner and file type, flagging any sensitive-looking file names.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+### 💡 Tip: SVAHNAR Key Vault
+
+Never hardcode your `client_secret` in plain text files. Use SVAHNAR Key Vault references (e.g., `${google_client_secret}`) to keep credentials secure.
+
+---
+
+## 🚑 Troubleshooting
+
+* **`401 Unauthorized` or Token Errors**
+  * The user's OAuth tokens are missing or invalid. Click **Authenticate** again to re-run the consent flow.
+  * If the user revoked access from [Google Account Permissions](https://myaccount.google.com/permissions), re-authentication is mandatory.
+
+* **Empty Results for `fullText` Queries**
+  * `fullText` indexing in Google Drive is asynchronous. Newly uploaded files may not be searchable for a few minutes after creation.
+  * Ensure the file format is indexed by Google (Google Docs, Sheets, PDFs, and plain text are indexed; binary formats like `.zip` are not).
+
+* **`Access Not Configured` or API Disabled Error**
+  * The Google Drive API is not enabled in your Cloud project. Go to **Google Cloud Console → APIs & Services → Library** and enable it.
+
+* **User Sees "App Not Verified" Warning on Consent Screen**
+  * Your OAuth app is in Testing mode. Add the user's email to **Test Users** in the OAuth Consent Screen settings, or submit the app for Google's verification to remove the warning for all users.
+
+* **Folder ID Not Found**
+  * Open the folder in Google Drive in your browser. The folder ID is the string after `/folders/` in the URL — e.g., `https://drive.google.com/drive/folders/1aBcDeFgH` → folder ID is `1aBcDeFgH`.

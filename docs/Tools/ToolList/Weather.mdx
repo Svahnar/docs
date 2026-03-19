@@ -1,0 +1,247 @@
+import Video from '@site/src/components/Video';
+import { Steps, Step } from '@site/src/components/Steps/Steps';
+
+# Weather
+
+Empower your agents to fetch real-time weather conditions for any city in the world through **OpenWeatherMap**.
+
+This guide will walk you through obtaining an OpenWeatherMap API key, configuring the SVAHNAR tool, and building weather-aware workflows.
+
+## 💡 Core Concepts
+
+To configure this tool effectively, you need to understand the underlying capabilities and the parameter contract.
+
+### 1. What can this tool do?
+
+The Weather tool queries the **OpenWeatherMap API** to retrieve current weather conditions for any city globally.
+
+| Capability | Description |
+| --- | --- |
+| Current temperature | Fetch the real-time temperature for any city. |
+| Weather conditions | Retrieve sky conditions — clear, cloudy, rain, snow, fog, etc. |
+| Humidity & wind | Get humidity percentage and wind speed data. |
+| City + country scoping | Disambiguate cities with the same name across countries. |
+
+:::note
+This tool returns **current weather conditions only**. It does not provide hourly forecasts, multi-day forecasts, or historical weather data. For forecast data, a different OpenWeatherMap endpoint would be required.
+:::
+
+### 2. Authentication
+
+This tool uses an **OpenWeatherMap API Key** — a static key tied to your OpenWeatherMap account.
+
+* **No OAuth required:** Generate a key once from the OpenWeatherMap dashboard and paste it into SVAHNAR. No per-user login flow needed.
+* **Activation delay:** New API keys may take up to **10 minutes** to become active after generation. If you receive a `401` immediately after creating a key, wait a few minutes and retry.
+* **Maintenance:** API keys do not expire automatically. They are invalidated only if manually deleted from your OpenWeatherMap account.
+
+### 3. Parameter Reference
+
+| Parameter | Type | Required | Description | Example |
+| --- | --- | --- | --- | --- |
+| `city` | string | Yes | The name of the city to get weather for. | `"Mumbai"`, `"London"` |
+| `country` | string | No | The country name to disambiguate cities with the same name. | `"India"`, `"United Kingdom"` |
+
+:::tip
+Always provide `country` when searching for cities that share names across multiple countries — e.g., `"Springfield"` exists in several US states, and `"Chennai"` vs `"Chennai"` disambiguation benefits from `"India"`. This ensures the API resolves to the correct location.
+:::
+
+---
+
+## 🔑 Prerequisites
+
+<Steps>
+<Step>
+
+### Create an OpenWeatherMap Account
+
+1. Go to [https://openweathermap.org](https://openweathermap.org) and click **Sign Up**.
+2. Fill in your details and verify your email address.
+3. OpenWeatherMap offers a **free tier** that includes up to **60 API calls/minute** and access to current weather data — sufficient for most agent workloads.
+
+</Step>
+
+<Step>
+
+### Generate an API Key
+
+1. After signing in, go to your account dashboard → **API Keys** tab (or navigate directly to [https://home.openweathermap.org/api_keys](https://home.openweathermap.org/api_keys)).
+2. A default API key is created automatically on signup — you can use this, or click **Generate** to create a named key (e.g., `SVAHNAR Agent`).
+3. Copy the API key.
+
+:::caution
+New API keys take up to **10 minutes** to activate. If you receive a `401 Invalid API key` error immediately after creating a key, wait a few minutes before retrying.
+
+Never commit your API key to version control or hardcode it in config files. Use SVAHNAR Key Vault (`${openweathermap_api_key}`) to reference it safely.
+:::
+
+</Step>
+</Steps>
+
+---
+
+## ⚙️ Configuration Steps
+
+<Steps>
+<Step>
+
+### Add the Tool in SVAHNAR
+
+1. Open your **SVAHNAR Agent Configuration**.
+2. Add the **Weather** tool and enter your credentials:
+   * `openweathermap_api_key` — your OpenWeatherMap API key
+
+3. Save the configuration.
+
+</Step>
+
+<Step>
+
+### Verify the Connection
+
+To confirm your API key is active and working:
+
+1. Trigger a test agent run with a simple payload:
+```json
+{
+  "city": "Mumbai",
+  "country": "India"
+}
+```
+2. A valid response will return the current temperature, weather condition, humidity, and wind speed for Mumbai.
+3. If you receive a `401 Invalid API key` error, your key may not have activated yet — wait 10 minutes and retry.
+4. If you receive a `404 City Not Found` error, check the spelling of the city name and try adding the `country` field to disambiguate.
+
+</Step>
+</Steps>
+
+---
+
+## 📚 Practical Recipes (Examples)
+
+### Recipe 1: Weather Assistant Agent
+
+> **Use Case:** An agent that answers weather queries for any city the user asks about.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: weather_assistant
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: Weather
+          config:
+            openweathermap_api_key: ${openweathermap_api_key}
+    agent_function:
+      - You are a weather assistant.
+      - When the user asks about weather in a city, extract the city name and country (if mentioned) from their query.
+      - Pass both 'city' and 'country' to the Weather tool for accurate disambiguation.
+      - Return the current conditions in plain language — temperature (in Celsius), conditions (sunny, cloudy, rainy), humidity, and wind speed.
+      - If the user asks about multiple cities, run one query per city and compile the results into a comparison table.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+---
+
+### Recipe 2: Travel Context Agent
+
+> **Use Case:** An agent that checks weather for a travel destination as part of trip planning.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: travel_context_agent
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: Weather
+          config:
+            openweathermap_api_key: ${openweathermap_api_key}
+        - name: GoogleFlights
+          config:
+            api_key: ${serpapi_key}
+    agent_function:
+      - You are a travel planning assistant.
+      - When the user asks about a trip, use Google Flights to find flight options for their route and dates.
+      - Use the Weather tool to fetch current conditions at the destination city.
+      - Present both together — flight options and a weather snapshot for the destination — so the user has full context for their travel decision.
+      - Advise on packing based on current weather conditions (e.g., "pack an umbrella — currently raining in London").
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+---
+
+### Recipe 3: Cross-Tool — Weather + Google Calendar Event Planner Agent
+
+> **Use Case:** An agent that checks the weather before creating an outdoor calendar event, and warns the user if conditions are unfavourable.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: weather_aware_scheduler
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: Weather
+          config:
+            openweathermap_api_key: ${openweathermap_api_key}
+        - name: GoogleCalendar
+          config:
+            client_id: ${google_client_id}
+            client_secret: ${google_client_secret}
+    agent_function:
+      - You are a weather-aware scheduling assistant.
+      - When the user wants to schedule an outdoor event, first use the Weather tool to check current conditions at the event location.
+      - If conditions are poor (rain, storm, extreme heat, or high wind), warn the user with the current conditions before proceeding.
+      - If the user confirms despite the weather, or conditions are fine, use Google Calendar 'create' task to schedule the event with location, attendees, and the correct timezone.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+### 💡 Tip: SVAHNAR Key Vault
+
+Never hardcode your `openweathermap_api_key` in plain text files. Use SVAHNAR Key Vault references (e.g., `${openweathermap_api_key}`) to keep credentials secure.
+
+### 💡 Tip: City Name Disambiguation
+
+Some city names appear in multiple countries. Always pass `country` alongside `city` for accurate results:
+
+| Ambiguous City | Pass as |
+| --- | --- |
+| Chennai (not to be confused with other results) | `city: "Chennai"`, `country: "India"` |
+| London, UK (not London, Ontario) | `city: "London"`, `country: "United Kingdom"` |
+| Springfield (multiple US states) | `city: "Springfield"`, `country: "United States"` |
+| Adelaide (Australia vs South Africa) | `city: "Adelaide"`, `country: "Australia"` |
+
+---
+
+## 🚑 Troubleshooting
+
+* **`401 Invalid API Key`**
+  * Your API key is incorrect, was not copied in full, or has not activated yet.
+  * New keys take up to 10 minutes to become active after generation — wait and retry before assuming the key is wrong.
+  * Go to [home.openweathermap.org/api_keys](https://home.openweathermap.org/api_keys) to verify the key and update it in SVAHNAR Key Vault.
+
+* **`404 City Not Found`**
+  * The city name is misspelled or does not match OpenWeatherMap's index.
+  * Try the most commonly used English spelling of the city — e.g., `"Bengaluru"` and `"Bangalore"` may behave differently; try both.
+  * Add the `country` field to help the API resolve the correct city when the name is ambiguous.
+
+* **Wrong City's Weather Returned**
+  * Without the `country` field, OpenWeatherMap resolves to the most prominent city matching the name — which may not be the one the user intended.
+  * Always pass `country` for any city that could exist in more than one country.
+
+* **Free Tier Rate Limit Hit (`429 Too Many Requests`)**
+  * The free tier allows up to 60 API calls per minute. If your agent queries weather for many cities in rapid succession, it may exceed this limit.
+  * Add a short delay between batch city queries, or upgrade to a paid OpenWeatherMap plan for higher rate limits.

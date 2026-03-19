@@ -1,0 +1,304 @@
+import Video from '@site/src/components/Video';
+import { Steps, Step } from '@site/src/components/Steps/Steps';
+
+# Salesforce
+
+Empower your agents to query, create, and manage CRM data directly through **Salesforce**.
+
+This guide will walk you through retrieving your Salesforce security token, configuring the SVAHNAR tool, and connecting your org.
+
+## 💡 Core Concepts
+
+To configure this tool effectively, you need to understand the underlying capabilities, the SOQL query model, and the parameter contract.
+
+### 1. What can this tool do?
+
+The Salesforce tool interacts with the **Salesforce REST API** to perform schema discovery, SOQL-based querying, and full CRUD operations across any standard or custom Salesforce object.
+
+| Operation | Description |
+| --- | --- |
+| `list_objects` | List all available Salesforce objects in the instance (standard + custom). |
+| `describe` | Retrieve the full schema of a specific object — all field names, types, and constraints. |
+| `query` | Execute a SOQL query to retrieve records with filters, field selection, and limits. |
+| `create` | Create a new record in a specified Salesforce object. |
+| `update` | Modify specific fields on an existing record by its record ID. |
+| `delete` | Permanently delete a record from a specified object by its record ID. |
+
+### 2. Authentication
+
+This tool uses **Salesforce Username-Password Authentication** with a Security Token — no Connected App, no OAuth flow, no `client_id` or `client_secret` required.
+
+| Credential | Description |
+| --- | --- |
+| `username` | Your Salesforce login email. |
+| `password` | Your Salesforce account password. |
+| `security_token` | A token appended to your password for API authentication. Retrieved from Salesforce account settings. |
+| `domain` | Your Salesforce instance domain — `login` for standard orgs, `test` for sandboxes. |
+
+* **No OAuth flow:** Credentials are stored statically in SVAHNAR Key Vault and resolved at runtime. No browser-based consent screen needed.
+* **Maintenance:** If you change your Salesforce password, Salesforce automatically invalidates your security token and emails you a new one. Update both `password` and `security_token` in SVAHNAR Key Vault whenever you reset your password.
+
+:::caution
+The security token is **separate from your password** and is not the same as your MFA code. It is a permanent token tied to your account — until you reset your password, which rotates it automatically.
+:::
+
+### 3. The SOQL Query Model
+
+Unlike SQL, **SOQL (Salesforce Object Query Language)** queries a single object at a time and requires you to explicitly name every field you want returned. There is no `SELECT *`.
+
+```sql
+-- Correct: explicit field list
+SELECT Id, Name, Email, Phone FROM Contact WHERE AccountId = '001XXXXXXXXXXXXXXX' LIMIT 10
+
+-- Correct: filter with string comparison
+SELECT Id, Name, Amount FROM Opportunity WHERE StageName = 'Closed Won' LIMIT 20
+```
+
+:::tip
+Always call `describe` on an object before writing a `query` — it gives you the exact API field names, which are case-sensitive and often differ from their UI labels (e.g., `LastModifiedDate`, not `Last Modified Date`).
+:::
+
+### 4. Operation Parameter Contract
+
+| Parameter | Required When | Description |
+| --- | --- | --- |
+| `operation` | Always | One of: `query`, `describe`, `list_objects`, `create`, `update`, `delete` |
+| `query` | `query` | A valid SOQL query string. |
+| `object_name` | `describe`, `create`, `update`, `delete` | API name of the Salesforce object (e.g., `Account`, `Contact`, `Lead`). |
+| `record_data` | `create`, `update` | Dict of field-value pairs to write (e.g., `{"LastName": "Doe", "Email": "doe@example.com"}`). |
+| `record_id` | `update`, `delete` | The Salesforce record ID (e.g., `003XXXXXXXXXXXXXXX`). |
+
+:::caution
+`delete` is **permanent** in Salesforce — records go to the Recycle Bin and are recoverable for 15 days, after which they are purged forever. Always confirm record IDs via `query` before deleting.
+:::
+
+---
+
+## 🔑 Prerequisites
+
+Before configuring the tool in SVAHNAR, you need your Salesforce login credentials and a **Security Token** for your account.
+
+<Steps>
+<Step>
+
+### Get Your Salesforce Security Token
+
+1. Log in to your Salesforce account.
+2. Click your **profile avatar** (top-right) → **Settings**.
+3. In the left sidebar, go to **My Personal Information** → **Reset My Security Token**.
+4. Click **Reset Security Token**. Salesforce will email the token to your registered email address.
+5. Copy the token from the email.
+
+:::note
+If you have **never reset** your security token, Salesforce may have emailed it to you when your account was first created. Check your inbox for an email with subject **"Your new Salesforce security token"**. If you cannot find it, follow the reset steps above.
+:::
+
+:::caution
+Resetting your password in Salesforce **automatically invalidates your current security token** and generates a new one — Salesforce emails the new token to you. Whenever you change your Salesforce password, update `security_token` in SVAHNAR Key Vault immediately.
+:::
+
+</Step>
+
+<Step>
+
+### Identify Your Domain
+
+The `domain` field tells the tool which Salesforce environment to connect to:
+
+| Environment | `domain` value |
+| --- | --- |
+| Production / Developer org | `login` |
+| Sandbox | `test` |
+| Custom domain (My Domain) | Your custom domain string (e.g., `mycompany`) |
+
+:::tip
+If you are unsure, use `login` for production orgs. Use `test` for sandboxes created under **Setup → Sandboxes**.
+:::
+
+</Step>
+
+<Step>
+
+### Verify API Access Is Enabled
+
+1. In Salesforce **Setup**, search for **Profiles** → open the profile used by your API user.
+2. Ensure **API Enabled** is checked under Administrative Permissions.
+
+:::note
+In enterprise Salesforce instances, API access may be restricted by your org's administrator. If you receive `INSUFFICIENT_ACCESS` errors, contact your Salesforce admin to enable API access for your profile.
+:::
+
+</Step>
+</Steps>
+
+---
+
+## ⚙️ Configuration Steps
+
+<Steps>
+<Step>
+
+### Add the Tool in SVAHNAR
+
+1. Open your **SVAHNAR Agent Configuration**.
+2. Add the **Salesforce** tool and enter your credentials:
+   * `username` — your Salesforce login email
+   * `password` — your Salesforce account password
+   * `security_token` — the token from the reset email
+   * `domain` — `login` for production, `test` for sandbox
+
+3. Save the configuration.
+
+</Step>
+
+<Step>
+
+### Verify the Connection
+
+To confirm your credentials are working:
+
+1. Trigger a test agent run using the `list_objects` operation:
+```json
+{
+  "operation": "list_objects"
+}
+```
+2. A valid response will return a list of all Salesforce objects in your org (e.g., `Account`, `Contact`, `Lead`, `Opportunity`).
+3. If you receive an `INVALID_LOGIN` error, verify your `username`, `password`, and `security_token` are all correct and up to date.
+4. If you receive `INSUFFICIENT_ACCESS`, your user profile does not have API access enabled — see Prerequisites Step 3.
+
+</Step>
+</Steps>
+
+---
+
+## 📚 Practical Recipes (Examples)
+
+### Recipe 1: CRM Query & Enrichment Agent
+
+> **Use Case:** An agent that queries Salesforce for specific records and updates them with enriched data.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: crm_enrichment_agent
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: Salesforce
+          config:
+            username: ${salesforce_username}
+            password: ${salesforce_password}
+            security_token: ${salesforce_security_token}
+            domain: login
+    agent_function:
+      - You are a CRM data enrichment assistant.
+      - First call 'describe' on the 'Contact' object to confirm exact field names before querying.
+      - Use 'query' with a SOQL statement to retrieve contacts missing a phone number — e.g., SELECT Id, FirstName, LastName, Email FROM Contact WHERE Phone = NULL LIMIT 50.
+      - For each contact where enrichment data is available, use 'update' with the record_id and the new field values in record_data.
+      - Report a summary of how many records were updated and which ones were skipped.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+---
+
+### Recipe 2: Lead Management Agent
+
+> **Use Case:** An agent that creates new leads from inbound data and tracks their pipeline stage.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: lead_management_agent
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: Salesforce
+          config:
+            username: ${salesforce_username}
+            password: ${salesforce_password}
+            security_token: ${salesforce_security_token}
+            domain: login
+    agent_function:
+      - You are a lead management assistant.
+      - Call 'describe' on the 'Lead' object first to verify required fields and valid picklist values (e.g., LeadSource, Status).
+      - Use 'create' with object_name 'Lead' and record_data containing FirstName, LastName, Email, Company, and LeadSource to add new inbound leads.
+      - Use 'query' to retrieve leads by status — e.g., SELECT Id, Name, Status FROM Lead WHERE Status = 'Open - Not Contacted' LIMIT 20.
+      - Use 'update' to advance lead status as they progress through the pipeline.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+---
+
+### Recipe 3: Schema Explorer Agent
+
+> **Use Case:** An agent that maps your Salesforce instance's object model — useful for onboarding, audits, or building downstream integrations.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: schema_explorer_agent
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: Salesforce
+          config:
+            username: ${salesforce_username}
+            password: ${salesforce_password}
+            security_token: ${salesforce_security_token}
+            domain: login
+    agent_function:
+      - You are a Salesforce schema analyst.
+      - Use 'list_objects' to retrieve all available objects in the org.
+      - For any object the user asks about, use 'describe' to retrieve its full field schema — names, types, required status, and picklist options.
+      - Present the schema in a clean, readable format and highlight required fields and any custom fields (identified by '__c' suffix in their API name).
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+### 💡 Tip: SVAHNAR Key Vault
+
+Never hardcode your `password` or `security_token` in plain text files. Use SVAHNAR Key Vault references (e.g., `${salesforce_password}`, `${salesforce_security_token}`) to keep credentials secure. Remember — when you reset your Salesforce password, both `password` and `security_token` must be updated in Key Vault simultaneously.
+
+---
+
+## 🚑 Troubleshooting
+
+* **`INVALID_LOGIN` or `401 Unauthorized`**
+  * Your `username`, `password`, or `security_token` is incorrect or out of date.
+  * If you recently changed your Salesforce password, your security token was automatically rotated — check your email for the new token and update both `password` and `security_token` in SVAHNAR Key Vault.
+  * Verify the `domain` is correct — `login` for production, `test` for sandbox. Using the wrong domain causes login failures even with valid credentials.
+
+* **`INSUFFICIENT_ACCESS` or `403 Forbidden`**
+  * Your Salesforce user profile does not have **API Enabled** permission.
+  * Contact your Salesforce administrator to enable API access for your profile under **Setup → Profiles → Administrative Permissions**.
+
+* **SOQL Query Errors (`MALFORMED_QUERY`)**
+  * Always call `describe` on the target object first to get exact API field names — they are case-sensitive.
+  * SOQL does not support `SELECT *`. You must explicitly list every field you need.
+  * String values in SOQL filters must be single-quoted: `WHERE Name = 'Acme Corp'`, not double-quoted.
+
+* **`create` or `update` Fails with `REQUIRED_FIELD_MISSING`**
+  * Call `describe` on the object to identify required fields (`nillable: false`, `createable: true`).
+  * Common required fields: `Contact` requires `LastName`, `Lead` requires `LastName` and `Company`.
+
+* **`delete` Returns `ENTITY_IS_DELETED`**
+  * The record was already deleted. Check the Salesforce Recycle Bin to restore it — records are recoverable for 15 days.
+
+* **Custom Objects Not Appearing in `list_objects`**
+  * Custom objects have an `__c` suffix in their API name (e.g., `Invoice__c`). They appear in `list_objects` — filter for `__c` to identify them.
+  * If a custom object is missing entirely, verify your user profile has read access under **Setup → Object Manager → [Object] → Security**.
+
+* **Sandbox Connection Failing**
+  * Ensure `domain` is set to `test` for sandboxes — not `login`. Sandboxes also have their own separate security tokens. Reset your sandbox security token from within the sandbox org, not production.

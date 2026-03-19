@@ -1,0 +1,259 @@
+import Video from '@site/src/components/Video';
+import { Steps, Step } from '@site/src/components/Steps/Steps';
+
+# Yahoo Finance
+
+Empower your agents to retrieve the latest financial news, market updates, and company-specific coverage through **Yahoo Finance**.
+
+This guide will walk you through configuring the SVAHNAR tool and building financial news workflows.
+
+## 💡 Core Concepts
+
+To configure this tool effectively, you need to understand what Yahoo Finance News returns, how it differs from other financial tools in your suite, and what query patterns produce the best results.
+
+### 1. What can this tool do?
+
+The Yahoo Finance tool queries **Yahoo Finance** to retrieve the latest news articles relevant to a company, ticker symbol, market sector, or financial topic.
+
+| Capability | Description |
+| --- | --- |
+| Company news | Latest news articles about a specific company or stock. |
+| Ticker-based search | Search by stock ticker symbol to get instrument-specific coverage. |
+| Sector & market news | Broader financial news on a sector, index, or market theme. |
+| Macroeconomic news | Coverage of interest rates, inflation, GDP, central bank decisions, and global markets. |
+
+:::note
+This tool returns **news articles** — headlines, summaries, and links to coverage. It does not return live stock prices, financial statements, or historical price data. For real-time prices, use the [Google Finance](/docs/google-finance) tool. For financial computations, use the [WolframAlpha](/docs/wolframalpha) tool.
+:::
+
+### 2. Authentication
+
+This tool uses the **Yahoo Finance public news feed** — no authentication, API key, or credentials are required.
+
+* **No setup required:** Yahoo Finance news is publicly accessible. There is no token, OAuth flow, or developer account needed.
+* **Rate limits:** The tool is subject to Yahoo Finance's standard rate limits. Avoid high-frequency automated bulk queries.
+
+### 3. Yahoo Finance vs Google Finance
+
+Both tools cover financial data but serve different purposes:
+
+| | Yahoo Finance | Google Finance |
+| --- | --- | --- |
+| **Best for** | Financial news and headlines | Real-time stock prices and chart data |
+| **News articles** | ✅ | ❌ |
+| **Live price quotes** | ❌ | ✅ |
+| **Historical chart data** | ❌ | ✅ |
+| **Market sentiment** | ✅ via news | ⚠️ Price movement only |
+| **Credentials required** | ❌ None | ✅ SerpApi key |
+
+:::tip
+Combine both tools for a complete market picture — use **Yahoo Finance** to understand what is being reported about a company, and **Google Finance** to see how the market is actually reacting to it in price.
+:::
+
+### 4. What Yahoo Finance Answers Well
+
+| Query Type | Example |
+| --- | --- |
+| Company-specific news | `"What is the news about Apple?"` |
+| Ticker-based news | `"Latest news on TSLA"` |
+| Earnings and results | `"Infosys Q3 earnings news"` |
+| Sector news | `"Electric vehicle sector news"` |
+| Macroeconomic news | `"US Federal Reserve interest rate news"` |
+| Market index news | `"NASDAQ market news today"` |
+| Merger & acquisition news | `"Microsoft acquisition news"` |
+| India market news | `"Nifty 50 news today"`, `"RBI policy news"` |
+
+:::tip
+Use company names or full ticker symbols for the most targeted results — `"What is the news about Reliance Industries?"` returns more focused coverage than just `"Reliance"`.
+:::
+
+### 5. Parameter Reference
+
+| Parameter | Type | Required | Description | Example |
+| --- | --- | --- | --- | --- |
+| `query` | string | Yes | A natural language question or keyword string about a company, ticker, sector, or financial topic. | `"What is the news about Apple?"` |
+
+---
+
+## ⚙️ Configuration Steps
+
+<Steps>
+<Step>
+
+### Add the Tool in SVAHNAR
+
+1. Open your **SVAHNAR Agent Configuration**.
+2. Add the **Yahoo Finance** tool.
+3. No credentials are required — the tool connects to Yahoo Finance's public news feed automatically.
+4. Save the configuration.
+
+</Step>
+
+<Step>
+
+### Verify the Connection
+
+To confirm the tool is working:
+
+1. Trigger a test agent run with a simple news query:
+```json
+{
+  "query": "What is the news about Apple?"
+}
+```
+2. A valid response will return recent Yahoo Finance news articles with headlines and summaries.
+3. If the tool returns an empty response, try rephrasing the query with the full company name or a more specific financial topic.
+
+</Step>
+</Steps>
+
+---
+
+## 📚 Practical Recipes (Examples)
+
+### Recipe 1: Financial News Briefing Agent
+
+> **Use Case:** An agent that delivers a morning news briefing on a set of stocks or financial topics the user follows.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: financial_news_briefing
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: YahooFinance
+    agent_function:
+      - You are a financial news assistant.
+      - For each company or topic in the user's watchlist, run a separate Yahoo Finance query using the company name or ticker as the 'query'.
+      - Summarize the top 3 most relevant news headlines for each company.
+      - Group results by company and present them as a clean morning briefing — company name, headline, and a one-line summary for each article.
+      - Flag any articles that mention earnings, mergers, regulatory action, or significant price targets.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+---
+
+### Recipe 2: Market Sentiment Agent
+
+> **Use Case:** An agent that gauges the current news sentiment around a stock before a trade decision.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: market_sentiment_agent
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: YahooFinance
+    agent_function:
+      - You are a market sentiment analyst.
+      - When the user asks about sentiment for a stock, search Yahoo Finance for recent news using the company name and ticker as the 'query'.
+      - Analyze the headlines and summaries returned — classify each as positive, negative, or neutral.
+      - Provide an overall sentiment score (Bullish / Neutral / Bearish) with a brief rationale citing the most significant articles.
+      - Flag any articles about earnings misses, lawsuits, leadership changes, or macroeconomic headwinds that could impact the stock.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+---
+
+### Recipe 3: Cross-Tool — Yahoo Finance + Google Finance Market Snapshot Agent
+
+> **Use Case:** An agent that pairs live price data from Google Finance with the latest news from Yahoo Finance for a complete market snapshot.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: full_market_snapshot_agent
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: YahooFinance
+        - name: GoogleFinance
+          config:
+            api_key: ${serpapi_key}
+    agent_function:
+      - You are a full market snapshot assistant.
+      - When the user asks about a stock, run both tools simultaneously.
+      - Use Google Finance with 'TICKER:EXCHANGE' format to fetch the current price, day's change, and percentage movement.
+      - Use Yahoo Finance to retrieve the latest news headlines about the same company.
+      - Present a unified snapshot — Current Price and Day's Movement (from Google Finance) followed by Latest News (from Yahoo Finance) — so the user gets both the numbers and the narrative in one view.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+---
+
+### Recipe 4: Cross-Tool — Yahoo Finance + Zerodha Trade Context Agent
+
+> **Use Case:** An agent that reads recent news before executing a trade on Zerodha, ensuring the user is informed of any material developments.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: news_before_trade_agent
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: YahooFinance
+        - name: Zerodha
+          config:
+            api_key: ${zerodha_api_key}
+            access_token: ${zerodha_access_token}
+    agent_function:
+      - You are a news-aware trade assistant.
+      - Before placing any trade, first use Yahoo Finance to retrieve recent news on the target stock.
+      - Summarize the key headlines and flag any material news — earnings, regulatory action, leadership changes, or significant analyst calls.
+      - Present the news summary to the user and ask them to confirm they are aware of the latest developments before proceeding.
+      - Only after explicit confirmation, use Zerodha 'get_ltp' to fetch the live price and 'place_order' to execute the trade.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+:::danger
+**Always require explicit user confirmation before placing any trade.** Never trigger a Zerodha order automatically. News awareness does not substitute for the user's own judgment on trade decisions.
+:::
+
+### 💡 Tip: Query Phrasing for Best Results
+
+| Instead of... | Use... |
+| --- | --- |
+| `"Apple"` | `"What is the news about Apple Inc?"` |
+| `"TCS"` | `"Latest news on Tata Consultancy Services TCS"` |
+| `"market"` | `"Indian stock market news today"` |
+| `"interest rates"` | `"US Federal Reserve interest rate decision news"` |
+| `"crypto"` | `"Bitcoin cryptocurrency market news"` |
+
+Phrasing queries as questions or including the full company name alongside the ticker symbol improves result relevance significantly.
+
+---
+
+## 🚑 Troubleshooting
+
+* **Empty or No Results Returned**
+  * Rephrase the query with the full company name rather than just the ticker — `"What is the news about Infosys?"` typically returns better results than `"INFY"` alone.
+  * For very recent events (last few hours), Yahoo Finance's news index may not yet have articles. Try again after a short delay or widen the query scope.
+
+* **Results Are Not About the Intended Company**
+  * Ambiguous company names may return results for unrelated entities. Include the industry or country for disambiguation — e.g., `"Titan Company India watches news"` instead of just `"Titan"`.
+
+* **Macro or Sector Query Returns Too Broad Results**
+  * Narrow the query with a specific aspect — `"RBI monetary policy rate hike news"` instead of just `"RBI news"` — to get more targeted coverage.
+
+* **Results Seem Outdated**
+  * Yahoo Finance news is updated continuously but the tool retrieves what is currently indexed. For breaking news on fast-moving situations, run the query again after a few minutes.
+  * Complement with a web search tool for the most immediate coverage of rapidly developing stories.
