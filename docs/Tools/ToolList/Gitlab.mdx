@@ -1,0 +1,312 @@
+import Video from '@site/src/components/Video';
+import { Steps, Step } from '@site/src/components/Steps/Steps';
+
+# GitLab
+
+Empower your agents to manage repositories, files, branches, issues, and merge requests directly through **GitLab**.
+
+This guide will walk you through generating a GitLab Personal Access Token, configuring the SVAHNAR tool, and connecting your repository.
+
+## 💡 Core Concepts
+
+To configure this tool effectively, you need to understand the underlying capabilities, the branch model, and the query format contract.
+
+### 1. What can this tool do?
+
+The GitLab tool interacts with the **GitLab API** via the `python-gitlab` library to perform repository operations across issues, files, branches, and merge requests.
+
+**Issue Operations**
+
+| Mode | Description | Query Required |
+| --- | --- | --- |
+| `get_issues` | Fetch all open issues from the repository. | No |
+| `get_issue` | Fetch a specific issue by number — title, body, and all comments. | Issue number as string, e.g. `"42"` |
+| `comment_on_issue` | Add a comment to a specific issue. | `"issue_number\n\nYour comment text"` |
+
+**File Operations**
+
+| Mode | Description | Query Required |
+| --- | --- | --- |
+| `read_file` | Read the contents of a file from the repository. | `"path/to/file.txt"` |
+| `create_file` | Create a new file on the active bot branch. | `"path/to/file.txt\nFile contents here"` |
+| `update_file` | Update file contents using OLD/NEW markers. | See [Update File Format](#3-update-file-format) below. |
+| `delete_file` | Delete a file from the active bot branch. | `"path/to/file.txt"` |
+
+**Branch Operations**
+
+| Mode | Description | Query Required |
+| --- | --- | --- |
+| `list_branches_in_repo` | List all branches in the repository. | No |
+| `create_branch` | Create a new branch and set it as the active bot branch. | `"new-branch-name"` |
+| `set_active_branch` | Switch to an existing branch (equivalent to `git checkout`). | `"branch-name"` |
+
+**Directory & Listing Operations**
+
+| Mode | Description | Query Required |
+| --- | --- | --- |
+| `list_files_in_main_branch` | List all files in the main/base branch. | No |
+| `list_files_in_bot_branch` | List all files in the current active bot branch. | No |
+| `list_files_from_directory` | List files from a specific directory in the active branch. | `"path/to/directory"` |
+
+**Merge Request Operations**
+
+| Mode | Description | Query Required |
+| --- | --- | --- |
+| `create_pull_request` | Create a merge request from the bot branch into the base branch. | `"PR Title\n\nPR description body"` |
+
+### 2. The Two-Branch Model
+
+This tool operates with two distinct branch concepts that you must configure clearly:
+
+| Branch | Config Key | Purpose |
+| --- | --- | --- |
+| **Base Branch** | `GITLAB_BASE_BRANCH` | The protected target branch (e.g., `main`, `production`). Merge requests are opened **into** this branch. |
+| **Bot Branch** | `GITLAB_BRANCH` | The active working branch where all file writes (`create_file`, `update_file`, `delete_file`) happen. |
+
+All write operations (create, update, delete file) always target the **bot branch**, never the base branch directly. When the agent's changes are ready, `create_pull_request` opens a merge request from the bot branch into the base branch for human review.
+
+:::tip
+Set `GITLAB_BRANCH` to a dedicated branch like `svahnar-bot` or `agent/changes` to keep agent-generated commits isolated from your main development workflow.
+:::
+
+### 3. Update File Format
+
+The `update_file` mode uses a structured OLD/NEW marker format. The exact content between markers is matched and replaced:
+
+```
+path/to/file.txt
+OLD <<<<
+old content to replace
+>>>> OLD
+NEW <<<<
+new replacement content
+>>>> NEW
+```
+
+:::caution
+The OLD block must match the existing file content **exactly** — including whitespace, indentation, and line endings. If the match fails, the update will be rejected. Always call `read_file` first to confirm the exact content before writing an `update_file` query.
+:::
+
+---
+
+## 🔑 Prerequisites
+
+Before configuring the tool in SVAHNAR, you need to generate a **Personal Access Token** from GitLab with repository access.
+
+<Steps>
+<Step>
+
+### Generate a Personal Access Token
+
+1. Log in to [GitLab](https://gitlab.com) (or your self-hosted GitLab instance).
+2. Go to your avatar (top-right) → **Edit profile** → **Access Tokens** in the left sidebar.
+3. Click **Add new token**.
+4. Fill in the details:
+   * **Token name:** `SVAHNAR Agent`
+   * **Expiration date:** Set to your desired expiry (or leave blank for no expiry — see the caution below).
+   * **Scopes:** Select the following:
+     * `api` — Full API access (required for all operations)
+5. Click **Create personal access token**.
+6. **Crucial:** Copy the token immediately — it is shown only once and cannot be retrieved again.
+
+:::caution
+If you set an expiration date, the token will stop working silently on that date. Plan a token rotation reminder and update SVAHNAR Key Vault accordingly. For long-running agents, consider using a **Group Access Token** or **Project Access Token** for better lifecycle management.
+:::
+
+</Step>
+
+<Step>
+
+### Note Your Repository Details
+
+1. Navigate to the GitLab repository your agent will work with.
+2. Note the repository path in the format `owner/repo-name` (visible in the URL — e.g., `myorg/backend-service`). This is your `GITLAB_REPOSITORY` value.
+3. For **self-hosted GitLab** instances, note your instance URL (e.g., `https://gitlab.mycompany.com`). This is your `GITLAB_URL` value. For gitlab.com, this defaults automatically.
+
+</Step>
+
+<Step>
+
+### Prepare the Bot Branch
+
+1. In your GitLab repository, create a dedicated working branch for the agent:
+```bash
+git checkout -b svahnar-bot
+git push origin svahnar-bot
+```
+2. This branch name goes into `GITLAB_BRANCH` in your SVAHNAR configuration.
+3. Set `GITLAB_BASE_BRANCH` to your protected branch (typically `main` or `master`).
+
+:::note
+You can also let the agent create its own branch at runtime using the `create_branch` mode — but pre-creating it ensures branch protection rules and naming conventions are applied from the start.
+:::
+
+</Step>
+</Steps>
+
+---
+
+## ⚙️ Configuration Steps
+
+<Steps>
+<Step>
+
+### Add the Tool in SVAHNAR
+
+1. Open your **SVAHNAR Agent Configuration**.
+2. Add the **GitLab** tool and enter your connection details:
+   * `GITLAB_PERSONAL_ACCESS_TOKEN` — your Personal Access Token
+   * `GITLAB_REPOSITORY` — repository path in `owner/repo-name` format or numeric project ID
+   * `GITLAB_URL` *(optional)* — your GitLab instance URL (default: `https://gitlab.com`)
+   * `GITLAB_BRANCH` *(optional)* — active bot branch for write operations (default: `main`)
+   * `GITLAB_BASE_BRANCH` *(optional)* — target branch for merge requests (default: `main`)
+
+3. Save the configuration.
+
+</Step>
+
+<Step>
+
+### Verify the Connection
+
+To confirm your token and repository path are correctly configured:
+
+1. Trigger a test agent run using the `list_branches_in_repo` mode with an empty query.
+2. A valid response will return all branches in your repository including `main` and your bot branch.
+3. If you receive a `401` error, your token is invalid or expired. If you receive a `404`, your `GITLAB_REPOSITORY` path is incorrect — double-check the `owner/repo-name` format.
+
+</Step>
+</Steps>
+
+---
+
+## 📚 Practical Recipes (Examples)
+
+### Recipe 1: Autonomous Code Review & Issue Triage Agent
+
+> **Use Case:** An agent that reads open issues, fetches relevant files for context, and comments with an initial triage assessment.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: issue_triage_agent
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: GitLab
+          config:
+            GITLAB_PERSONAL_ACCESS_TOKEN: ${gitlab_token}
+            GITLAB_REPOSITORY: ${gitlab_repo}
+            GITLAB_BRANCH: svahnar-bot
+            GITLAB_BASE_BRANCH: main
+    agent_function:
+      - You are a code review and issue triage assistant.
+      - Use 'get_issues' to fetch all open issues in the repository.
+      - For each issue that appears to be a bug report, use 'get_issue' with the issue number to read the full description and existing comments.
+      - If the issue references a specific file, use 'read_file' to examine the relevant code.
+      - Use 'comment_on_issue' to add a structured triage comment — include reproduction steps, severity assessment, and suggested area of the codebase to investigate.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+---
+
+### Recipe 2: Automated Documentation Writer Agent
+
+> **Use Case:** An agent that reads source files and writes or updates documentation on a bot branch, then raises a merge request for review.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: documentation_agent
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: GitLab
+          config:
+            GITLAB_PERSONAL_ACCESS_TOKEN: ${gitlab_token}
+            GITLAB_REPOSITORY: ${gitlab_repo}
+            GITLAB_BRANCH: svahnar-bot
+            GITLAB_BASE_BRANCH: main
+    agent_function:
+      - You are a technical documentation assistant.
+      - Use 'list_files_in_main_branch' to discover all files in the repository.
+      - Use 'read_file' to read source files the user specifies (e.g., API route handlers, model definitions).
+      - If a documentation file already exists, use 'read_file' to get its current content, then use 'update_file' with the OLD/NEW marker format to patch the relevant section.
+      - If no documentation file exists yet, use 'create_file' to write a new one under the docs/ directory on the bot branch.
+      - Once all documentation is written, use 'create_pull_request' with a clear title and description summarizing all changes made.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+---
+
+### Recipe 3: Feature Branch Scaffolding Agent
+
+> **Use Case:** An agent that creates a new feature branch, scaffolds boilerplate files, and opens a draft merge request — all in one automated flow.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: feature_scaffolding_agent
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: GitLab
+          config:
+            GITLAB_PERSONAL_ACCESS_TOKEN: ${gitlab_token}
+            GITLAB_REPOSITORY: ${gitlab_repo}
+            GITLAB_BASE_BRANCH: main
+    agent_function:
+      - You are a feature scaffolding assistant.
+      - Use 'create_branch' to create a new branch with the feature name (e.g., 'feature/user-auth').
+      - The newly created branch automatically becomes the active bot branch for subsequent file operations.
+      - Use 'create_file' to scaffold boilerplate files — route handlers, test stubs, README sections — as requested by the user.
+      - Once scaffolding is complete, use 'create_pull_request' with the feature name as title and a checklist of what was scaffolded as the description body.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+### 💡 Tip: SVAHNAR Key Vault
+
+Never hardcode your `GITLAB_PERSONAL_ACCESS_TOKEN` in plain text files. Use SVAHNAR Key Vault references (e.g., `${gitlab_token}`) to keep credentials secure. If your token has an expiration date, set a calendar reminder to rotate it and update Key Vault before it lapses.
+
+---
+
+## 🚑 Troubleshooting
+
+* **`401 Unauthorized`**
+  * Your Personal Access Token is invalid, expired, or was not copied in full.
+  * Go to **GitLab → Edit Profile → Access Tokens**, verify the token's expiry, and regenerate if needed. Update the new token in SVAHNAR Key Vault.
+
+* **`404 Not Found` on Any Operation**
+  * Your `GITLAB_REPOSITORY` value is incorrect. It must be in `owner/repo-name` format exactly as it appears in the GitLab URL — e.g., `myorg/backend-service`, not `Backend Service` or a partial path.
+  * For self-hosted instances, ensure `GITLAB_URL` points to the correct base URL.
+
+* **`update_file` Fails with No Match Error**
+  * The OLD block content did not match the current file exactly. Always call `read_file` immediately before constructing an `update_file` query — even a single extra space or different line ending will cause a mismatch.
+  * Copy the exact content from the `read_file` response into the OLD block.
+
+* **Write Operations Affecting the Wrong Branch**
+  * All file writes (`create_file`, `update_file`, `delete_file`) target `GITLAB_BRANCH` (the bot branch). If changes are appearing on the wrong branch, verify that `GITLAB_BRANCH` is set correctly in your tool config, and use `set_active_branch` to explicitly switch if needed.
+
+* **`create_pull_request` Fails**
+  * A merge request between the bot branch and base branch may already be open. GitLab does not allow duplicate open MRs for the same source → target pair.
+  * Use `list_branches_in_repo` to confirm the bot branch exists and has commits ahead of the base branch before attempting to create a merge request.
+
+* **`comment_on_issue` or `get_issue` Returns Not Found**
+  * Issue numbers in GitLab are project-scoped integers. Pass the number as a plain string — e.g., `"42"`, not a URL or `#42`.
+  * Confirm the issue is open and belongs to the repository configured in `GITLAB_REPOSITORY`.
+
+* **Self-Hosted GitLab Not Connecting**
+  * Ensure `GITLAB_URL` is set to your full instance URL including protocol — e.g., `https://gitlab.mycompany.com`. Do not include a trailing slash.
+  * Verify your network allows outbound HTTPS from the SVAHNAR deployment to your GitLab instance.

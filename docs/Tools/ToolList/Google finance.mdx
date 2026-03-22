@@ -1,0 +1,293 @@
+import Video from '@site/src/components/Video';
+import { Steps, Step } from '@site/src/components/Steps/Steps';
+
+# Google Finance
+
+Empower your agents to fetch real-time stock quotes, financial data, and chart history through **Google Finance**, powered by SerpApi.
+
+This guide will walk you through obtaining a SerpApi key, configuring the SVAHNAR tool, and building financial data workflows.
+
+## 💡 Core Concepts
+
+To configure this tool effectively, you need to understand the underlying capabilities, the ticker symbol format, and the available query parameters.
+
+### 1. What can this tool do?
+
+The Google Finance tool queries **Google Finance via SerpApi** to retrieve real-time and historical financial data for stocks, indices, currencies, and ETFs.
+
+| Capability | Description |
+| --- | --- |
+| Stock quotes | Fetch real-time price, change, and percentage movement for any ticker. |
+| Company lookup | Search by company name or ticker symbol across global exchanges. |
+| Chart history | Retrieve price history across configurable time windows (1D to MAX). |
+| Currency pairs | Look up forex exchange rates between currency pairs. |
+| Market localization | Scope results to a specific country's market and language. |
+
+:::note
+This tool is **read-only**. It fetches financial data and quotes — it does not place trades, manage portfolios, or connect to brokerage accounts. For trade execution, use the [Zerodha](/docs/zerodha) tool.
+:::
+
+### 2. Authentication
+
+This tool uses a **SerpApi API Key** — a static key passed with every request.
+
+* **No OAuth required:** Generate a key once from the SerpApi dashboard and paste it into SVAHNAR. No per-user login flow needed.
+* **Rate limits:** SerpApi enforces monthly search credit limits based on your plan. Each tool call consumes one search credit.
+* **Maintenance:** API keys do not expire automatically. They are invalidated only if manually rotated from the SerpApi dashboard.
+
+:::tip
+If you already use the [Google Jobs](/docs/google-jobs) tool, your **SerpApi key is the same** — one key works across all SerpApi-powered tools in SVAHNAR. No separate account needed.
+:::
+
+### 3. The `q` Ticker Format
+
+The `q` parameter accepts ticker symbols in two formats:
+
+| Format | When to use | Example |
+| --- | --- | --- |
+| `TICKER` | When the exchange is implied by `gl` and `gl` is set. | `"RELIANCE"` |
+| `TICKER:EXCHANGE` | When targeting a specific exchange explicitly. Always preferred for accuracy. | `"AAPL:NASDAQ"`, `"RELIANCE:NSE"` |
+
+**Common exchange codes:**
+
+| Exchange | Code |
+| --- | --- |
+| NASDAQ | `NASDAQ` |
+| New York Stock Exchange | `NYSE` |
+| National Stock Exchange (India) | `NSE` |
+| Bombay Stock Exchange (India) | `BSE` |
+| London Stock Exchange | `LON` |
+| Frankfurt Stock Exchange | `FRA` |
+| Tokyo Stock Exchange | `TYO` |
+
+**Currency pairs** use the format `CURRENCY1-CURRENCY2`:
+```
+"USD-INR"   → US Dollar to Indian Rupee
+"EUR-USD"   → Euro to US Dollar
+"BTC-USD"   → Bitcoin to US Dollar
+```
+
+### 4. Parameter Reference
+
+| Parameter | Type | Required | Description | Example |
+| --- | --- | --- | --- | --- |
+| `q` | string | Yes | Ticker symbol, company name, or currency pair. | `"AAPL:NASDAQ"`, `"USD-INR"` |
+| `engine` | string | No | Must be `"google_finance"` when specified. | `"google_finance"` |
+| `window` | string | No | Time range for chart data. See table below. | `"1M"` |
+| `gl` | string | No | 2-letter country code for market context. | `"us"`, `"in"` |
+| `hl` | string | No | 2-letter language code for result language. | `"en"` |
+
+**Window values for chart history:**
+
+| Window | Time Range |
+| --- | --- |
+| `1D` | Last 1 day (intraday) |
+| `5D` | Last 5 days |
+| `1M` | Last 1 month |
+| `6M` | Last 6 months |
+| `YTD` | Year to date |
+| `1Y` | Last 1 year |
+| `5Y` | Last 5 years |
+| `MAX` | Maximum available history |
+
+---
+
+## 🔑 Prerequisites
+
+<Steps>
+<Step>
+
+### Create a SerpApi Account
+
+1. Go to [https://serpapi.com](https://serpapi.com) and sign up for an account.
+2. SerpApi offers a **free tier with 100 searches/month** — sufficient for development and light agent usage.
+3. For production workloads or high-frequency financial monitoring, select a paid plan based on your expected monthly query volume.
+
+</Step>
+
+<Step>
+
+### Get Your API Key
+
+1. After signing in, go to your [SerpApi Dashboard](https://serpapi.com/dashboard).
+2. Copy the **API Key** shown on the dashboard.
+
+:::caution
+Never commit this key to version control or hardcode it in config files. Use SVAHNAR Key Vault (`${serpapi_key}`) to reference it safely. If you are already using the Google Jobs tool, the same key applies here — no need to generate a separate one.
+:::
+
+</Step>
+</Steps>
+
+---
+
+## ⚙️ Configuration Steps
+
+<Steps>
+<Step>
+
+### Add the Tool in SVAHNAR
+
+1. Open your **SVAHNAR Agent Configuration**.
+2. Add the **Google Finance** tool and enter your SerpApi credentials:
+   * `api_key` — your SerpApi API key
+
+3. Save the configuration.
+
+</Step>
+
+<Step>
+
+### Verify the Connection
+
+To confirm your API key is working:
+
+1. Trigger a test agent run with a simple payload — e.g., `{"q": "AAPL:NASDAQ", "gl": "us", "hl": "en"}`.
+2. A valid response will return current price, price change, and percentage movement for Apple Inc.
+3. If you receive an `Invalid API key` error, verify the key was copied in full from your SerpApi dashboard.
+4. If you receive a `credits exhausted` error, your monthly search quota has been reached — upgrade your SerpApi plan or wait for the next billing cycle.
+
+</Step>
+</Steps>
+
+---
+
+## 📚 Practical Recipes (Examples)
+
+### Recipe 1: Stock Price Lookup Agent
+
+> **Use Case:** An agent that fetches real-time price and movement data for any stock or index on demand.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: stock_lookup_agent
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: GoogleFinance
+          config:
+            api_key: ${serpapi_key}
+    agent_function:
+      - You are a real-time stock quote assistant.
+      - When the user asks about a stock, construct a payload with 'q' set to 'TICKER:EXCHANGE' format — e.g., 'RELIANCE:NSE' for Indian stocks or 'AAPL:NASDAQ' for US stocks.
+      - Always set 'gl' and 'hl' to match the target market — use 'gl:in' for Indian stocks and 'gl:us' for US stocks.
+      - Return the current price, today's change, and percentage movement in a clean one-line summary.
+      - If the user asks for multiple stocks, run separate queries for each and compile the results.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+---
+
+### Recipe 2: Portfolio Monitor Agent
+
+> **Use Case:** An agent that checks real-time prices for a watchlist of stocks and flags significant movers.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: portfolio_monitor_agent
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: GoogleFinance
+          config:
+            api_key: ${serpapi_key}
+    agent_function:
+      - You are a portfolio monitoring assistant.
+      - Fetch current prices for each stock in the configured watchlist by running one query per ticker using the 'TICKER:EXCHANGE' format.
+      - Calculate and present each stock's daily change and percentage movement.
+      - Flag any stock with a movement greater than ±2% as a significant mover and highlight it.
+      - Return a clean portfolio digest — ticker, current price, change, and a status indicator (📈 / 📉).
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+---
+
+### Recipe 3: Cross-Tool — Google Finance → Zerodha Trade Trigger Agent
+
+> **Use Case:** An agent that monitors a stock price and triggers a trade via Zerodha when a threshold is crossed.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: price_alert_trade_agent
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: GoogleFinance
+          config:
+            api_key: ${serpapi_key}
+        - name: Zerodha
+          config:
+            api_key: ${zerodha_api_key}
+            access_token: ${zerodha_access_token}
+    agent_function:
+      - You are a price-alert trade assistant.
+      - Use Google Finance to fetch the current price of the configured stock using 'TICKER:NSE' format with 'gl:in'.
+      - Compare the fetched price against the user-defined target price threshold.
+      - If the price has crossed the threshold, present the current price to the user and ask for explicit confirmation before placing any order.
+      - Only after receiving clear confirmation, use Zerodha 'place_order' with the configured trading_symbol, transaction_type, quantity, and order_type.
+      - Report the Zerodha order_id after placing and use 'order_history' to confirm the status.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+:::danger
+**Always require explicit user confirmation before placing any trade.** Never trigger a Zerodha order automatically without a human-in-the-loop confirmation step. Financial losses from automated trades are not reversible.
+:::
+
+### 💡 Tip: SVAHNAR Key Vault
+
+Never hardcode your `api_key` in plain text files. Use SVAHNAR Key Vault references (e.g., `${serpapi_key}`) to keep credentials secure. The same SerpApi key used for Google Jobs works here — no separate credential needed.
+
+### 💡 Tip: Indian Market Queries
+
+For NSE/BSE stocks, always use these parameters together for the most accurate results:
+
+```json
+{
+  "q": "RELIANCE:NSE",
+  "gl": "in",
+  "hl": "en"
+}
+```
+
+Omitting `gl: "in"` may cause Google Finance to return data from the wrong exchange or an incorrect price in a different currency.
+
+---
+
+## 🚑 Troubleshooting
+
+* **`Invalid API key` Error**
+  * Your SerpApi key is incorrect or was not copied in full. Go to your [SerpApi Dashboard](https://serpapi.com/dashboard), copy the key again, and update it in SVAHNAR Key Vault.
+
+* **`Credits Exhausted` Error**
+  * Your monthly SerpApi search quota has been reached. Each Google Finance query consumes one credit — watchlist agents that run frequently can deplete a free tier quickly.
+  * Upgrade your plan at [serpapi.com/pricing](https://serpapi.com/pricing) or reduce query frequency.
+
+* **Wrong Price or Wrong Currency Returned**
+  * Always use the `TICKER:EXCHANGE` format in `q`. Without the exchange suffix, Google Finance may resolve the ticker to a different exchange or a different market listing.
+  * Always set `gl` to match the target market — `"in"` for India, `"us"` for the US. Mismatched `gl` values can cause results to reflect the wrong regional market.
+
+* **`window` Parameter Returning No Chart Data**
+  * Not all tickers have historical data available for every window. Newly listed stocks may not have `5Y` or `MAX` data — try a shorter window like `1M` or `6M` first.
+  * The `window` parameter affects chart/historical data in the response, not the real-time quote — the current price is always returned regardless of `window`.
+
+* **Currency Pair Not Found**
+  * Ensure the format is `CURRENCY1-CURRENCY2` with a hyphen, not a slash — `"USD-INR"`, not `"USD/INR"`.
+  * Verify both currency codes are valid ISO 4217 codes. Crypto pairs like `BTC-USD` are supported but not all crypto tokens are indexed.
+
+* **`engine` Field Causing Errors**
+  * If specified, `engine` must be exactly `"google_finance"`. Any other value routes to a different SerpApi engine and will return unexpected results. When in doubt, omit the field entirely — it defaults correctly.

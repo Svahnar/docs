@@ -1,0 +1,320 @@
+import Video from '@site/src/components/Video';
+import { Steps, Step } from '@site/src/components/Steps/Steps';
+
+# Google Flights
+
+Empower your agents to search for flight options, prices, and schedules through **Google Flights**, powered by SerpApi.
+
+This guide will walk you through obtaining a SerpApi key, configuring the SVAHNAR tool, and building flight search workflows.
+
+## 💡 Core Concepts
+
+To configure this tool effectively, you need to understand the underlying capabilities, the trip type model, and the full parameter set available for filtering.
+
+### 1. What can this tool do?
+
+The Google Flights tool queries **Google Flights via SerpApi** to search real-time flight availability, pricing, and schedules across airlines worldwide.
+
+| Capability | Description |
+| --- | --- |
+| One-way search | Search for one-way flights between two airports. |
+| Round trip search | Search for round trips with a configurable return date. |
+| Multi-city search | Search for multi-leg itineraries. |
+| Cabin class filtering | Filter by Economy, Premium Economy, Business, or First Class. |
+| Passenger configuration | Specify adults, children, and infants separately. |
+| Airline include/exclude | Restrict or exclude specific airlines or alliances. |
+| Stop filtering | Limit results to nonstop, 1-stop, or 2-stop flights. |
+| Price cap | Set a maximum ticket price to filter out expensive options. |
+| Duration & layover limits | Filter by max flight duration and layover time windows. |
+| Emissions filter | Limit results to lower-emissions flight options. |
+
+:::note
+This tool is **read-only**. It searches and returns flight options — it does not book tickets, process payments, or interact with airline reservation systems.
+:::
+
+### 2. Authentication
+
+This tool uses a **SerpApi API Key** — a static key passed with every request.
+
+* **No OAuth required:** Generate a key once from the SerpApi dashboard and paste it into SVAHNAR. No per-user login flow needed.
+* **Rate limits:** SerpApi enforces monthly search credit limits based on your plan. Each tool call consumes one search credit.
+* **Maintenance:** API keys do not expire automatically. They are invalidated only if manually rotated from the SerpApi dashboard.
+
+:::tip
+If you already use the [Google Jobs](/docs/google-jobs) or [Google Finance](/docs/google-finance) tools, your **SerpApi key is the same** — one key works across all SerpApi-powered tools in SVAHNAR.
+:::
+
+### 3. Trip Type Model
+
+The `type` parameter controls the entire search structure. Set it correctly before configuring any other fields.
+
+| `type` | Trip Type | `return_date` Required |
+| --- | --- | --- |
+| `1` | Round trip | Yes |
+| `2` | One way | No |
+| `3` | Multi-city | No |
+
+:::caution
+For round trips (`type: 1`), `return_date` is mandatory. Omitting it will cause the query to fail or return incorrect results.
+:::
+
+### 4. Parameter Reference
+
+**Core Search Parameters**
+
+| Parameter | Type | Required | Description | Example |
+| --- | --- | --- | --- | --- |
+| `departure_id` | string | Yes | Departure airport IATA code. | `"DEL"`, `"JFK"` |
+| `arrival_id` | string | Yes | Arrival airport IATA code. | `"DXB"`, `"LAX"` |
+| `outbound_date` | string | Yes | Departure date in `YYYY-MM-DD` format. | `"2025-12-24"` |
+| `return_date` | string | Required if `type: 1` | Return date in `YYYY-MM-DD` format. | `"2026-01-02"` |
+| `type` | int | Yes | `1` = Round trip, `2` = One way, `3` = Multi-city. | `2` |
+| `travel_class` | int | No | `1` = Economy, `2` = Premium Economy, `3` = Business, `4` = First. | `1` |
+| `currency` | string | No | 3-letter ISO currency code for prices. | `"USD"`, `"INR"` |
+| `engine` | string | No | Must be `"google_flights"` when specified. | `"google_flights"` |
+
+**Passenger Parameters**
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `adults` | int | `1` | Number of adult passengers. |
+| `children` | int | `0` | Number of child passengers. |
+| `infants_in_seat` | int | `0` | Infants occupying their own seat. |
+| `infants_on_lap` | int | `0` | Infants travelling on a lap. |
+
+**Sorting & Filter Parameters**
+
+| Parameter | Type | Description | Example |
+| --- | --- | --- | --- |
+| `sort_by` | int | `1` = Top picks, `2` = Price, `3` = Departure time, `4` = Arrival time, `5` = Duration, `6` = Emissions. | `2` |
+| `stops` | int | `0` = Any, `1` = Nonstop only, `2` = 1 stop or fewer, `3` = 2 stops or fewer. | `1` |
+| `max_price` | int | Maximum ticket price in the specified `currency`. | `500` |
+| `bags` | int | Number of carry-on bags. | `1` |
+| `max_duration` | int | Maximum total flight duration in minutes. | `300` |
+| `layover_duration` | string | Min and max layover in minutes — `"min,max"`. | `"90,300"` |
+| `emissions` | int | Set to `1` to restrict to lower-emissions flights only. | `1` |
+| `outbound_times` | string | Departure/arrival time window — `"HH,HH"` (dep only) or `"HH,HH,HH,HH"` (dep + arr). | `"4,18"` |
+| `return_times` | string | Return leg time window — same format as `outbound_times`. Only used when `type: 1`. | `"6,22"` |
+| `include_airlines` | string | Comma-separated IATA airline codes or alliance names to include. | `"AI,6E"`, `"ONEWORLD"` |
+| `exclude_airlines` | string | Comma-separated IATA codes or alliances to exclude. | `"UA,SKYTEAM"` |
+| `exclude_conns` | string | Comma-separated airport IATA codes to avoid as layover points. | `"ORD,DFW"` |
+
+**Airline Alliance Codes for `include_airlines` / `exclude_airlines`:**
+
+| Alliance | Code |
+| --- | --- |
+| Star Alliance | `STAR_ALLIANCE` |
+| SkyTeam | `SKYTEAM` |
+| Oneworld | `ONEWORLD` |
+
+---
+
+## 🔑 Prerequisites
+
+<Steps>
+<Step>
+
+### Create a SerpApi Account
+
+1. Go to [https://serpapi.com](https://serpapi.com) and sign up for an account.
+2. SerpApi offers a **free tier with 100 searches/month** — sufficient for development and light agent usage.
+3. For production workloads or high-frequency flight monitoring, select a paid plan based on your expected monthly query volume.
+
+</Step>
+
+<Step>
+
+### Get Your API Key
+
+1. After signing in, go to your [SerpApi Dashboard](https://serpapi.com/dashboard).
+2. Copy the **API Key** shown on the dashboard.
+
+:::caution
+Never commit this key to version control or hardcode it in config files. Use SVAHNAR Key Vault (`${serpapi_key}`) to reference it safely. If you already use other SerpApi tools in SVAHNAR, the same key applies — no separate account needed.
+:::
+
+</Step>
+</Steps>
+
+---
+
+## ⚙️ Configuration Steps
+
+<Steps>
+<Step>
+
+### Add the Tool in SVAHNAR
+
+1. Open your **SVAHNAR Agent Configuration**.
+2. Add the **Google Flights** tool and enter your SerpApi credentials:
+   * `api_key` — your SerpApi API key
+
+3. Save the configuration.
+
+</Step>
+
+<Step>
+
+### Verify the Connection
+
+To confirm your API key is working:
+
+1. Trigger a test agent run with a simple one-way payload:
+```json
+{
+  "departure_id": "DEL",
+  "arrival_id": "BOM",
+  "outbound_date": "2025-12-24",
+  "type": 2,
+  "currency": "INR"
+}
+```
+2. A valid response will return a list of available flights with airlines, prices, and durations.
+3. If you receive an `Invalid API key` error, verify the key was copied in full from your SerpApi dashboard.
+4. If you receive a `credits exhausted` error, your monthly search quota has been reached.
+
+</Step>
+</Steps>
+
+---
+
+## 📚 Practical Recipes (Examples)
+
+### Recipe 1: Flight Search Agent
+
+> **Use Case:** An agent that finds the best flight options based on the user's travel preferences.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: flight_search_agent
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: GoogleFlights
+          config:
+            api_key: ${serpapi_key}
+    agent_function:
+      - You are a flight search assistant.
+      - Ask the user for origin airport, destination airport, travel date, trip type (one-way or round trip), number of passengers, and preferred cabin class.
+      - For round trips, also ask for the return date.
+      - Construct the payload using the correct IATA airport codes. Set 'type' to 2 for one-way or 1 for round trip.
+      - Set 'sort_by' to 2 (Price) by default unless the user prefers fastest or best-ranked results.
+      - Return the top 5 options — airline, departure time, arrival time, stops, duration, and price.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+---
+
+### Recipe 2: Budget Flight Finder Agent
+
+> **Use Case:** An agent that searches for the cheapest nonstop flights under a user-defined price cap.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: budget_flight_finder
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: GoogleFlights
+          config:
+            api_key: ${serpapi_key}
+    agent_function:
+      - You are a budget travel assistant.
+      - Ask the user for their route, travel date, and maximum budget.
+      - Set 'stops' to 1 (Nonstop only) and 'max_price' to the user's budget.
+      - Set 'sort_by' to 2 (Price) to surface cheapest options first.
+      - Set 'currency' to match the user's preferred currency.
+      - If no nonstop options exist under the budget, retry with 'stops' set to 2 (1 stop or fewer) and notify the user.
+      - Return results with airline, price, duration, and number of stops clearly labelled.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+---
+
+### Recipe 3: Business Travel Planner Agent
+
+> **Use Case:** An agent that finds premium cabin round trips with airline preferences and layover constraints.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: business_travel_planner
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: GoogleFlights
+          config:
+            api_key: ${serpapi_key}
+    agent_function:
+      - You are a business travel planning assistant.
+      - Ask for the route, outbound date, return date, and any airline preferences (specific airlines or alliances).
+      - Set 'type' to 1 (Round trip), 'travel_class' to 3 (Business) or 4 (First) based on user preference.
+      - Set 'layover_duration' to '60,240' to avoid very short connections and excessively long layovers.
+      - Use 'include_airlines' if the user has a preferred airline or alliance (e.g., ONEWORLD or STAR_ALLIANCE).
+      - Use 'exclude_conns' to avoid any connection airports the user wants to skip.
+      - Set 'sort_by' to 5 (Duration) to prioritize fastest itineraries. Return top 3 options with full itinerary details.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+### 💡 Tip: SVAHNAR Key Vault
+
+Never hardcode your `api_key` in plain text files. Use SVAHNAR Key Vault references (e.g., `${serpapi_key}`) to keep credentials secure. The same SerpApi key used for Google Jobs and Google Finance works here — no separate credential needed.
+
+### 💡 Tip: Indian Route Searches
+
+For domestic Indian flights and routes to/from India, always set `currency: "INR"` and use the correct IATA codes. Common Indian airport codes:
+
+| City | Airport | IATA Code |
+| --- | --- | --- |
+| Delhi | Indira Gandhi International | `DEL` |
+| Mumbai | Chhatrapati Shivaji Maharaj International | `BOM` |
+| Bangalore | Kempegowda International | `BLR` |
+| Hyderabad | Rajiv Gandhi International | `HYD` |
+| Chennai | Chennai International | `MAA` |
+| Kolkata | Netaji Subhas Chandra Bose International | `CCU` |
+| Pune | Pune Airport | `PNQ` |
+| Ahmedabad | Sardar Vallabhbhai Patel International | `AMD` |
+
+---
+
+## 🚑 Troubleshooting
+
+* **`Invalid API key` Error**
+  * Your SerpApi key is incorrect or was not copied in full. Go to your [SerpApi Dashboard](https://serpapi.com/dashboard), copy the key again, and update it in SVAHNAR Key Vault.
+
+* **`Credits Exhausted` Error**
+  * Your monthly SerpApi search quota has been reached. Each Google Flights query consumes one credit.
+  * Upgrade your plan at [serpapi.com/pricing](https://serpapi.com/pricing) or reduce query frequency. Avoid running broad searches for date ranges — each date requires a separate query.
+
+* **No Flights Returned**
+  * Verify the `departure_id` and `arrival_id` are valid IATA airport codes — not city names or full airport names. `"Delhi"` will not work; `"DEL"` will.
+  * Check that `outbound_date` is a future date in `YYYY-MM-DD` format. Past dates return no results.
+  * If `stops: 1` (nonstop only) returns nothing, the route may have no direct flights — retry with `stops: 2`.
+
+* **Round Trip Returns No Results**
+  * Ensure `return_date` is set when `type: 1`. Omitting it for a round trip query causes incorrect or empty results.
+  * Verify `return_date` is after `outbound_date`.
+
+* **Prices Showing in Wrong Currency**
+  * Always set the `currency` field explicitly using a valid 3-letter ISO 4217 code — e.g., `"INR"`, `"USD"`, `"EUR"`. Without it, SerpApi defaults to USD.
+
+* **`outbound_times` or `return_times` Not Filtering Correctly**
+  * The time window format is `"HH,HH"` for departure window only, or `"HH,HH,HH,HH"` for departure + arrival window. Values are in 24-hour format — e.g., `"6,22"` means 06:00 to 22:00.
+  * `return_times` is only applied when `type: 1` (round trip). It has no effect on one-way searches.
+
+* **`engine` Field Causing Errors**
+  * If specified, `engine` must be exactly `"google_flights"`. Any other value routes to a different SerpApi engine and returns unexpected data. When in doubt, omit the field entirely — it defaults correctly.

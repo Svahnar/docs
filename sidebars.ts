@@ -1,4 +1,4 @@
-import type {SidebarsConfig} from '@docusaurus/plugin-content-docs';
+import type { SidebarsConfig } from '@docusaurus/plugin-content-docs';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
@@ -20,7 +20,7 @@ const sidebars: SidebarsConfig = {
   // ],
 
   // But you can create a sidebar manually
-  
+
   docSidebar: [
     {
       type: 'html',
@@ -30,7 +30,7 @@ const sidebars: SidebarsConfig = {
     'GetStarted/Overview',
     'GetStarted/Quickstart',
     'GetStarted/Models',
-    
+
     {
       type: 'html',
       value: '<div style="margin-top: 20px; margin-bottom: 8px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; color: var(--ifm-color-primary); text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.9;"><svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="16" width="16" xmlns="http://www.w3.org/2000/svg"><rect x="9" y="3" width="6" height="6" rx="1"></rect><rect x="3" y="15" width="6" height="6" rx="1"></rect><rect x="15" y="15" width="6" height="6" rx="1"></rect><path d="M12 9v6"></path><path d="M12 15H6v0"></path><path d="M12 15h6v0"></path></svg> AI FRAMEWORK</div>',
@@ -100,18 +100,41 @@ const sidebars: SidebarsConfig = {
         'Tools/ToolList/Arxiv',
         'Tools/ToolList/AWS_Lambda',
         'Tools/ToolList/AWS_SES_send_email',
+        'Tools/ToolList/Calendly',
         'Tools/ToolList/DatabaseTool',
         'Tools/ToolList/DatabaseToolReadOnly',
+        'Tools/ToolList/Discord',
         'Tools/ToolList/GitHubTool',
+        'Tools/ToolList/Gitlab',
+        'Tools/ToolList/Google calendar',
+        'Tools/ToolList/Google drive',
+        'Tools/ToolList/Google finance',
+        'Tools/ToolList/Google flight',
+        'Tools/ToolList/Google hotel',
+        'Tools/ToolList/Google Mail',
+        'Tools/ToolList/Google scholar',
+        'Tools/ToolList/Google Jobs',
+        'Tools/ToolList/HubSpot',
         'Tools/ToolList/JiraTool',
+        'Tools/ToolList/KnowledgeRepo',
+        'Tools/ToolList/Notion',
         'Tools/ToolList/Outlook',
         'Tools/ToolList/Pinecone',
+        'Tools/ToolList/Reddit',
+        'Tools/ToolList/Salesforce',
+        'Tools/ToolList/Slack',
         'Tools/ToolList/Tavily',
         'Tools/ToolList/Twilio_sms',
         'Tools/ToolList/Twilio_whatsapp',
+        'Tools/ToolList/Weather',
         'Tools/ToolList/webpage_search',
+        'Tools/ToolList/WikiData',
         'Tools/ToolList/Wikipedia',
+        'Tools/ToolList/Wolframalpha',
+        'Tools/ToolList/Yahoo finance',
         'Tools/ToolList/Zapier',
+        'Tools/ToolList/Zerodha',
+
       ],
     },
     {
@@ -138,7 +161,7 @@ const sidebars: SidebarsConfig = {
     },
     'additional/YAML_Conversion_Guide',
 
-   
+
   ],
 };
 

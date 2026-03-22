@@ -1,0 +1,223 @@
+import Video from '@site/src/components/Video';
+import { Steps, Step } from '@site/src/components/Steps/Steps';
+
+# Notion
+
+Empower your agents to manage pages, databases, and workspaces directly through **Notion**.
+
+This guide will walk you through creating a Notion integration, configuring OAuth credentials, and authenticating your user.
+
+## 💡 Core Concepts
+
+To configure this tool effectively, you need to understand the underlying capabilities and the authentication flow.
+
+### 1. What can this tool do?
+
+The Notion tool interacts with the **Notion API** to perform operations across pages, databases, blocks, and workspace search. Your agent can call the following operations:
+
+| Operation | Description |
+| --- | --- |
+| `search` | Search across all pages and databases the integration can access. |
+| `get_page` | Fetch a page's metadata and properties (not its content). |
+| `create_page` | Create a new standalone page or a database row with typed properties. |
+| `update_page` | Update a page's title, properties, icon, or archive/restore it. |
+| `get_block_children` | Read the full block content of a page or nested block. |
+| `append_blocks` | Add new content blocks (paragraphs, to-dos, code, dividers) to a page. |
+| `delete_block` | Soft-delete (archive) a block or page by ID. |
+| `get_database` | Fetch the schema of a database — all column names, types, and valid select options. |
+| `query_database` | Filter and sort rows in a Notion database. |
+| `create_database_entry` | Add a new row to a Notion database with properties and content blocks. |
+
+### 2. Authentication
+
+This tool uses **OAuth 2.0** (multi-workspace).
+
+* **First Run:** You must call the `exchange_token` operation once per user to store the access token. This happens automatically when you click **Authenticate** in the tool configuration UI (check Step 4).
+* **Token Storage:** After a successful exchange, the access token is stored securely in **Redis** and resolved automatically on all subsequent calls.
+* **Maintenance:** Notion OAuth tokens do not expire by default, but if your integration's permissions are revoked or the workspace is disconnected, you will need to re-authenticate.
+
+---
+
+## 🔑 Prerequisites
+
+Before configuring the tool in SVAHNAR, you need to create a **Notion Integration** and obtain your OAuth credentials from the Notion developer portal.
+
+<Steps>
+<Step>
+
+### Create a Notion Integration
+
+1. Go to [https://www.notion.so/profile/integrations](https://www.notion.so/profile/integrations) and click **New integration**.
+2. Give it a name (e.g., `SVAHNAR Agent`) and select the **associated workspace**.
+3. Under **Integration type**, select **Public** (required for OAuth multi-workspace support).
+4. Note your **OAuth client ID** and **OAuth client secret** — you will need these in SVAHNAR.
+
+</Step>
+
+<Step>
+
+### Configure the Redirect URI
+
+1. In your integration settings, scroll to **OAuth Domain & URIs**.
+2. Add your SVAHNAR redirect URI as an allowed redirect URL:
+```
+https://api.platform.svahnar.com/notion/auth
+```
+3. Save the changes.
+
+:::tip
+The redirect URI must match **exactly** — including protocol and path — with what SVAHNAR sends during the OAuth flow.
+:::
+
+</Step>
+
+<Step>
+
+### Set Capabilities
+
+1. In the integration settings, go to the **Capabilities** section.
+2. Enable the permissions your agent needs:
+   * `Read content` — for `search`, `get_page`, `get_block_children`, `get_database`, `query_database`
+   * `Update content` — for `update_page`, `append_blocks`, `create_page`, `create_database_entry`
+   * `Insert content` — for `create_page`, `create_database_entry`, `append_blocks`
+3. Save the configuration.
+
+:::note
+For most agent workflows (reading and writing pages/databases), enabling all three content capabilities is recommended.
+:::
+
+</Step>
+</Steps>
+
+---
+
+## ⚙️ Configuration Steps
+
+<Steps>
+<Step>
+
+### Add the Tool in SVAHNAR
+
+1. Open your **SVAHNAR Agent Configuration**.
+2. Add the **Notion** tool and enter your integration credentials:
+   * `client_id` — from your Notion integration
+   * `client_secret` — from your Notion integration
+   * `redirect_uri` — must match what you registered in the Notion portal
+
+3. Save the configuration.
+
+</Step>
+
+<Step>
+
+### Authenticate
+
+1. Click the **Authenticate** button in the Notion tool UI.
+2. A pop-up will launch asking you to log in with your Notion account and select a workspace to connect.
+3. After granting access, SVAHNAR will automatically call `exchange_token` internally, store the access token in Redis, and confirm the connection.
+
+</Step>
+
+<Step>
+
+### Share Pages or Databases (Important)
+
+By default, a Notion integration can only access content that has been **explicitly shared** with it.
+
+1. Open any Notion page or database you want the agent to access.
+2. Click the **···** menu (top-right) → **Connect to** → select your integration name.
+3. Repeat for every page or database the agent needs to read or write.
+
+:::caution
+If your agent gets empty results or a `403` error, the most common cause is that the target page/database has not been shared with the integration.
+:::
+
+</Step>
+</Steps>
+
+---
+
+## 📚 Practical Recipes (Examples)
+
+### Recipe 1: Knowledge Capture Agent
+
+> **Use Case:** An agent that searches your Notion workspace, reads relevant pages, and appends structured notes.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: knowledge_capture_agent
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: Notion
+          config:
+            client_id: ${notion_client_id}
+            client_secret: ${notion_client_secret}
+            redirect_uri: ${notion_redirect_uri}
+    agent_function:
+      - You are a knowledge management assistant.
+      - Use 'search' to find relevant pages by topic when the user asks a question.
+      - Use 'get_block_children' on the found page_id to read the full content.
+      - Use 'append_blocks' to add a summary or new notes to that page.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+---
+
+### Recipe 2: Task Tracker Agent
+
+> **Use Case:** An agent that manages a Notion task database — creating, updating, and querying rows.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: task_tracker_agent
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: Notion
+          config:
+            client_id: ${notion_client_id}
+            client_secret: ${notion_client_secret}
+            redirect_uri: ${notion_redirect_uri}
+    agent_function:
+      - You are a task management assistant.
+      - Always call 'get_database' first to check the exact property names and valid select values before creating or querying rows.
+      - Use 'create_database_entry' to add new tasks with Status, Priority, and Due Date properties.
+      - Use 'query_database' with filters to retrieve open tasks (e.g., Status != Done).
+      - Use 'update_page' to mark tasks as complete by setting Status to 'Done'.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+### 💡 Tip: SVAHNAR Key Vault
+
+Never hardcode your `client_secret` in plain text files. Use SVAHNAR Key Vault references (e.g., `${notion_client_secret}`) to keep credentials secure.
+
+---
+
+## 🚑 Troubleshooting
+
+* **"Token not found" or Authentication Errors**
+  * Ensure you have clicked the **Authenticate** button in the UI at least once to complete the OAuth exchange.
+  * If you revoked the integration's access from the Notion workspace settings, re-authenticate from SVAHNAR.
+
+* **Empty Results from `search` or `query_database`**
+  * Verify the target page or database has been **shared with your integration** via the Notion UI (···  → Connect to).
+  * Notion integrations only see content explicitly shared with them — they cannot access your entire workspace by default.
+
+* **Property Mismatch Errors on `create_database_entry` or `update_page`**
+  * Always call `get_database` first to inspect the exact column names, property types, and valid `select` options before writing to a database.
+  * Property names in the Notion API are **case-sensitive**.
+
+* **Permission Denied (403)**
+  * Check that the **Capabilities** (Read, Update, Insert content) are correctly enabled in your Notion integration settings.
+  * Ensure the page/database is shared with the integration and not just with a personal account.

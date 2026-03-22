@@ -1,0 +1,236 @@
+import Video from '@site/src/components/Video';
+import { Steps, Step } from '@site/src/components/Steps/Steps';
+
+# Calendly
+
+Empower your agents to manage scheduling, event types, and bookings directly through **Calendly**.
+
+This guide will walk you through generating your Calendly Personal Access Token, configuring the SVAHNAR tool, and connecting your scheduling workspace.
+
+## 💡 Core Concepts
+
+To configure this tool effectively, you need to understand the underlying capabilities and the scheduling lifecycle.
+
+### 1. What can this tool do?
+
+The Calendly tool interacts with the **Calendly API v2** to cover the full scheduling lifecycle — discovering event templates, reading booked meetings, generating personalized booking links, listing invitees, and cancelling events.
+
+| Operation | Description |
+| --- | --- |
+| `get_user` | Get the authenticated user's profile and organization URI. **Always run this first** to resolve `user_uri` required by all other tasks. |
+| `list_event_types` | List all bookable meeting templates (solo or group) for the user. |
+| `list_scheduled_events` | List upcoming or past booked meetings, filterable by status and date range. |
+| `get_event` | Fetch complete details of a single scheduled event by UUID. |
+| `list_invitees` | Get all people who booked a specific event, including their Q&A responses. |
+| `cancel_event` | Cancel a scheduled event — automatically notifies all invitees. |
+| `create_scheduling_link` | Generate a one-off (single-use) personalized booking link for emails, Slack, or WhatsApp. |
+
+### 2. Authentication
+
+This tool uses a **Calendly Personal Access Token** (Bearer token).
+
+* **Token Type:** `Bearer` — passed as `Authorization: Bearer <token>` on every request.
+* **No OAuth popup required:** Calendly Personal Access Tokens are generated directly from the Calendly developer portal. Paste it into SVAHNAR once and all subsequent calls resolve credentials from `tool_config` automatically.
+* **Maintenance:** Personal Access Tokens do not expire automatically. They are invalidated only if manually revoked from the Calendly portal. Keep your token stored in SVAHNAR Key Vault.
+
+### 3. The `user_uri` Dependency
+
+Almost every Calendly API operation requires a `user_uri` — a fully-qualified URI in the format `https://api.calendly.com/users/<uuid>`. This is **not your email or username**.
+
+Always call `get_user` first in any agent workflow to resolve the `user_uri` and `organization` values. These are then passed as inputs to `list_event_types`, `list_scheduled_events`, and other tasks.
+
+---
+
+## 🔑 Prerequisites
+
+Before configuring the tool in SVAHNAR, you need to generate a **Personal Access Token** from the Calendly developer portal.
+
+<Steps>
+<Step>
+
+### Generate a Personal Access Token
+
+1. Log in to [Calendly](https://calendly.com) and go to your account.
+2. Navigate to **Integrations & apps** → **API & Webhooks** (or go directly to [https://calendly.com/integrations/api_webhooks](https://calendly.com/integrations/api_webhooks)).
+3. Under the **Personal Access Tokens** section, click **Generate New Token**.
+4. Give it a name (e.g., `SVAHNAR Agent`) and click **Create Token**.
+5. **Crucial:** Copy the token immediately — it is shown only once and cannot be retrieved again.
+
+:::caution
+Never commit this token to version control or hardcode it in config files. Use SVAHNAR Key Vault (`${calendly_token}`) to reference it safely.
+:::
+
+</Step>
+
+<Step>
+
+### Note Your Event Type URIs (Optional but Recommended)
+
+For agents that generate booking links via `create_scheduling_link`, you will need the **Event Type URI** (format: `https://api.calendly.com/event_types/<uuid>`).
+
+You can resolve these at runtime by calling `list_event_types` in your agent workflow, or look them up in advance:
+
+1. Go to your Calendly dashboard → **Event Types**.
+2. Click on an event type → **Share** → copy the scheduling URL slug.
+3. Use the `list_event_types` task in a test run to get the full URI for each template.
+
+</Step>
+</Steps>
+
+---
+
+## ⚙️ Configuration Steps
+
+<Steps>
+<Step>
+
+### Add the Tool in SVAHNAR
+
+1. Open your **SVAHNAR Agent Configuration**.
+2. Add the **Calendly** tool and enter your credentials:
+   * `access_token` — the Personal Access Token from the Calendly developer portal
+
+3. Save the configuration.
+
+</Step>
+
+<Step>
+
+### Verify the Connection
+
+There is no OAuth popup for Calendly. To verify your token is working:
+
+1. Trigger a test agent run using the `get_user` task with an empty `params` object.
+2. If you receive a valid response with your `name`, `email`, and `uri`, the connection is live.
+3. Copy the returned `uri` value — this is your `user_uri` needed for all subsequent tasks.
+
+</Step>
+</Steps>
+
+---
+
+## 📚 Practical Recipes (Examples)
+
+### Recipe 1: AI Scheduling Assistant Agent
+
+> **Use Case:** An agent that picks the right event type and sends a personalized booking link via any channel (email, Slack, WhatsApp).
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: scheduling_assistant
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: Calendly
+          config:
+            access_token: ${calendly_token}
+    agent_function:
+      - You are a scheduling assistant.
+      - First, call 'get_user' to resolve the user_uri.
+      - Call 'list_event_types' using the resolved user_uri to discover available meeting templates.
+      - Based on the user's request (e.g., "30-minute intro call"), pick the matching event type URI.
+      - Call 'create_scheduling_link' with that event_type URI to generate a single-use booking link.
+      - Return the booking URL to the user for sharing.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+---
+
+### Recipe 2: Booking Confirmation & Invitee Review Agent
+
+> **Use Case:** An agent that confirms upcoming bookings and reviews who signed up and what they answered in the booking form.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: booking_review_agent
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: Calendly
+          config:
+            access_token: ${calendly_token}
+    agent_function:
+      - You are a booking review assistant.
+      - Call 'get_user' to resolve the user_uri.
+      - Call 'list_scheduled_events' with status 'active' and a min_start_time of today to get upcoming meetings.
+      - For each event returned, call 'list_invitees' using the event UUID to get attendee names, emails, and Q&A responses.
+      - Summarize all upcoming meetings and their attendees in a clean report.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+---
+
+### Recipe 3: Cross-Tool — Calendly → HubSpot CRM Sync Agent
+
+> **Use Case:** An agent that detects new Calendly bookings and automatically creates or updates CRM contacts and deals in HubSpot.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: calendly_hubspot_sync
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: Calendly
+          config:
+            access_token: ${calendly_token}
+        - name: HubSpot
+          config:
+            access_token: ${hubspot_token}
+    agent_function:
+      - You are a CRM sync agent.
+      - Call 'get_user' on Calendly to resolve the user_uri.
+      - Call 'list_scheduled_events' to retrieve all active bookings from the past 24 hours.
+      - For each event, call 'list_invitees' to extract invitee name and email.
+      - For each invitee, use HubSpot 'search' on contacts with an EQ filter on email to check if they already exist.
+      - If the contact does not exist, use HubSpot 'create' to add them as a new contact.
+      - Use HubSpot 'create' to create a deal linked to the contact with the meeting name as the deal name.
+      - Use HubSpot 'associate' to link the contact to the deal.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+### 💡 Tip: SVAHNAR Key Vault
+
+Never hardcode your `access_token` in plain text files. Use SVAHNAR Key Vault references (e.g., `${calendly_token}`) to keep credentials secure.
+
+---
+
+## 🚑 Troubleshooting
+
+* **`401 Unauthorized`**
+  * Your Personal Access Token is invalid or was revoked from the Calendly portal.
+  * Go to **Calendly → Integrations → API & Webhooks**, generate a new token, and update it in SVAHNAR Key Vault.
+
+* **`get_user` Returns an Error**
+  * This is the most fundamental call — if it fails, all other tasks will too. Double-check that the token was copied in full without trailing whitespace.
+
+* **`list_event_types` Returns an Empty Array**
+  * Verify that the `user_uri` passed was resolved from `get_user` and not manually constructed.
+  * Check that you have at least one active Event Type published on your Calendly profile.
+  * If `active_only` is `true` (default), unpublished or paused event types will not appear.
+
+* **`create_scheduling_link` Fails with Invalid URI**
+  * The `owner_uri` must be an **Event Type URI** (`https://api.calendly.com/event_types/<uuid>`), not a user URI or scheduling URL slug.
+  * Resolve the correct URI at runtime using `list_event_types` and pick the `uri` field from the response.
+
+* **`cancel_event` Does Not Notify Invitees**
+  * Calendly sends cancellation notifications automatically to all invitees — no additional step is needed in the agent.
+  * If invitees report they did not receive a notification, verify their email addresses via `list_invitees` and check Calendly's email delivery settings in your account.
+
+* **`list_scheduled_events` Returns Stale or Missing Bookings**
+  * Use the `min_start_time` and `max_start_time` filters with explicit ISO8601 timestamps to narrow the date window.
+  * Bookings that were cancelled will not appear unless you set `status: "canceled"` explicitly.

@@ -1,0 +1,370 @@
+import Video from '@site/src/components/Video';
+import { Steps, Step } from '@site/src/components/Steps/Steps';
+
+# Google Hotels
+
+Empower your agents to search for hotel listings, prices, and availability through **Google Hotels**, powered by SerpApi.
+
+This guide will walk you through obtaining a SerpApi key, configuring the SVAHNAR tool, and building hotel search workflows.
+
+## 💡 Core Concepts
+
+To configure this tool effectively, you need to understand the underlying capabilities, the required parameters, and the difference between hotel and vacation rental search modes.
+
+### 1. What can this tool do?
+
+The Google Hotels tool queries **Google Hotels via SerpApi** to search real-time hotel availability, pricing, and ratings across properties worldwide.
+
+| Capability | Description |
+| --- | --- |
+| Hotel search | Search by city, neighborhood, hotel name, or landmark. |
+| Vacation rental search | Switch to Airbnb-style vacation rentals with bedroom/bathroom filters. |
+| Date-based availability | Search for specific check-in and check-out dates. |
+| Guest configuration | Specify adults, children, and children's ages separately. |
+| Price range filtering | Set minimum and maximum nightly price bounds. |
+| Star class filtering | Filter by 2-star through 5-star properties. |
+| Rating filtering | Restrict results to 3.5+, 4.0+, or 4.5+ rated properties. |
+| Amenity filtering | Filter by specific amenities using amenity IDs. |
+| Brand filtering | Restrict results to specific hotel chains or brands. |
+| Free cancellation | Filter for properties offering free cancellation. |
+| Special offers | Surface properties with active promotions. |
+| Eco-certified | Filter for environmentally certified properties. |
+| Pagination | Page through large result sets using `next_page_token`. |
+
+:::note
+This tool is **read-only**. It searches and returns hotel listings — it does not make reservations, process payments, or interact with hotel booking systems.
+:::
+
+### 2. Authentication
+
+This tool uses a **SerpApi API Key** — a static key passed with every request.
+
+* **No OAuth required:** Generate a key once from the SerpApi dashboard and paste it into SVAHNAR. No per-user login flow needed.
+* **Rate limits:** SerpApi enforces monthly search credit limits based on your plan. Each tool call consumes one search credit.
+* **Maintenance:** API keys do not expire automatically. They are invalidated only if manually rotated from the SerpApi dashboard.
+
+:::tip
+If you already use [Google Jobs](/docs/google-jobs), [Google Finance](/docs/google-finance), or [Google Flights](/docs/google-flights) tools, your **SerpApi key is the same** — one key works across all SerpApi-powered tools in SVAHNAR.
+:::
+
+### 3. Hotels vs Vacation Rentals
+
+This tool operates in two distinct modes controlled by the `vacation_rentals` flag. Some filters only apply to one mode:
+
+| Filter | Hotels | Vacation Rentals |
+| --- | --- | --- |
+| `hotel_class` (star rating) | ✅ | ❌ |
+| `brands` | ✅ | ❌ |
+| `free_cancellation` | ✅ | ❌ |
+| `special_offers` | ✅ | ❌ |
+| `eco_certified` | ✅ | ❌ |
+| `bedrooms` | ❌ | ✅ |
+| `bathrooms` | ❌ | ✅ |
+| `amenities`, `rating`, `min_price`, `max_price` | ✅ | ✅ |
+
+:::caution
+Passing hotel-only filters (like `free_cancellation` or `brands`) when `vacation_rentals: true` will be silently ignored. Always match your filters to the correct search mode.
+:::
+
+### 4. Parameter Reference
+
+**Required Parameters**
+
+| Parameter | Type | Description | Example |
+| --- | --- | --- | --- |
+| `engine` | string | Must be `"google_hotels"`. | `"google_hotels"` |
+| `q` | string | Search query — city, hotel name, or location. | `"Bali Resorts"`, `"Paris"` |
+| `check_in_date` | string | Check-in date in `YYYY-MM-DD` format. | `"2025-12-15"` |
+| `check_out_date` | string | Check-out date in `YYYY-MM-DD` format. | `"2025-12-20"` |
+
+**Guest Parameters**
+
+| Parameter | Type | Default | Description | Example |
+| --- | --- | --- | --- | --- |
+| `adults` | int | `2` | Number of adult guests. | `2` |
+| `children` | int | `0` | Number of child guests. | `2` |
+| `children_ages` | string | — | Ages of children, comma-separated. Range: 1–17. | `"5,12"` |
+
+:::tip
+Always set `children_ages` when `children` is greater than 0. Many hotels price children's stays based on age — omitting ages may return inaccurate pricing.
+:::
+
+**Sorting & Filtering Parameters**
+
+| Parameter | Type | Description | Example |
+| --- | --- | --- | --- |
+| `sort_by` | int | `3` = Lowest price, `8` = Highest rating, `13` = Most reviewed. | `3` |
+| `min_price` | int | Minimum nightly price in the specified `currency`. | `100` |
+| `max_price` | int | Maximum nightly price in the specified `currency`. | `500` |
+| `rating` | int | `7` = 3.5+, `8` = 4.0+, `9` = 4.5+ guest rating. | `8` |
+| `hotel_class` | string | Star class filter — comma-separated: `2`, `3`, `4`, `5`. | `"4,5"` |
+| `amenities` | string | Comma-separated amenity IDs. See [Amenity IDs](#5-amenity--property-type-ids) below. | `"35,9"` |
+| `property_types` | string | Comma-separated property type IDs. | `"17,12"` |
+| `brands` | string | Comma-separated brand IDs. Hotels only — not for vacation rentals. | `"33,67"` |
+| `free_cancellation` | boolean | Show only properties with free cancellation. Hotels only. | `true` |
+| `special_offers` | boolean | Show only properties with active special offers. Hotels only. | `true` |
+| `eco_certified` | boolean | Show only eco-certified properties. Hotels only. | `true` |
+
+**Vacation Rental Parameters**
+
+| Parameter | Type | Description | Example |
+| --- | --- | --- | --- |
+| `vacation_rentals` | boolean | Set to `true` to switch to vacation rental search mode. | `true` |
+| `bedrooms` | int | Minimum number of bedrooms. Vacation rentals only. | `2` |
+| `bathrooms` | int | Minimum number of bathrooms. Vacation rentals only. | `1` |
+
+**Localization & Pagination Parameters**
+
+| Parameter | Type | Description | Example |
+| --- | --- | --- | --- |
+| `gl` | string | 2-letter country code for market localization. | `"us"`, `"in"` |
+| `hl` | string | 2-letter language code for result language. | `"en"` |
+| `currency` | string | 3-letter ISO currency code (default: `USD`). | `"INR"`, `"EUR"` |
+| `next_page_token` | string | Token from a previous response to retrieve the next page of results. | `"AtySUc..."` |
+| `property_token` | string | Token to fetch detailed information about a specific property. | `"ChoQ5Yi..."` |
+
+### 5. Amenity & Property Type IDs
+
+**Common Amenity IDs:**
+
+| Amenity | ID |
+| --- | --- |
+| Free Wi-Fi | `35` |
+| Pool | `9` |
+| Free breakfast | `19` |
+| Air conditioning | `23` |
+| Gym / Fitness center | `11` |
+| Spa | `40` |
+| Pet-friendly | `17` |
+| Parking | `22` |
+| Restaurant | `14` |
+| Room service | `34` |
+
+**Common Property Type IDs:**
+
+| Type | ID |
+| --- | --- |
+| Hotel | `17` |
+| Hostel | `12` |
+| Resort | `14` |
+| Motel | `13` |
+| Bed and Breakfast | `8` |
+| Apartment | `3` |
+| Villa | `2` |
+
+---
+
+## 🔑 Prerequisites
+
+<Steps>
+<Step>
+
+### Create a SerpApi Account
+
+1. Go to [https://serpapi.com](https://serpapi.com) and sign up for an account.
+2. SerpApi offers a **free tier with 100 searches/month** — sufficient for development and light agent usage.
+3. For production workloads, select a paid plan based on your expected monthly search volume.
+
+</Step>
+
+<Step>
+
+### Get Your API Key
+
+1. After signing in, go to your [SerpApi Dashboard](https://serpapi.com/dashboard).
+2. Copy the **API Key** shown on the dashboard.
+
+:::caution
+Never commit this key to version control or hardcode it in config files. Use SVAHNAR Key Vault (`${serpapi_key}`) to reference it safely. If you are already using other SerpApi tools, the same key applies here — no new account needed.
+:::
+
+</Step>
+</Steps>
+
+---
+
+## ⚙️ Configuration Steps
+
+<Steps>
+<Step>
+
+### Add the Tool in SVAHNAR
+
+1. Open your **SVAHNAR Agent Configuration**.
+2. Add the **Google Hotels** tool and enter your SerpApi credentials:
+   * `api_key` — your SerpApi API key
+
+3. Save the configuration.
+
+</Step>
+
+<Step>
+
+### Verify the Connection
+
+To confirm your API key is working:
+
+1. Trigger a test agent run with a minimal payload:
+```json
+{
+  "engine": "google_hotels",
+  "q": "Mumbai",
+  "check_in_date": "2025-12-20",
+  "check_out_date": "2025-12-22",
+  "currency": "INR",
+  "adults": 2
+}
+```
+2. A valid response will return a list of available properties with names, prices, and ratings.
+3. If you receive an `Invalid API key` error, verify the key was copied in full from your SerpApi dashboard.
+4. If you receive a `credits exhausted` error, your monthly search quota has been reached — upgrade your SerpApi plan or wait for the next billing cycle.
+
+</Step>
+</Steps>
+
+---
+
+## 📚 Practical Recipes (Examples)
+
+### Recipe 1: Hotel Search & Recommendation Agent
+
+> **Use Case:** An agent that finds hotels based on the user's destination, dates, budget, and preferences.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: hotel_search_agent
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: GoogleHotels
+          config:
+            api_key: ${serpapi_key}
+    agent_function:
+      - You are a hotel search assistant.
+      - Ask the user for destination, check-in date, check-out date, number of adults and children, and their budget range.
+      - If children are specified, always ask for each child's age and pass them as a comma-separated string in 'children_ages'.
+      - Set 'min_price' and 'max_price' from the user's budget. Set 'sort_by' to 3 (Lowest price) for budget searches or 8 (Highest rating) for quality-first searches.
+      - Set 'currency' to match the user's preferred currency.
+      - Return the top 5 results — property name, rating, nightly price, and key amenities.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+---
+
+### Recipe 2: Luxury Hotel Finder Agent
+
+> **Use Case:** An agent that searches for top-rated 4-star and 5-star hotels with specific amenities.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: luxury_hotel_finder
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: GoogleHotels
+          config:
+            api_key: ${serpapi_key}
+    agent_function:
+      - You are a luxury travel assistant.
+      - Ask for the destination, travel dates, and any must-have amenities (pool, spa, gym, free breakfast).
+      - Set 'hotel_class' to '4,5' for 4-star and 5-star properties only.
+      - Set 'rating' to 9 (4.5+ guest rating) to ensure quality.
+      - Map requested amenities to their IDs — pool=9, spa=40, gym=11, free breakfast=19, free Wi-Fi=35 — and pass them as a comma-separated string in 'amenities'.
+      - Set 'sort_by' to 8 (Highest rating). Set 'free_cancellation' to true for flexible bookings.
+      - Return top results with property name, star class, guest rating, nightly price, and amenity highlights.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+---
+
+### Recipe 3: Vacation Rental Search Agent
+
+> **Use Case:** An agent that finds vacation rentals for families or groups needing multiple bedrooms.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: vacation_rental_agent
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: GoogleHotels
+          config:
+            api_key: ${serpapi_key}
+    agent_function:
+      - You are a vacation rental search assistant.
+      - Ask for the destination, check-in and check-out dates, total guests, required number of bedrooms, and budget per night.
+      - Always set 'vacation_rentals' to true for this workflow. Do NOT set 'hotel_class', 'brands', 'free_cancellation', 'special_offers', or 'eco_certified' — these filters do not apply to vacation rentals.
+      - Set 'bedrooms' and 'bathrooms' based on the user's group size.
+      - Set 'children_ages' if any children are included in the guest count.
+      - Set 'max_price' from the user's nightly budget and 'sort_by' to 3 (Lowest price).
+      - Return top results with property name, number of bedrooms, nightly price, and guest rating.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+### 💡 Tip: SVAHNAR Key Vault
+
+Never hardcode your `api_key` in plain text files. Use SVAHNAR Key Vault references (e.g., `${serpapi_key}`) to keep credentials secure. The same SerpApi key used for Google Jobs, Finance, and Flights works here — no separate credential needed.
+
+### 💡 Tip: Paginating Results
+
+If the user wants to see more options beyond the first page, pass the `next_page_token` from the previous response into the next query. Do not change any other parameters — only add the token.
+
+```json
+{
+  "engine": "google_hotels",
+  "q": "Goa Beach Resort",
+  "check_in_date": "2025-12-20",
+  "check_out_date": "2025-12-25",
+  "currency": "INR",
+  "adults": 2,
+  "next_page_token": "AtySUc..."
+}
+```
+
+---
+
+## 🚑 Troubleshooting
+
+* **`Invalid API key` Error**
+  * Your SerpApi key is incorrect or was not copied in full. Go to your [SerpApi Dashboard](https://serpapi.com/dashboard), copy the key again, and update it in SVAHNAR Key Vault.
+
+* **`Credits Exhausted` Error**
+  * Your monthly SerpApi search quota has been reached. Each Google Hotels query consumes one credit.
+  * Upgrade your plan at [serpapi.com/pricing](https://serpapi.com/pricing). Avoid running redundant searches — use `next_page_token` to paginate rather than re-running the same query.
+
+* **No Results Returned**
+  * Verify `check_in_date` and `check_out_date` are future dates in `YYYY-MM-DD` format. Past dates return no availability.
+  * Ensure `check_out_date` is strictly after `check_in_date` — same-day check-in and check-out is not valid.
+  * Broadening or removing `min_price` / `max_price`, `hotel_class`, and `rating` filters can help when results are too narrow.
+
+* **Vacation Rental Filters Being Ignored**
+  * `hotel_class`, `brands`, `free_cancellation`, `special_offers`, and `eco_certified` do not apply when `vacation_rentals: true`. Remove these fields from the payload when searching in vacation rental mode to avoid confusion.
+  * Conversely, `bedrooms` and `bathrooms` have no effect when `vacation_rentals` is not set.
+
+* **`children_ages` Format Error**
+  * Ages must be a comma-separated string with values between 1 and 17 — e.g., `"5,12"`. Do not pass ages as an array or include ages of 0 (infants are not counted as children in Google Hotels).
+  * The number of values in `children_ages` must match the `children` count.
+
+* **Prices Showing in Wrong Currency**
+  * Always set `currency` explicitly using a valid 3-letter ISO 4217 code — e.g., `"INR"`, `"EUR"`, `"GBP"`. Without it, SerpApi defaults to `USD` regardless of the user's location.
+
+* **`next_page_token` Returning Stale Results**
+  * Pagination tokens are tied to the original search parameters. If any parameter (dates, guests, filters) changes between pages, discard the old token and run a fresh search to get a new one.
+
+* **Amenity or Property Type IDs Not Filtering Correctly**
+  * Amenity and property type values must be passed as comma-separated strings — e.g., `"35,9"`, not `[35, 9]` or `35`. Verify the IDs against the [Amenity & Property Type IDs](#5-amenity--property-type-ids) reference table above.

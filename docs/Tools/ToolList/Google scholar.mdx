@@ -1,0 +1,294 @@
+import Video from '@site/src/components/Video';
+import { Steps, Step } from '@site/src/components/Steps/Steps';
+
+# Google Scholar
+
+Empower your agents to search academic publications, citations, and research papers through **Google Scholar**, powered by SerpApi.
+
+This guide will walk you through obtaining a SerpApi key, configuring the SVAHNAR tool, and building research discovery workflows.
+
+## 💡 Core Concepts
+
+To configure this tool effectively, you need to understand the underlying capabilities, the two distinct search modes, and the available filtering parameters.
+
+### 1. What can this tool do?
+
+The Google Scholar tool queries **Google Scholar via SerpApi** to search academic publications, journals, conference papers, theses, and books indexed across the web.
+
+| Capability | Description |
+| --- | --- |
+| Keyword search | Search by topic, keywords, author name, or journal title. |
+| Citation lookup | Find all papers that cite a specific article using its unique ID. |
+| Year range filtering | Restrict results to papers published within a specific year window. |
+| Sort by recency | Surface the most recently published papers first. |
+| Patent exclusion | Filter out patents and legal documents from results. |
+| Pagination | Page through large result sets using the `start` offset. |
+| Language localization | Return results in a specific language. |
+
+:::note
+This tool is **read-only**. It searches and returns publication metadata — it does not download full-text papers, access paywalled content, or interact with journal databases directly.
+:::
+
+### 2. Authentication
+
+This tool uses a **SerpApi API Key** — a static key passed with every request.
+
+* **No OAuth required:** Generate a key once from the SerpApi dashboard and paste it into SVAHNAR. No per-user login flow needed.
+* **Rate limits:** SerpApi enforces monthly search credit limits based on your plan. Each tool call consumes one search credit.
+* **Maintenance:** API keys do not expire automatically. They are invalidated only if manually rotated from the SerpApi dashboard.
+
+:::tip
+If you already use [Google Jobs](/docs/google-jobs), [Google Finance](/docs/google-finance), [Google Flights](/docs/google-flights), or [Google Hotels](/docs/google-hotels) tools, your **SerpApi key is the same** — one key works across all SerpApi-powered tools in SVAHNAR.
+:::
+
+### 3. Two Search Modes
+
+The tool operates in two distinct modes depending on whether you use `q` or `cites`:
+
+| Mode | Key Parameter | Use Case |
+| --- | --- | --- |
+| **Keyword Search** | `q` | Find papers by topic, author, journal, or any keyword. |
+| **Cited By Search** | `cites` | Find all papers that have cited a specific article by its Scholar ID. |
+
+:::caution
+`q` and `cites` serve different purposes and should not be used simultaneously. Use `q` for discovery — use `cites` for tracing how a specific paper has influenced the field.
+:::
+
+### 4. The `scisbd` Sort Parameter
+
+The `scisbd` field controls how results are sorted and what content is included:
+
+| Value | Behavior |
+| --- | --- |
+| `0` | Sort by **relevance** (default). Best for general keyword searches. |
+| `1` | Sort by **date — abstracts only**. Most recently published papers first. |
+| `2` | Sort by **date — everything**. Most recent, including non-abstract results. |
+
+:::tip
+Use `scisbd: 1` combined with `as_ylo` and `as_yhi` when you want the most recent peer-reviewed papers on a topic. Use `scisbd: 0` when you want the most authoritative and widely-cited results regardless of date.
+:::
+
+### 5. Parameter Reference
+
+| Parameter | Type | Required | Description | Example |
+| --- | --- | --- | --- | --- |
+| `q` | string | Yes (unless using `cites`) | Search query — keywords, author name, or journal. | `"machine learning"`, `"author:Hinton"` |
+| `engine` | string | No | Must be `"google_scholar"` when specified. | `"google_scholar"` |
+| `cites` | string | No | Scholar article ID — triggers a "Cited By" search for that paper. | `"127598..."` |
+| `as_ylo` | int | No | Start year for date range filter (inclusive). | `2020` |
+| `as_yhi` | int | No | End year for date range filter (inclusive). | `2024` |
+| `scisbd` | int | No | Sort mode. `0` = Relevance, `1` = Date (abstracts), `2` = Date (all). | `0` |
+| `as_sdt` | string | No | Search type filter. `"0"` excludes patents. `"1"` includes only case law. | `"0"` |
+| `num` | int | No | Number of results to return. Range: 1–20. Default: 10. | `10` |
+| `start` | int | No | Pagination offset. Use `0`, `10`, `20`... to page through results. | `10` |
+| `hl` | string | No | 2-letter language code for results. | `"en"` |
+
+**Common `as_sdt` Values:**
+
+| Value | Filter Applied |
+| --- | --- |
+| `"0"` | Exclude patents — return academic papers only. |
+| `"1"` | Case law only. |
+| `"5"` | Include patents in results. |
+| `"0,5"` | All results — articles and patents. |
+
+---
+
+## 🔑 Prerequisites
+
+<Steps>
+<Step>
+
+### Create a SerpApi Account
+
+1. Go to [https://serpapi.com](https://serpapi.com) and sign up for an account.
+2. SerpApi offers a **free tier with 100 searches/month** — sufficient for development and light research agent usage.
+3. For research-heavy workloads or automated literature monitoring, select a paid plan based on your expected monthly query volume.
+
+</Step>
+
+<Step>
+
+### Get Your API Key
+
+1. After signing in, go to your [SerpApi Dashboard](https://serpapi.com/dashboard).
+2. Copy the **API Key** shown on the dashboard.
+
+:::caution
+Never commit this key to version control or hardcode it in config files. Use SVAHNAR Key Vault (`${serpapi_key}`) to reference it safely. If you are already using other SerpApi tools in SVAHNAR, the same key applies — no new account needed.
+:::
+
+</Step>
+</Steps>
+
+---
+
+## ⚙️ Configuration Steps
+
+<Steps>
+<Step>
+
+### Add the Tool in SVAHNAR
+
+1. Open your **SVAHNAR Agent Configuration**.
+2. Add the **Google Scholar** tool and enter your SerpApi credentials:
+   * `api_key` — your SerpApi API key
+
+3. Save the configuration.
+
+</Step>
+
+<Step>
+
+### Verify the Connection
+
+To confirm your API key is working:
+
+1. Trigger a test agent run with a simple payload:
+```json
+{
+  "q": "machine learning",
+  "hl": "en",
+  "num": 5
+}
+```
+2. A valid response will return a list of academic papers with titles, authors, publication year, and citation counts.
+3. If you receive an `Invalid API key` error, verify the key was copied in full from your SerpApi dashboard.
+4. If you receive a `credits exhausted` error, your monthly search quota has been reached — upgrade your SerpApi plan or wait for the next billing cycle.
+
+</Step>
+</Steps>
+
+---
+
+## 📚 Practical Recipes (Examples)
+
+### Recipe 1: Literature Review Agent
+
+> **Use Case:** An agent that finds the most relevant and highly-cited papers on a research topic within a specific time window.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: literature_review_agent
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: GoogleScholar
+          config:
+            api_key: ${serpapi_key}
+    agent_function:
+      - You are a research literature assistant.
+      - Ask the user for their research topic and preferred year range (e.g., 2019–2024).
+      - Set 'q' to the topic keywords, 'as_ylo' and 'as_yhi' to the year range, and 'scisbd' to 0 (relevance) to surface the most authoritative papers first.
+      - Set 'as_sdt' to '0' to exclude patents and return academic papers only.
+      - Set 'num' to 10 for a comprehensive first-page result set.
+      - Return a structured list of results — paper title, authors, publication year, journal, and citation count.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+---
+
+### Recipe 2: Recent Publications Monitor Agent
+
+> **Use Case:** An agent that surfaces the latest published papers on a topic, sorted by recency.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: recent_publications_agent
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: GoogleScholar
+          config:
+            api_key: ${serpapi_key}
+    agent_function:
+      - You are an academic research monitor.
+      - Use the configured research topic as 'q', set 'scisbd' to 1 (sort by date, abstracts only) to surface the most recently published papers.
+      - Set 'as_ylo' to the current year to restrict results to the latest publications only.
+      - Set 'as_sdt' to '0' to exclude patents.
+      - Return paper titles, authors, year, and a brief summary of the abstract where available.
+      - If the user wants to go deeper, use 'start' to paginate — set to 10 for page 2, 20 for page 3.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+---
+
+### Recipe 3: Citation Tracer Agent
+
+> **Use Case:** An agent that finds all papers citing a specific foundational paper — useful for tracking how a seminal work has influenced the field.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: citation_tracer_agent
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: GoogleScholar
+          config:
+            api_key: ${serpapi_key}
+    agent_function:
+      - You are a citation analysis assistant.
+      - Ask the user for the Google Scholar article ID of the paper they want to trace (found in the Scholar URL or a prior keyword search result).
+      - Use 'cites' with that article ID — do NOT set 'q' simultaneously.
+      - Set 'scisbd' to 0 (relevance) to surface the most impactful citing papers first, or 1 (date) to find the most recent work building on it.
+      - Set 'num' to 20 for a wide first pass.
+      - Return the citing papers grouped by year — most recent first — with title, authors, and their own citation count.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+### 💡 Tip: SVAHNAR Key Vault
+
+Never hardcode your `api_key` in plain text files. Use SVAHNAR Key Vault references (e.g., `${serpapi_key}`) to keep credentials secure. The same SerpApi key used for Google Jobs, Finance, Flights, and Hotels works here — no separate credential needed.
+
+### 💡 Tip: Finding a Paper's Scholar ID for `cites`
+
+To get the `cites` ID for a paper:
+1. Search for the paper using a keyword `q` query first.
+2. In the response, each result includes a `result_id` or a `cites` link — this alphanumeric string is the Scholar ID.
+3. Pass that string as the `cites` value in a subsequent query to fetch all papers citing it.
+
+---
+
+## 🚑 Troubleshooting
+
+* **`Invalid API key` Error**
+  * Your SerpApi key is incorrect or was not copied in full. Go to your [SerpApi Dashboard](https://serpapi.com/dashboard), copy the key again, and update it in SVAHNAR Key Vault.
+
+* **`Credits Exhausted` Error**
+  * Your monthly SerpApi search quota has been reached. Each Google Scholar query consumes one search credit.
+  * Upgrade at [serpapi.com/pricing](https://serpapi.com/pricing). Reduce consumption by increasing `num` to get more results per query rather than paginating with many small calls.
+
+* **Results Include Patents When Not Wanted**
+  * Set `as_sdt: "0"` to exclude patents from results. Without this, Google Scholar may return patent filings alongside academic papers.
+
+* **`cites` Search Returning Unrelated Results**
+  * The `cites` ID must be the exact Scholar article ID — a long numeric string. If it came from a URL, ensure no extra characters (slashes, query strings) were included.
+  * Do not combine `cites` with `q` — Scholar treats these as separate modes. Using both simultaneously produces unpredictable results.
+
+* **Year Range Filter Not Working**
+  * Ensure `as_ylo` and `as_yhi` are passed as integers — not strings. `as_ylo: 2020` is correct; `as_ylo: "2020"` may be ignored.
+  * Both fields are inclusive — `as_ylo: 2020, as_yhi: 2024` returns papers from 2020 through 2024.
+
+* **`num` Exceeding 20 Returns an Error**
+  * Google Scholar limits results to a maximum of 20 per query. To retrieve more results, use `start` to paginate — `start: 0` for page 1, `start: 10` for page 2, `start: 20` for page 3, and so on.
+
+* **Results in Wrong Language**
+  * Set `hl` to the desired 2-letter language code — e.g., `"en"` for English, `"hi"` for Hindi. Without it, Scholar may return results in the language of the most relevant indexed papers, which may not match the user's expectation.
+
+* **`engine` Field Causing Errors**
+  * If specified, `engine` must be exactly `"google_scholar"`. Any other value routes to a different SerpApi engine. When in doubt, omit the field entirely — it defaults correctly.

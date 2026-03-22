@@ -1,0 +1,285 @@
+import Video from '@site/src/components/Video';
+import { Steps, Step } from '@site/src/components/Steps/Steps';
+
+# WolframAlpha
+
+Empower your agents to solve mathematical problems, perform scientific computations, and answer complex factual queries through **WolframAlpha**.
+
+This guide will walk you through obtaining a WolframAlpha App ID, configuring the SVAHNAR tool, and building computation and knowledge workflows.
+
+## 💡 Core Concepts
+
+To configure this tool effectively, you need to understand what WolframAlpha excels at, how it differs from other knowledge tools, and what kinds of queries produce the best results.
+
+### 1. What can this tool do?
+
+The WolframAlpha tool queries the **WolframAlpha Computational Intelligence engine** — a system purpose-built for answering mathematical, scientific, and factual queries with step-by-step precision.
+
+| Capability | Description |
+| --- | --- |
+| Mathematics | Solve equations, integrals, derivatives, limits, matrix operations, and more. |
+| Statistics & probability | Calculate distributions, standard deviations, combinatorics, and statistical tests. |
+| Physics & engineering | Unit conversions, formula lookups, physical constants, and physical system calculations. |
+| Chemistry | Molecular weights, chemical formulas, reaction balancing, and compound properties. |
+| Finance | Compound interest, loan amortization, currency conversion, and financial formulas. |
+| Dates & time | Day of the week for any date, time between dates, calendar computations. |
+| Data & facts | Population figures, geographic data, nutritional information, and astronomy. |
+| Step-by-step solutions | Many math and science queries return detailed working steps, not just answers. |
+
+:::note
+WolframAlpha excels at **computation and structured factual data**. It is not a general-purpose search engine — for open-ended questions, opinions, or current news, use web search or Reddit tools instead.
+:::
+
+### 2. Authentication
+
+This tool uses a **WolframAlpha App ID** — a static key tied to your WolframAlpha developer app.
+
+* **App ID:** Generated once from the WolframAlpha developer portal. Passed with every API request.
+* **No OAuth flow required:** Paste the App ID into SVAHNAR once and all subsequent calls resolve credentials automatically.
+* **Maintenance:** App IDs do not expire automatically. They are invalidated only if the app is deleted from the developer portal or the ID is manually reset.
+
+### 3. WolframAlpha vs Wikidata vs Web Search
+
+All three tools can answer factual questions — but they serve different strengths:
+
+| | WolframAlpha | Wikidata | Web Search |
+| --- | --- | --- | --- |
+| **Best for** | Computation, math, science | Structured entity facts | Current events, opinions |
+| **Math solving** | ✅ Step-by-step | ❌ | ❌ |
+| **Unit conversion** | ✅ | ❌ | ⚠️ Approximate |
+| **Encyclopedic facts** | ⚠️ Limited | ✅ Rich | ✅ |
+| **Current news** | ❌ | ❌ | ✅ |
+| **Complex formulas** | ✅ | ❌ | ❌ |
+
+:::tip
+Use WolframAlpha whenever the user's query involves **calculation, computation, or a precise numerical answer**. Use Wikidata for biographical and encyclopedic lookups. Use web search for anything requiring recency or narrative context.
+:::
+
+### 4. What WolframAlpha Answers Well
+
+| Query Type | Example |
+| --- | --- |
+| Algebra | `"solve x^2 - 5x + 6 = 0"` |
+| Calculus | `"integrate sin(x)cos(x) dx"`, `"derivative of e^(x^2)"` |
+| Linear algebra | `"eigenvalues of {{1,2},{3,4}}"` |
+| Statistics | `"mean and standard deviation of 3,7,12,9,5"` |
+| Unit conversion | `"convert 100 miles per hour to km/h"` |
+| Physics | `"kinetic energy of 5kg object at 20m/s"` |
+| Chemistry | `"molecular weight of caffeine"` |
+| Finance | `"compound interest on $10000 at 8% for 5 years"` |
+| Dates | `"days between January 1 2020 and March 19 2026"` |
+| Nutrition | `"calories in 100g of brown rice"` |
+| Astronomy | `"distance from Earth to Mars today"` |
+
+### 5. Parameter Reference
+
+| Parameter | Type | Required | Description | Example |
+| --- | --- | --- | --- | --- |
+| `query` | string | Yes | A natural language question, mathematical expression, or factual query. | `"integrate x^2 dx"`, `"What is the capital of France?"` |
+
+---
+
+## 🔑 Prerequisites
+
+<Steps>
+<Step>
+
+### Create a WolframAlpha Developer Account
+
+1. Go to [https://developer.wolframalpha.com](https://developer.wolframalpha.com) and sign in with your Wolfram ID (or create one if you don't have one).
+2. Once logged in, go to **My Apps**.
+
+</Step>
+
+<Step>
+
+### Create an App and Get Your App ID
+
+1. Click **Get an AppID**.
+2. Fill in the details:
+   * **App Name:** `SVAHNAR Agent`
+   * **App Description:** Brief description of your use case.
+3. Click **Get AppID**.
+4. Copy the generated **App ID** — it is an alphanumeric string (e.g., `XXXXXX-XXXXXXXXXX`).
+
+:::note
+WolframAlpha offers a **free tier** that allows up to 2,000 non-commercial API calls per month. For higher volumes or commercial usage, a paid plan is required. Check current limits at [products.wolframalpha.com/api](https://products.wolframalpha.com/api).
+:::
+
+:::caution
+Never commit your App ID to version control or hardcode it in config files. Use SVAHNAR Key Vault (`${wolframalpha_app_id}`) to reference it safely.
+:::
+
+</Step>
+</Steps>
+
+---
+
+## ⚙️ Configuration Steps
+
+<Steps>
+<Step>
+
+### Add the Tool in SVAHNAR
+
+1. Open your **SVAHNAR Agent Configuration**.
+2. Add the **WolframAlpha** tool and enter your credentials:
+   * `app_id` — your WolframAlpha App ID
+
+3. Save the configuration.
+
+</Step>
+
+<Step>
+
+### Verify the Connection
+
+To confirm your App ID is working:
+
+1. Trigger a test agent run with a simple query:
+```json
+{
+  "query": "square root of 144"
+}
+```
+2. A valid response will return `12` along with any related computed data.
+3. If you receive an `Invalid App ID` or authentication error, verify the App ID was copied in full from the WolframAlpha developer portal.
+4. If you receive an `API calls exceeded` error, your free tier quota has been reached — upgrade your plan or wait for the next monthly reset.
+
+</Step>
+</Steps>
+
+---
+
+## 📚 Practical Recipes (Examples)
+
+### Recipe 1: Math & Science Solver Agent
+
+> **Use Case:** An agent that solves mathematical expressions and scientific problems with step-by-step working.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: math_science_solver
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: WolframAlpha
+          config:
+            app_id: ${wolframalpha_app_id}
+    agent_function:
+      - You are a mathematics and science assistant.
+      - For any query involving calculation, equation solving, integration, differentiation, matrix operations, or unit conversion — pass the expression directly as 'query' to WolframAlpha.
+      - Write mathematical expressions in a clear form WolframAlpha can parse — e.g., 'integrate x^2 from 0 to 5', 'solve 3x + 7 = 22', 'eigenvalues of {{2,1},{1,3}}'.
+      - Present the answer clearly and include any step-by-step solution returned in the response.
+      - If the query is ambiguous, ask the user to clarify before computing.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+---
+
+### Recipe 2: Financial Computation Agent
+
+> **Use Case:** An agent that handles compound interest, loan calculations, and financial formula queries.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: financial_computation_agent
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: WolframAlpha
+          config:
+            app_id: ${wolframalpha_app_id}
+    agent_function:
+      - You are a financial computation assistant.
+      - Use WolframAlpha for any financial formula query — compound interest, loan EMI, present value, future value, annuity calculations, or currency conversions.
+      - Frame queries in plain English — e.g., 'compound interest on 50000 INR at 9% per year for 7 years' or 'monthly EMI for loan of 1000000 INR at 10% for 20 years'.
+      - Return the computed result with the formula used and all intermediate values where WolframAlpha provides them.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+---
+
+### Recipe 3: Cross-Tool — WolframAlpha + Google Finance Market Analysis Agent
+
+> **Use Case:** An agent that fetches a live stock price from Google Finance, then uses WolframAlpha to compute financial metrics like percentage change or return on investment.
+
+```yaml showLineNumbers
+create_vertical_agent_network:
+  agent-1:
+    agent_name: market_analysis_agent
+    LLM_config:
+        params:
+          model: gpt-4o
+    tools:
+      tool_assigned:
+        - name: GoogleFinance
+          config:
+            api_key: ${serpapi_key}
+        - name: WolframAlpha
+          config:
+            app_id: ${wolframalpha_app_id}
+    agent_function:
+      - You are a market analysis assistant.
+      - Use Google Finance to fetch the current price of the user's specified stock using 'TICKER:EXCHANGE' format.
+      - Use WolframAlpha to compute any derived metrics the user needs — e.g., 'percentage change from 145 to 162', 'return on investment of 50000 INR at 12% for 3 years', or 'standard deviation of 145, 152, 148, 162, 159'.
+      - Combine both results into a clean market snapshot — current price from Google Finance, computed analysis from WolframAlpha.
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+### 💡 Tip: SVAHNAR Key Vault
+
+Never hardcode your `app_id` in plain text files. Use SVAHNAR Key Vault references (e.g., `${wolframalpha_app_id}`) to keep credentials secure.
+
+### 💡 Tip: Writing Effective WolframAlpha Queries
+
+WolframAlpha parses natural language well, but precise phrasing improves accuracy:
+
+| Instead of... | Use... |
+| --- | --- |
+| `"integral of sin x cos x"` | `"integrate sin(x)cos(x) dx"` |
+| `"matrix eigenvalues 1 2 3 4"` | `"eigenvalues of {{1,2},{3,4}}"` |
+| `"loan 10 lakh 10 percent 20 years"` | `"monthly EMI for loan of 1000000 at 10% for 20 years"` |
+| `"distance earth mars"` | `"distance from Earth to Mars today"` |
+| `"calories rice"` | `"calories in 100g of cooked white rice"` |
+
+Include units, variable names, and full context — WolframAlpha resolves ambiguity better with more specificity.
+
+---
+
+## 🚑 Troubleshooting
+
+* **`Invalid App ID` or Authentication Error**
+  * Your `app_id` is incorrect or was not copied in full. Go to [developer.wolframalpha.com](https://developer.wolframalpha.com), navigate to **My Apps**, and copy the App ID again. Update it in SVAHNAR Key Vault.
+
+* **`API Calls Exceeded` Error**
+  * Your free tier quota of 2,000 calls/month has been reached. Upgrade to a paid plan at [products.wolframalpha.com/api](https://products.wolframalpha.com/api) or wait for the next monthly reset.
+  * To reduce consumption, cache common computation results in your agent and avoid redundant calls for the same expression.
+
+* **Query Returns No Result or Ambiguous Result**
+  * Rephrase the query with more specificity — include units, full variable names, and context. `"EMI for 500000 at 8.5% for 15 years"` is far more parseable than `"loan calculation 500000 8.5 15"`.
+  * WolframAlpha may return results for the most common interpretation of an ambiguous query — if the result seems wrong, add context to disambiguate.
+
+* **Mathematical Expression Not Parsed Correctly**
+  * Use standard mathematical notation — parentheses `()` for grouping, `^` for exponents, `*` for multiplication, `sqrt()` for square roots.
+  * For matrices, use the double-bracket format: `{{a,b},{c,d}}`.
+  * For definite integrals, specify bounds explicitly: `"integrate x^2 from 0 to 5"`.
+
+* **Result Is Accurate But Missing Steps**
+  * Not all query types return step-by-step solutions. Algebra, calculus, and equation solving typically include working steps. Data lookups and unit conversions typically return just the result.
+  * If steps are needed, rephrase the query to emphasize the computation — e.g., `"step by step solution for 2x^2 + 3x - 5 = 0"`.
+
+* **Free Tier Restriction on Commercial Use**
+  * WolframAlpha's free API tier is for **non-commercial use only**. If SVAHNAR is deployed in a production commercial context, ensure your WolframAlpha plan covers commercial usage.
