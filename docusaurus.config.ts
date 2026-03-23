@@ -61,6 +61,10 @@ const config: Config = {
         gtag: {
           trackingID: 'G-50T925X4N9',
         },
+        sitemap: {
+          changefreq: 'daily',
+          priority: 1,
+        },
       } satisfies Preset.Options,
     ],
   ],
