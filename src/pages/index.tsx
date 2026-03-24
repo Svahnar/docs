@@ -1,46 +1,21 @@
-import type {ReactNode} from 'react';
-import clsx from 'clsx';
-import Link from '@docusaurus/Link';
+import { useEffect } from 'react';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
-import Heading from '@theme/Heading';
+import { useHistory } from '@docusaurus/router';
 
-import styles from './index.module.css';
+export default function Home(): null {
+  const history = useHistory();
 
-function HomepageHeader() {
-  const {siteConfig} = useDocusaurusContext();
-  return (
-    <header className={clsx('hero hero--primary', styles.heroBanner)}>
-      <div className="container">
-        <Heading as="h1" className="hero__title">
-          {siteConfig.title}
-        </Heading>
-        <p className="hero__subtitle">{siteConfig.tagline}</p>
-        <div className={styles.buttons}>
-          <Link
-            className="button button--secondary button--lg"
-            to="/docs/GetStarted/Overview">
-            Check Documentation
-          </Link>
-          {/* <Link
-            className="button button--secondary button--lg"
-            to="docs/GetStarted/Overview">
-            Release Notes
-          </Link> */}
-        </div>
-      </div>
-    </header>
-  );
-}
-export default function Home(): ReactNode {
-  const {siteConfig} = useDocusaurusContext();
+  useEffect(() => {
+    history.replace('/docs/GetStarted/Overview');
+  }, [history]);
+
   return (
     <Layout
-      title={`${siteConfig.title}`}
-      description="">
-      <HomepageHeader />
-      <main>
-      </main>
+      title="SVAHNAR Docs – Agentic AI Platform Developer Documentation"
+      description="Official SVAHNAR developer documentation for building, configuring, and deploying AI agents on the SVAHNAR platform."
+    >
+      {null}
     </Layout>
   );
 }
