@@ -1,7 +1,7 @@
 import { themes as prismThemes } from 'prism-react-renderer';
 import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
-import { img } from 'framer-motion/client';
+// framer-motion img import removed (unused)
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
@@ -15,6 +15,7 @@ const config: Config = {
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: '/',
+  trailingSlash: true,
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
@@ -63,29 +64,23 @@ const config: Config = {
         },
         sitemap: {
           changefreq: 'daily',
-          priority: 1,
+          priority: 0.8,
+          lastmod: 'date',
+          ignorePatterns: ['/'],
         },
       } satisfies Preset.Options,
     ],
   ],
 
   plugins: [
-    [
-      '@docusaurus/plugin-client-redirects',
-      {
-        redirects: [
-          {
-            to: '/docs/GetStarted/Overview',
-            from: ['/'],
-          },
-        ],
-      },
-    ],
-    // 'docusaurus-markdown-source-plugin',
+    // Note: Homepage redirect is handled by src/pages/index.* instead
+    // '@docusaurus/plugin-client-redirects' removed: root redirect conflicted with trailingSlash
   ],
 
+
   themeConfig: {
-    // Replace with your project's social card
+    image: 'img/docusaurus-social-card.jpg', // Default OG image for all pages
+
 
     navbar: {
       // title: 'SVAHNAR DOCS',
