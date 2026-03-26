@@ -23,7 +23,7 @@ const config: Config = {
   projectName: 'DOCUMENTATION', // Usually your repo name.
   deploymentBranch: 'main',
 
-  onBrokenLinks: 'warn',
+  onBrokenLinks: 'throw',
 
   clientModules: ['./src/client-modules/sidebar-scroll.ts'],
 
@@ -66,7 +66,7 @@ const config: Config = {
           changefreq: 'daily',
           priority: 0.8,
           lastmod: 'date',
-          ignorePatterns: ['/'],
+          ignorePatterns: ['/search'],
         },
       } satisfies Preset.Options,
     ],
