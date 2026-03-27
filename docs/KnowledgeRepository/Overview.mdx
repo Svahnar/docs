@@ -1,13 +1,13 @@
 ---
-title: "Knowledge Repository"
-description: "Learn how SVAHNAR's Knowledge Repository enables Retrieval-Augmented Generation (RAG) for your AI agents with semantic search."
+title: "KnowledgeRepository"
+description: "Learn how SVAHNAR's KnowledgeRepository enables Retrieval-Augmented Generation (RAG) for your AI agents with semantic search."
 keywords: ['knowledge repository', 'rag', 'retrieval augmented generation', 'svahnar', 'semantic search']
 ---
 
 import Video from '@site/src/components/Video';
 import { Steps, Step } from '@site/src/components/Steps/Steps';
 
-# Knowledge Repository
+# KnowledgeRepository
 
 Empower your agents with **semantic search** capabilities by connecting them to your documents.
 
@@ -18,7 +18,7 @@ This guide will walk you through configuring the **KnowledgeRepo** tool to enabl
 To configure this tool, you need to understand how data ingestion and search scoping work.
 
 ### 1. How it works
-The Knowledge Repository (KR) indexes your documents so agents can retrieve, analyze, and answer queries based on that content rather than hallucinating. 
+The KnowledgeRepository (KR) indexes your documents so agents can retrieve, analyze, and answer queries based on that content rather than hallucinating. 
 
 1.  **Ingest:** Upload documents (PDFs) directly or use SVAHNAR Connectors.
 2.  **Index:** The repository preprocesses content (including OCR for image-based PDFs) for semantic search.
@@ -26,10 +26,10 @@ The Knowledge Repository (KR) indexes your documents so agents can retrieve, ana
 
 ### 2. Supported Data Sources
 You can upload files manually or use **Connectors** to index external sources automatically:
-* [URL](/docs/Knowledge%20Repository/Connectors/URL.mdx)
-* [AWS S3](/docs/Knowledge%20Repository/Connectors/AWS%20S3)
-* [Confluence](/docs/Knowledge%20Repository/Connectors/Confluence)
-* [SharePoint](/docs/Knowledge%20Repository/Connectors/Sharepoint)
+* [URL](/docs/KnowledgeRepository/Connectors/URL.mdx)
+* [AWS S3](/docs/KnowledgeRepository/Connectors/AWS_S3)
+* [Confluence](/docs/KnowledgeRepository/Connectors/Confluence)
+* [SharePoint](/docs/KnowledgeRepository/Connectors/Sharepoint)
 
 ### 3. Search Scoping (Filtering)
 You can restrict the search to specific data subsets using IDs:
@@ -38,14 +38,14 @@ You can restrict the search to specific data subsets using IDs:
 * **Document ID (`doc_id`):** Restricts search to a specific document UUID within a repository.
 
 :::info Access Control
-**Permissions are inherited.** If a user has permission to access an agent associated with a Knowledge Repository in your organization, they automatically inherit access to that repository. You do not need to configure separate permissions.
+**Permissions are inherited.** If a user has permission to access an agent associated with a KnowledgeRepository in your organization, they automatically inherit access to that repository. You do not need to configure separate permissions.
 :::
 
 ---
 
 ## ⚙️ Configuration Steps
 
-Follow these steps to integrate the Knowledge Repository with your agent.
+Follow these steps to integrate the KnowledgeRepository with your agent.
 
 <Steps>
 <Step>
@@ -54,7 +54,7 @@ Follow these steps to integrate the Knowledge Repository with your agent.
 
 Before configuring the agent, ensure your documents are uploaded and indexed.
 
-1.  Navigate to the **Knowledge Repository** section in the SVAHNAR dashboard.
+1.  Navigate to the **KnowledgeRepository** section in the SVAHNAR dashboard.
 2.  Create a new Repository or identify an existing one.
 3.  Upload your PDFs or configure a Connector (e.g., AWS S3, Confluence).
 4.  Copy the **Repository UUID** (and optional **Document UUID** if scoping is required).
@@ -93,7 +93,7 @@ Instruct your agent on *when* to use this tool in the `agent_function` section.
 
 ### Recipe 1: Basic Global Search
 
-> **Use Case:** An agent that searches an entire Knowledge Repository to answer questions.
+> **Use Case:** An agent that searches an entire KnowledgeRepository to answer questions.
 
 ```yaml showLineNumbers
 create_vertical_agent_network:
@@ -106,7 +106,7 @@ create_vertical_agent_network:
       tool_assigned:
         - name: KnowledgeRepo
           config:
-            # The UUID of your Knowledge Repository
+            # The UUID of your KnowledgeRepository
             k_repo_id: "550e8400-e29b-41d4-a716-446655440000"
     agent_function:
       - "Search the knowledge repository for relevant passages and answer the user's question."
@@ -145,14 +145,14 @@ create_vertical_agent_network:
 
 ## 🚑 Troubleshooting
 
-* **"Invalid Knowledge Repository ID" Error**
+* **"Invalid KnowledgeRepository ID" Error**
   * Ensure the `k_repo_id` provided is a valid UUID format.
   * Check for whitespace characters pasted accidentally into the YAML.
 
 
 * **"You do not have permission to access..."**
   * This occurs if the `k_repo_id` exists but belongs to a different organization and is not marked as `is_global`.
-  * **Private Repos:** Only the creator and authorized organization members can access them. verify the ownership of the Knowledge Repository.
+  * **Private Repos:** Only the creator and authorized organization members can access them. verify the ownership of the KnowledgeRepository.
 
 
 * **Poor Search Results**

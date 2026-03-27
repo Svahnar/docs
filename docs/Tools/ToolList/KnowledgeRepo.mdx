@@ -11,7 +11,7 @@ import { Steps, Step } from '@site/src/components/Steps/Steps';
 
 Empower your agents with **semantic search** capabilities over your Knowledge Repositories.
 
-This guide will walk you through configuring the Knowledge Repository tool to enable Agentic-Retrieval-Augmented Generation (A-RAG).
+This guide will walk you through configuring the KnowledgeRepository tool to enable Agentic-Retrieval-Augmented Generation (A-RAG).
 
 ## 💡 Core Concepts
 
@@ -39,7 +39,7 @@ The tool automatically enforces permission checks. If a `k_repo_id` is provided,
 
 ## ⚙️ Configuration Steps
 
-Follow these steps to integrate the Knowledge Repository tool.
+Follow these steps to integrate the KnowledgeRepository tool.
 
 <Steps>
 
@@ -77,9 +77,9 @@ Instruct your agent on *when* to use this tool.
 
 ## 📚 Practical Recipes (Examples)
 
-### Recipe 1: Basic Global Search of Knowledge Repository
+### Recipe 1: Basic Global Search of KnowledgeRepository
 
-> **Use Case:** An agent that searches the entire Knowledge Repository without restriction.
+> **Use Case:** An agent that searches the entire KnowledgeRepository without restriction.
 
 ```yaml showLineNumbers
 create_vertical_agent_network:
@@ -101,9 +101,9 @@ create_vertical_agent_network:
 
 ```
 
-### Recipe 2: Scoped Search of Knowledge Repository (Specific Document)
+### Recipe 2: Scoped Search of KnowledgeRepository (Specific Document)
 
-> **Use Case:** An agent restricted to searching a specific document within a Knowledge Repository (e.g., "HR Policies" only).
+> **Use Case:** An agent restricted to searching a specific document within a KnowledgeRepository (e.g., "HR Policies" only).
 
 ```yaml showLineNumbers
 create_vertical_agent_network:
@@ -130,9 +130,9 @@ create_vertical_agent_network:
 
 ## 🚑 Troubleshooting
 
-* **"Invalid Knowledge Repository ID" Error**
+* **"Invalid KnowledgeRepository ID" Error**
     * Ensure the `k_repo_id` provided is a valid UUID format.
 
 * **"You do not have permission to access..."**
     * This occurs if the `k_repo_id` exists but belongs to a different user/organization, and is not marked as `is_global`.
-    * Verify the ownership of the Knowledge Repository you are trying to access.
+    * Verify the ownership of the KnowledgeRepository you are trying to access.

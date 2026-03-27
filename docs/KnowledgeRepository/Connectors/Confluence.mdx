@@ -1,6 +1,6 @@
 ---
 title: "Confluence"
-description: "Integrate Atlassian Confluence as a knowledge source for SVAHNAR's AI agents via the Knowledge Repository."
+description: "Integrate Atlassian Confluence as a knowledge source for SVAHNAR's AI agents via the KnowledgeRepository."
 keywords: ['confluence connector', 'atlassian', 'knowledge repository', 'svahnar', 'rag']
 ---
 
@@ -8,7 +8,7 @@ import { Steps, Step } from '@site/src/components/Steps/Steps';
 
 # Confluence
 
-Seamlessly import pages, hierarchies, and attachments from your Confluence workspace into the SVAHNAR Knowledge Repository.
+Seamlessly import pages, hierarchies, and attachments from your Confluence workspace into the SVAHNAR KnowledgeRepository.
 
 This connector allows you to centralize internal documentation for Search, QA, and Knowledge Ops.
 
@@ -17,7 +17,7 @@ This connector allows you to centralize internal documentation for Search, QA, a
 Before configuring the connector, it is helpful to understand how SVAHNAR interacts with Confluence.
 
 ### 1. How does the Confluence Connector work?
-The connector acts as a read-only ingestion tool. It connects to your Confluence instance using an API token, crawls the specified `space_key`, and normalizes the content (text, tables, and attachments) for the Knowledge Repository.
+The connector acts as a read-only ingestion tool. It connects to your Confluence instance using an API token, crawls the specified `space_key`, and normalizes the content (text, tables, and attachments) for the KnowledgeRepository.
 
 ### 2. Permissions & Security
 The connector respects Confluence permissions. It can only import content that the user/token has explicit access to.
@@ -65,7 +65,7 @@ Follow these steps to set up the connection and begin importing data.
 
 ### Execute Import
 
-  1. Pass your configuration payload to the Knowledge Repository connector tool.
+  1. Pass your configuration payload to the KnowledgeRepository connector tool.
   2. The connector will enumerate pages and begin the walk of the page hierarchy.
   3. Monitor the logs for any 403 (Forbidden) errors, which indicate permission issues on specific pages.
 
