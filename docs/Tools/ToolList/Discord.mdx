@@ -70,6 +70,8 @@ Before configuring the tool in SVAHNAR, you need to create a **Discord Bot** fro
 4. Click **Add Bot** → **Yes, do it!**
 5. Under the **Token** section, click **Reset Token**, confirm, and **copy the token immediately** — it is shown only once.
 
+![Create Discord Bot](../../assets/discord-bot.png)
+
 :::caution
 Never share or commit your Bot Token. Anyone with this token can operate your bot with full permissions. Store it in SVAHNAR Key Vault (`${discord_bot_token}`) and nowhere else.
 :::
@@ -83,6 +85,8 @@ Never share or commit your Bot Token. Anyone with this token can operate your bo
 1. In the **Bot** section of the Developer Portal, scroll down to **Privileged Gateway Intents**.
 2. Enable **Message Content Intent** — required to read message content via the REST API.
 3. Save your changes.
+
+![Configure Bot Permissions](../../assets/discord_permissions.png)
 
 :::note
 Without the **Message Content Intent**, the `read` and `search` modes will return messages with empty content bodies. This intent must be enabled even though this tool uses REST, not the Gateway.
