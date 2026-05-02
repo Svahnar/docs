@@ -24,6 +24,9 @@ tools:
     - name: "<Tool Name>"
       config:
         # Tool-specific configurations
+        # HITL: true  # Enable Human-in-the-Loop approval (optional)
+        # instruction: |  # Custom instruction for tool behavior (optional)
+        #   Your instructions here...
 ```
 
 ### Example: Assigning Tools to Agents
@@ -53,6 +56,8 @@ tools:
 
 - **name**: Specifies the tool name.
 - **config**: Contains tool-specific parameters.
+  - **`HITL`** (optional): Set to `true` to require human approval before tool execution. See [Human-in-the-Loop](/docs/AgenticNetwork/Configuration/HITL) for details.
+  - **`instruction`** (optional): Custom instructions to guide how the agent uses this tool. See [Custom Instruction](/docs/AgenticNetwork/Configuration/Custom_Instruction) for details.
 
 ## Where to Find Tool Configurations?
 
@@ -61,3 +66,17 @@ Detailed explanations of each tool and their configuration parameters are availa
 - Available tools.
 - Required and optional configuration parameters.
 - Examples and usage guidelines.
+
+## Configuration Options Summary
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `name` | string | The name of the tool to assign |
+| `config` | object | Tool-specific configuration parameters |
+| `config.HITL` | boolean | Enable Human-in-the-Loop approval (default: `false`) |
+| `config.instruction` | string | Custom instructions for tool behavior |
+
+## Related Documentation
+
+- [Human-in-the-Loop (HITL)](/docs/AgenticNetwork/Configuration/HITL) - Require human approval for tool execution
+- [Custom Instruction](/docs/AgenticNetwork/Configuration/Custom_Instruction) - Add tool-specific guidance

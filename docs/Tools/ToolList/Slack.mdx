@@ -78,6 +78,8 @@ Use WolframAlpha or a simple conversion — `"unix timestamp for December 24 202
 3. Enter an **App Name** (e.g., `SVAHNAR Agent`) and select the **workspace** to develop it in.
 4. Click **Create App**.
 
+![Create a Slack App](../../assets/slack-create-app.png)
+
 </Step>
 
 <Step>
@@ -89,6 +91,8 @@ Use WolframAlpha or a simple conversion — `"unix timestamp for December 24 202
 ```
 https://api.platform.svahnar.com/slack/auth
 ```
+![Configure Redirect URL](../../assets/slack_redirect.png)
+
 3. Scroll down to **Bot Token Scopes** and add the following:
 
    | Scope | Required For |
@@ -102,6 +106,8 @@ https://api.platform.svahnar.com/slack/auth
    | `chat:scheduledMessages.write` | `schedule_message` — schedule future messages |
 
 4. Click **Save Changes**.
+
+![Configure Scopes](../../assets/slack_scopes.png)
 
 :::note
 `chat:write.public` allows the bot to send messages to any public channel without being manually invited first. Without it, the bot must be added to a channel before it can post there.
