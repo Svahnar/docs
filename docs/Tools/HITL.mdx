@@ -1,0 +1,237 @@
+---
+title: "Human-in-the-Loop (HITL)"
+description: "Enable Human-in-the-Loop intervention to allow human administrators to approve, modify, or reject AI agent tool calls before execution."
+keywords: ['HITL', 'human in the loop', 'human intervention', 'agent approval', 'svahnar', 'ai oversight']
+---
+
+# Human-in-the-Loop (HITL)
+
+import { Steps, Step } from '@site/src/components/Steps/Steps';
+
+
+Enable Human-in-the-Loop (HITL) intervention to require human approval for sensitive AI agent operations. When enabled, the agent will pause and wait for a human administrator to review and either approve, modify, or reject tool calls before they execute.
+
+This is critical for:
+- **Financial operations** (payments, transfers, budget changes)
+- **Data modifications** (database writes, record updates)
+- **External communications** (emails, sms, notifications)
+- **Infrastructure changes** (deployments, configuration updates)
+
+## 💡 Core Concepts
+
+### 1. How HITL Works
+
+When a tool has `HITL: true` in its configuration:
+
+1. **Agent plans a tool call** → The agent determines which tool to use and with what parameters
+2. **Request suspended** → The tool call is paused, not executed
+3. **Human review** → An administrator receives the tool call details for review
+4. **Decision** → The human can:
+   - **Approve** (execute as planned)
+   - **Modify** (change parameters before execution)
+   - **Reject** (cancel the tool call entirely)
+5. **Execution** → If approved/modified, the tool executes with the final parameters
+
+---
+
+## ⚙️ Configuration Steps
+
+Enable HITL by adding `HITL: true` to a tool's config block.
+
+<Steps>
+<Step>
+
+  ### Step 1: Identify Tools Requiring Oversight
+
+  Determine which tools need human approval. Common examples:
+  - `AWS_Lambda` - infrastructure changes
+  - `DatabaseTool` - data modifications
+  - `AWS_SES_send_email` - email sends
+  - `Twilio_sms` / `Twilio_whatsapp` - messaging
+
+</Step>
+
+<Step>
+
+### Step 2: Configure HITL in Agent YAML
+
+Add `HITL: true` to the tool configuration:
+
+```yaml showLineNumbers
+create_agent_network:
+  agent-1:
+    agent_name: "email_admin_agent"
+    LLM_config:
+      params:
+        model: "gpt-4o"
+    tools:
+      tool_assigned:
+        - name: "AWS_SES_send_email"
+          config:
+            HITL: true
+            # Other tool-specific configs...
+            # SMTP_USER: ${SMTP_USER}
+            # SMTP_PASS: ${SMTP_PASS}
+    agent_function:
+      - "You are an email admin assistant. All emails require human approval."
+
+```
+
+</Step>
+
+<Step>
+
+### Step 3: Handle HITL Interruptions
+
+When a tool call is interrupted for HITL:
+
+1. **Review the pending request** in the SVAHNAR dashboard
+2. **Check tool parameters** (recipient, content, scope)
+3. **Make a decision**:
+   - **Approve**: Execute exactly as the agent intended
+   - **Modify**: Change specific parameters (e.g., different recipient, reduced scope)
+   - **Reject**: Cancel the operation entirely
+4. **Provide feedback** if rejecting (helps train the agent)
+
+</Step>
+</Steps>
+
+---
+
+## 📚 Practical Recipes
+
+### Recipe 1: Financial Dashboard Agent with HITL
+
+> **Use Case:** An agent that can update financial records but requires approval for any changes.
+
+```yaml showLineNumbers
+create_agent_network:
+  agent-1:
+    agent_name: "financial_agent"
+    LLM_config:
+      params:
+        model: "gpt-4o"
+    tools:
+      tool_assigned:
+        - name: "DatabaseTool"
+          config:
+            HITL: true
+            db_uri: "postgresql+psycopg2://finance:pass@db:5432/financials"
+    agent_function:
+      - "You are a financial data assistant."
+      - "You can look up financial data for users."
+      - "Any database modifications (INSERT/UPDATE/DELETE) require HITL approval."
+      - "If a user asks to 'update' or 'change' financial records, the HITL process will handle it."
+
+```
+
+### Recipe 2: Email Notification Agent with Granular HITL
+
+> **Use Case:** An agent that sends notifications. Some emails need approval, others don't.
+
+**Note:** HITL is configured per-tool. For more granular control (per-message), use custom logic in the agent's `agent_function` to prompt for manual review.
+
+```yaml showLineNumbers
+create_agent_network:
+  agent-1:
+    agent_name: "notification_agent"
+    LLM_config:
+      params:
+        model: "gpt-4o"
+    tools:
+      tool_assigned:
+        - name: "AWS_SES_send_email"
+          config:
+            HITL: true
+            SMTP_USER: ${SMTP_USER}
+            SMTP_PASS: ${SMTP_PASS}
+    agent_function:
+      - "You are a notification assistant."
+      - "ALWAYS ask for user confirmation before sending any email."
+      - "The HITL system will prompt the user to approve or reject the message."
+
+```
+
+### Recipe 3: Multiple Tools with Mixed HITL Settings
+
+> **Use Case:** An agent with both high-risk (HITL) and low-risk tools.
+
+```yaml showLineNumbers
+create_agent_network:
+  agent-1:
+    agent_name: "full_service_agent"
+    LLM_config:
+      params:
+        model: "gpt-4o"
+    tools:
+      tool_assigned:
+        # High-risk tools require HITL
+        - name: "DatabaseTool"
+          config:
+            HITL: true
+            db_uri: ${DB_URI}
+        
+        - name: "AWS_SES_send_email"
+          config:
+            HITL: true
+            SMTP_USER: ${SMTP_USER}
+        
+        # Low-risk tools can run freely
+        - name: "Tavily"
+          config:
+            API_key: ${TAVILY_API_KEY}
+        
+        - name: "Arxiv"
+          config: {}
+
+```
+
+---
+
+## 🚑 Troubleshooting
+
+### HITL Request Never Appears
+
+* **Check HITL is enabled**: Ensure `HITL: true` is correctly indented under the tool's `config:` block (not at the tool level).
+* **Verify middleware**: The `HumanInTheLoopMiddleware` must be present in the agent creation. This is enabled when `HITL: true` is set.
+
+### Agent Keeps Retrying After Rejection
+
+* **This is expected behavior**: When a tool call is rejected, the agent should stop that specific operation.
+* **Fix**: Update the agent's instructions (in `agent_function`) to handle rejections gracefully and not retry rejected operations.
+
+### User Doesn't Receive HITL Notification
+
+* **Check notification settings**: Ensure the human administrator has notifications enabled in the SVAHNAR dashboard.
+* **Review middleware configuration**: The `HumanInTheLoopMiddleware` requires proper setup of the interrupt system.
+
+### Mixed HITL Configurations
+
+* **Note**: If multiple tools have `HITL: true`, each tool call will trigger a separate HITL interrupt. Consider whether this is the desired behavior or if you want to batch interruptions.
+
+---
+
+## 🔐 Security Considerations
+
+* **Never disable HITL for sensitive operations**: Password changes, financial transactions, and data deletions should always require human approval.
+* **HITL is bypassed in dev mode**: When `ENVIRONMENT=dev`, HITL may be automatically disabled for testing. Ensure production has `ENVIRONMENT=prod`.
+* **Audit Trail**: All HITL decisions (approve/modify/reject) are logged. Ensure these logs are accessible for compliance audits.
+
+### When HITL Is NOT Needed
+
+* **Read-only operations**: Search, lookups, and data retrieval typically don't require approval.
+* **Low-risk informational tools**: Weather, calculators, web search.
+* **Internal math/logic tools**: Tools in `additional_tools.py` (math operations).
+
+---
+
+## API Reference: HITL Middleware
+
+When `HITL: true` is configured, the agent uses:
+
+| Component | Purpose |
+|-----------|---------|
+| `HumanInTheLoopMiddleware` | Pauses tool execution and waits for human review |
+| `ModelFallbackMiddleware` | Fallback LLM if the primary fails |
+
+The middleware intercepts tool calls, queues them for human review, and only executes after approval.

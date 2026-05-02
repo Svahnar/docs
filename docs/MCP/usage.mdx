@@ -1,0 +1,80 @@
+---
+title: "Model Context Protocol (MCP) Usage"
+description: "Learn how to configure and use Model Context Protocol (MCP) servers to extend SVAHNAR agent capabilities with dynamic tool integration."
+keywords: ['MCP', 'Model Context Protocol', 'SVAHNAR', 'Agent Tools', 'Dynamic Tools', 'External Tool Servers', 'Tool Integration', 'YAML Configuration', 'HTTP Transport', 'SSE']
+---
+
+# Model Context Protocol (MCP) Usage Guide
+
+The Model Context Protocol (MCP) allows agents within the SVAHNAR framework to connect to external tool servers dynamically. This guide explains how to configure and use MCP servers with your agents.
+
+## Overview
+
+MCP is a standardized protocol that enables agents to discover and use tools hosted on remote or local servers. By acting as an MCP client, SVAHNAR agents can extend their capabilities without requiring custom code for every new tool integration.
+
+## Configuration
+
+To add an MCP server to an agent, use the `mcp_assigned` field within the `tools` section of your agent configuration YAML.
+
+### Configuration Fields
+
+- **name**: A unique identifier for the MCP server connection.
+- **hitl**: (Boolean) If set to `true`, any tool call from this MCP server will require Human-In-The-Loop approval before execution.
+- **config**:
+  - **url**: The endpoint URL of the MCP server (e.g., `http://127.0.0.1:8007/mcp`).
+  - **transport**: The communication method. Currently, `http`, `sse`, and `streamable_http` are supported (all map to HTTP-based communication).
+  - **headers**: A dictionary of HTTP headers for authentication or metadata.
+    - **Authorization**: Used for Bearer tokens or API keys (e.g., `"Bearer xoxb-..."`).
+    - **Accept**: Usually `"text/event-stream, application/json"` for MCP SSE connections.
+
+### Example Agent Configuration
+
+```yaml
+create_agent_network:
+  agent-1:
+    agent_name: Agent_1
+    agent_function:
+      - >
+        You are an agent which interact with arxiv to look for the research papers or articles 
+        and later you can also connect with user provided mcp and perform task that user asks 
+        for and answer him accordingly
+    LLM_config:
+      params:
+        model: gpt-5  
+    tools:
+      tool_assigned:
+        - name: Arxiv
+          hitl: true
+      mcp_assigned:
+        - name: testing-mcp
+          hitl: true
+          config:
+            url: http://127.0.0.1:8007/mcp
+            transport: streamable_http
+            headers:
+             Authorization: "Bearer xoxb-user-token-here" 
+             Accept: "text/event-stream, application/json"
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+## Security & Performance
+
+### Disabled Transports
+For security reasons, the **`stdio` transport is intentionally disabled** for user-provided MCP configurations. All connections must be made via HTTP/SSE.
+
+### Retries and Timeouts
+- **Timeout**: Each connection attempt to an MCP server has a **10-second timeout** to prevent the agent from hanging if a server is unresponsive.
+- **Retries**: The system will automatically attempt to reconnect up to **3 times** if a transient error occurs during tool discovery.
+
+## Authentication Support
+
+SVAHNAR supports the following header-based authentication types for MCP:
+
+- **Bearer Tokens**: Standard for OAuth2-protected APIs.
+- **API Keys**: Can be passed via custom headers (e.g., `x-api-key`) or the `Authorization` header.
+- **Basic Auth**: Supported via the `Authorization` header with Base64 encoded credentials.
+
+> [!NOTE]
+> While you can provide tokens obtained via OAuth2, the platform does not currently manage the full OAuth2 lifecycle (e.g., automatic token refresh). Ensure your tokens are valid for the duration of the agent session.

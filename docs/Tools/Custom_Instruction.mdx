@@ -1,0 +1,272 @@
+---
+title: "Custom Instruction"
+description: "Add tool-specific instructions to guide AI agent behavior for individual tool calls."
+keywords: ['custom instruction', 'tool instruction', 'agent configuration', 'svahnar', 'ai tool guidance']
+---
+
+# Custom Instruction
+
+Add tool-specific instructions to provide context-specific guidance to the AI agent when calling a particular tool. This allows you to tailor how the agent uses each tool beyond the default behavior.
+
+## 💡 Core Concepts
+
+### 1. What is a Custom Instruction?
+
+A custom instruction is a text string added to a tool's configuration that:
+- **Guides the agent's behavior** for that specific tool
+- **Provides context** about how/when to use the tool
+- **Overrides or supplements** the default tool description
+- **Can include examples** of desired input patterns
+
+### 2. How Custom Instructions Work
+
+When an agent is deciding whether and how to call a tool:
+
+1. **Default behavior**: The agent uses the tool's built-in description
+2. **With custom instruction**: The agent receives your instruction as additional context
+3. **Priority**: Your instruction supplements (does not replace) the tool's functionality
+
+### 3. Use Cases
+
+| Use Case | Example |
+|----------|---------|
+| **Domain-specific context** | "For customer emails, always check CRM first before composing a response." |
+| **Format requirements** | "Always return results in JSON format with 'status' and 'data' fields." |
+| **Approval workflows** | "Before writing to the database, confirm with the user via email." |
+| **Data validation** | "Validate all email addresses before sending to prevent bouncebacks." |
+| **Brand voice** | "Use a friendly, conversational tone in all customer communications." |
+
+---
+
+## ⚙️ Configuration
+
+Add the `instruction` field to a tool's config block:
+
+```yaml showLineNumbers
+create_agent_network:
+  agent-1:
+    agent_name: "customer_support_agent"
+    LLM_config:
+      params:
+        model: "gpt-4o"
+    tools:
+      tool_assigned:
+        - name: "AWS_SES_send_email"
+          config:
+            SMTP_USER: ${SMTP_USER}
+            SMTP_PASS: ${SMTP_PASS}
+            instruction: >
+              When composing emails to customers:
+              1. Use a friendly, professional tone
+              2. Include the customer's name if available
+              3. Keep messages concise but informative
+              4. Always ask if there's anything else you can help with
+```
+
+---
+
+## 📚 Practical Recipes
+
+### Recipe 1: Database Tool with Query Guidelines
+
+> **Use Case:** You want to limit the agent's database queries to specific tables and columns.
+
+```yaml showLineNumbers
+create_agent_network:
+  agent-1:
+    agent_name: "data_analyst"
+    LLM_config:
+      params:
+        model: "gpt-4o"
+    tools:
+      tool_assigned:
+        - name: "DatabaseTool"
+          config:
+            db_uri: ${DB_URI}
+            instruction: >
+              IMPORTANT QUERY GUIDELINES:
+              
+              1. **Allowed Tables**: Only query `users`, `orders`, and `products`
+              2. **Avoid**: Do not query `payments`, `inventory`, or `audit_log` tables
+              3. **Column restrictions**: Never select `ssn`, `credit_card`, or `password_hash` columns
+              4. **Output format**: Return results as a markdown table with clear column headers
+              5. **Null handling**: If a value is NULL, display "N/A" instead
+              
+              When in doubt about whether a query is allowed, ask the user for clarification.
+```
+
+### Recipe 2: Web Search with Source Requirements
+
+> **Use Case:** You need recent, authoritative sources for research tasks.
+
+```yaml showLineNumbers
+create_agent_network:
+  agent-1:
+    agent_name: "research_agent"
+    LLM_config:
+      params:
+        model: "gpt-4o"
+    tools:
+      tool_assigned:
+        - name: "Tavily"
+          config:
+            API_key: ${TAVILY_API_KEY}
+            instruction: >
+              SOURCE QUALITY REQUIREMENTS:
+              
+              1. **Preferred sources**: Academic papers (.edu, .gov), official documentation, reputable news outlets
+              2. **Avoid**: User-generated content forums, personal blogs, social media posts
+              3. **Date requirement**: Prioritize results from the last 12 months unless historical context is needed
+              4. **Search depth**: Use 'advanced' search for complex queries
+              5. **Result count**: Return at least 5 high-quality sources
+```
+
+### Recipe 3: Email with Spam Prevention
+
+> **Use Case:** Prevent the agent from sending emails that might be flagged as spam.
+
+```yaml showLineNumbers
+create_agent_network:
+  agent-1:
+    agent_name: "email_assistant"
+    LLM_config:
+      params:
+        model: "gpt-4o"
+    tools:
+      tool_assigned:
+        - name: "AWS_SES_send_email"
+          config:
+            SMTP_USER: ${SMTP_USER}
+            SMTP_PASS: ${SMTP_PASS}
+            instruction: >
+              EMAIL BEST PRACTICES - DO NOT VIOLATE:
+              
+              1. **Subject line**: Must be clear and descriptive. Never use ALL CAPS or excessive punctuation (!!!).
+              2. ** unsubscribe**: Include an unsubscribe link if sending to a marketing list.
+              3. **Email frequency**: Do not send more than 3 emails per day to the same recipient.
+              4. **Content warnings**: If the email contains sensitive information, include a privacy warning.
+              5. **Testing**: For important emails, suggest sending a test to yourself first.
+```
+
+### Recipe 4: Database Tool with Approval Workflow
+
+> **Use Case:** Require confirmation before any data modification.
+
+```yaml showLineNumbers
+create_agent_network:
+  agent-1:
+    agent_name: "data_manager"
+    LLM_config:
+      params:
+        model: "gpt-4o"
+    tools:
+      tool_assigned:
+        - name: "DatabaseTool"
+          config:
+            db_uri: ${DB_URI}
+            instruction: >
+              DATA MODIFICATION PROTOCOL:
+              
+              1. **Before UPDATE/INSERT/DELETE**: Always explain what changes will be made
+              2. **Preview first**: If possible, show the user what will change (use SELECT first)
+              3. ** Confirmation**: Explicitly ask user: "Should I proceed with this change?"
+              4. **Rollback plan**: For destructive operations, suggest creating a backup first
+              5. **Audit trail**: Note that all changes are logged for compliance
+              
+              IMPORTANT: Do not execute any data modification without explicit user approval.
+```
+
+### Recipe 5: Multiple Tools with Different Instructions
+
+> **Use Case:** An agent that handles various tasks, each requiring different guidance.
+
+```yaml showLineNumbers
+create_agent_network:
+  agent-1:
+    agent_name: "virtual_assistant"
+    LLM_config:
+      params:
+        model: "gpt-4o"
+    tools:
+      tool_assigned:
+        - name: "Tavily"
+          config:
+            API_key: ${TAVILY_API_KEY}
+            instruction: >
+              For web searches:
+              - Prioritize official documentation and academic sources
+              - Use advanced search for complex questions
+              - Include source URLs in your responses
+          
+        - name: "DatabaseTool"
+          config:
+            db_uri: ${DB_URI}
+            instruction: >
+              For database queries:
+              - Use parameterized queries to prevent SQL injection
+              - Limit result sets to 100 rows unless explicitly requested
+              - Format timestamps as ISO 8601 (YYYY-MM-DD HH:MM:SS)
+              - For aggregates, include both raw values and percentages
+          
+        - name: "AWS_SES_send_email"
+          config:
+            SMTP_USER: ${SMTP_USER}
+            SMTP_PASS: ${SMTP_PASS}
+            instruction: >
+              For email composition:
+              - Use clear, actionable subject lines (include [ACTION] if response needed)
+              - Keep paragraphs under 4 sentences
+              - Use bullet points for multi-part requests
+              - End with a clear call-to-action or next step
+
+```
+
+---
+
+## 🚑 Troubleshooting
+
+### Instruction Not being Applied
+
+* **Check YAML indentation**: The `instruction` field must be at the same level as `HITL` under `config:`
+* **Verify tool name**: Ensure the tool name matches exactly (case-sensitive)
+* **Check agent reload**: Changes to instructions require the agent to be recompiled
+
+### Instruction Conflicts with Agent Behavior
+
+* **Priority**: Custom instructions supplement, not replace, the agent's main `agent_function`
+* **Resolution**: If conflicting, the agent's primary function (defined in `agent_function`) takes precedence
+
+### Too Long Instruction Causes Context Window Issues
+
+* **Solution**: Keep instructions concise (under 500 words recommended)
+* **Alternative**: Use the agent's main `agent_function` for complex instructions that apply to all tools
+
+---
+
+## Best Practices
+
+| Do | Don't |
+|----|-------|
+| ❌Be specific about what the tool should do | ❌Vague statements like "use your best judgment" |
+| ❌Include examples of expected input/output | ❌Overwhelming documentation (limit to key points) |
+| ❌State any restrictions or limitations | ❌Conflicting instructions (pick one approach) |
+| ❌Use clear, actionable language | ❌Internal implementation details the agent doesn't need |
+
+### Recommended Instruction Structure
+
+```
+1. Purpose: What should the tool achieve?
+2. Context: When should it be used?
+3. Constraints: What should be avoided?
+4. Output format: How should results be structured?
+5. Examples: Sample input/output pairs
+```
+
+### Length Guidelines
+
+| Length | Use Case |
+|--------|----------|
+| 1-2 sentences | Simple guidance (e.g., "Always validate email addresses") |
+| 3-5 sentences | Moderate guidance (e.g., brand voice, format requirements) |
+| 6-10 sentences | Complex guidance (e.g., multi-step workflows) |
+| >10 sentences | Consider using `agent_function` instead |

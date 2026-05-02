@@ -96,11 +96,110 @@ print(response)
 ```
 ## Request Parameters
 
-- **`yaml_string`**: The YAML configuration string that defines the agent's context and settings.
-- **`message`**: The input data or message you want to send to the agent for processing. Currently it only supports string input.
-- **`agent_history`**: Optional. List of prior messages; defaults to empty list.
+- **`yaml_file`**: The YAML configuration file you want to upload. (Provide either `yaml_file` or `yaml_string`).
+- **`yaml_string`**: The YAML configuration string that defines the agent's context and settings. (Provide either `yaml_file` or `yaml_string`).
+- **`message`**: The input data or message you want to send to the agent for processing. Can be a string or a JSON dictionary.
+- **`agent_history`**: Optional. List of prior messages; defaults to an empty list.
+- **`thread_id`**: Optional. A unique identifier for the chat session.
+- **`hitl_decision`**: Optional. The Human-in-the-Loop decision. Accepts `"approve"`, `"edit"`, or `"reject"`. Required when resuming an agent that was paused for HITL.
 - **`timeout`**: The maximum time (in seconds) to wait for the agent to respond. This is useful for complex agents that may take longer to process.
 
 ### Response
 
-You get same response as [executing the agent](../Tools/list_of_tools.mdx).
+The response format is identical to the standard agent execution.
+
+``` json title="json" showLineNumbers
+{
+    "response": [
+        {
+            "information_search_agent": {
+                "reasoning": "Determined that search tool is needed.",
+                "toolcalls": [
+                    {
+                        "name": "Tavily",
+                        "arguments": {"query": "Stargate Project"},
+                        "id": "call_abc123"
+                    }
+                ],
+                "toolresponse": ["Search results..."],
+                "llmresponse": "The Stargate Project was a secret U.S. Army unit...",
+                "hitl": null
+            }
+        }
+    ],
+    "usage": {
+        "credits_charged": [
+            {
+                "agent_name": "information_search_agent",
+                "number_of_runs": 1,
+                "credit_consumed": 1
+            }
+        ],
+        "total_credits_charged": 1
+    },
+    "additional_metadata": {
+        "thread_id": "000000-00000-00000-00000"
+    },
+    "request_metadata": {
+        "request_id": "req_123456"
+    }
+}
+```
+
+## Response Parameters
+
+- **`response`**: A list containing dictionaries for each agent execution step. Each step includes `reasoning`, `toolcalls`, `toolresponse`, `llmresponse`, and `hitl` state.
+- **`usage`**: Information about the credits charged for the agent execution.
+- **`additional_metadata`**: Contains metadata like the `thread_id` to continue the conversation.
+- **`request_metadata`**: Contains the unique `request_id`.
+
+## Human-in-the-Loop (HITL) Handling
+
+When testing an agent configured with Human-In-The-Loop (`hitl: true`), the execution will pause when the tool is called. The API will return a response where the `hitl` field contains the tool call details awaiting approval.
+
+To resume the agent's execution, you must send the **same request** (including the YAML file/string) back to the `/test` endpoint, but include the `hitl_decision` parameter:
+- `"approve"`: Allow the agent to execute the tool with the originally proposed arguments.
+- `"edit"`: Allow execution, but use the modified arguments you provide in the `message` field.
+- `"reject"`: Deny the tool execution. The agent receives feedback that the tool was denied and will attempt to proceed without it.
+
+### Example: Resuming after HITL Pause
+
+```python title="Python" showLineNumbers
+from svahnar import Svahnar
+from pathlib import Path
+
+client = Svahnar()
+
+yaml_path = Path("agent.yaml")
+
+# 1. Initial Request
+response = client.agents.test(
+    yaml_file=yaml_path,
+    message="Tell me about the Stargate Project",
+    thread_id="my-test-session-123",
+    timeout=600
+)
+
+# Suppose the agent pauses here and returns hitl data in the response.
+# You inspect the tool call and decide to approve it.
+
+# 2. Resuming the agent with an approval
+resume_response = client.agents.test(
+    yaml_file=yaml_path,                       # Must provide the exact same YAML
+    message=None,                              # Message is not needed when approving/rejecting
+    thread_id="my-test-session-123",           # Must use the exact same thread_id
+    timeout=600,
+    hitl_decision="approve"                    # The HITL decision
+)
+
+print(resume_response)
+
+# OR: Resuming with an edit (providing new arguments)
+edit_response = client.agents.test(
+    yaml_file=yaml_path,
+    message={"query": "Declassified UFO documents"}, # The edited tool arguments
+    thread_id="my-test-session-123",
+    timeout=600,
+    hitl_decision="edit"
+)
+```
