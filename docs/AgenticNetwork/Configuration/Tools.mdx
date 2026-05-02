@@ -27,6 +27,11 @@ tools:
         # HITL: true  # Enable Human-in-the-Loop approval (optional)
         # instruction: |  # Custom instruction for tool behavior (optional)
         #   Your instructions here...
+  mcp_assigned:
+    - name: "<MCP Server Name>"
+      config:
+        # MCP server specific configurations (url, transport, headers)
+        # See MCP documentation for details
 ```
 
 ### Example: Assigning Tools to Agents
@@ -56,8 +61,14 @@ tools:
 
 - **name**: Specifies the tool name.
 - **config**: Contains tool-specific parameters.
-  - **`HITL`** (optional): Set to `true` to require human approval before tool execution. See [Human-in-the-Loop](/docs/AgenticNetwork/Configuration/HITL) for details.
-  - **`instruction`** (optional): Custom instructions to guide how the agent uses this tool. See [Custom Instruction](/docs/AgenticNetwork/Configuration/Custom_Instruction) for details.
+  - **`HITL`** (optional): Set to `true` to require human approval before tool execution. See [Human-in-the-Loop](/docs/Tools/HITL) for details.
+  - **`instruction`** (optional): Custom instructions to guide how the agent uses this tool. See [Custom Instruction](/docs/Tools/Custom_Instruction) for details.
+
+### Model Context Protocol (MCP)
+
+In addition to standard built-in tools, SVAHNAR allows agents to dynamically connect to external tool servers using the Model Context Protocol (MCP). This is configured via the `mcp_assigned` field under `tools`.
+
+For complete details on configuring and using MCP servers, see the [Model Context Protocol Usage Guide](/docs/MCP/usage).
 
 ## Where to Find Tool Configurations?
 
@@ -75,8 +86,10 @@ Detailed explanations of each tool and their configuration parameters are availa
 | `config` | object | Tool-specific configuration parameters |
 | `config.HITL` | boolean | Enable Human-in-the-Loop approval (default: `false`) |
 | `config.instruction` | string | Custom instructions for tool behavior |
+| `mcp_assigned` | array | List of MCP servers assigned to the agent |
 
 ## Related Documentation
 
-- [Human-in-the-Loop (HITL)](/docs/AgenticNetwork/Configuration/HITL) - Require human approval for tool execution
-- [Custom Instruction](/docs/AgenticNetwork/Configuration/Custom_Instruction) - Add tool-specific guidance
+- [Human-in-the-Loop (HITL)](/docs/Tools/HITL) - Require human approval for tool execution
+- [Custom Instruction](/docs/Tools/Custom_Instruction) - Add tool-specific guidance
+- [Model Context Protocol (MCP)](/docs/MCP/usage) - Connect to external tool servers
