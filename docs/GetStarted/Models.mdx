@@ -1,7 +1,7 @@
 ---
 title: "Models"
-description: "Explore the large language models (LLMs) supported by SVAHNAR, including GPT-4, Claude, Gemini, and more."
-keywords: ['ai models', 'llm', 'gpt-4', 'claude', 'gemini', 'svahnar models']
+description: "Explore the large language models (LLMs) supported by SVAHNAR, including GPT-4o, GPT-5, Llama, and Deepseek."
+keywords: ['ai models', 'llm', 'gpt-4o', 'gpt-5', 'llama', 'deepseek', 'qwen', 'svahnar models']
 ---
 
 import styles from './customcss/modelList.module.css';
@@ -32,7 +32,7 @@ The following models are available for immediate use in your agent configuration
     <tbody>
       {/* OpenAI Models */}
       <tr>
-        <td rowspan="5"><strong>OpenAI</strong></td>
+        <td rowspan="7"><strong>OpenAI</strong></td>
         <td><code>gpt-4o-mini</code></td>
         <td>1</td>
       </tr>
@@ -41,53 +41,73 @@ The following models are available for immediate use in your agent configuration
         <td>15</td>
       </tr>
       <tr>
-        <td><code>GPT-5-nano</code></td>
+        <td><code>gpt-5-nano</code></td>
         <td>1</td>
       </tr>
       <tr>
-        <td><code>GPT-5-mini</code></td>
+        <td><code>gpt-5-mini</code></td>
         <td>3</td>
       </tr>
       <tr>
-        <td><code>GPT-5</code></td>
+        <td><code>gpt-5</code></td>
         <td>15</td>
       </tr>
-
-      {/* LLaMA Models */}
       <tr>
-        <td rowspan="2"><strong>LLaMA</strong></td>
-        <td><code>Llama 3.1 8B instruct</code></td>
+        <td><code>gpt-oss-120b</code></td>
         <td>1</td>
       </tr>
       <tr>
-        <td><code>Llama 3.3 70B instruct</code></td>
+        <td><code>gpt-oss-20b</code></td>
+        <td>1</td>
+      </tr>
+
+      {/* Meta Llama Models */}
+      <tr>
+        <td rowspan="3"><strong>Meta Llama</strong></td>
+        <td><code>llama3-1-8b-instruct</code></td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td><code>llama3-3-70b-instruct</code></td>
+        <td>2</td>
+      </tr>
+      <tr>
+        <td><code>llama4-maverick-17b-instruct</code></td>
         <td>2</td>
       </tr>
       
       {/* Deepseek Models */}
       <tr>
         <td rowspan="2"><strong>Deepseek</strong></td>
-        <td><code>Deepseek - Qwen-2.5-32B</code></td>
-        <td>2</td>
+        <td><code>deepseek.v3.2</code></td>
+        <td>3</td>
       </tr>
       <tr>
-        <td><code>Deepseek - LLama70B</code></td>
-        <td>3</td>
+        <td><code>deepseek.r1-v1:0</code></td>
+        <td>7</td>
       </tr>
 
       {/* Qwen Models */}
       <tr>
-        <td rowspan="3"><strong>Qwen</strong></td>
-        <td><code>Qwen QwQ 32B (Preview)</code></td>
+        <td rowspan="5"><strong>Qwen</strong></td>
+        <td><code>qwen3-32b</code></td>
         <td>1</td>
       </tr>
       <tr>
-        <td><code>Qwen 2.5 32B Instruct 128k</code></td>
-        <td>3</td>
+        <td><code>qwen3-coder-30b-a3b</code></td>
+        <td>1</td>
       </tr>
       <tr>
-        <td><code>Qwen 2.5 Coder 32B Instruct 128k</code></td>
-        <td>3</td>
+        <td><code>qwen3-235b-a22b</code></td>
+        <td>4</td>
+      </tr>
+      <tr>
+        <td><code>qwen3-vl-235b-a22b</code></td>
+        <td>4</td>
+      </tr>
+      <tr>
+        <td><code>qwen3-coder-next</code></td>
+        <td>4</td>
       </tr>
     </tbody>
   </table>
@@ -131,7 +151,7 @@ A **Run** occurs whenever an agent is triggered to perform a task or participate
 ### 2. How are credits consumed?
 Credits are deducted strictly on a **pay-per-run** basis.
 * If an agent uses **gpt-4o-mini**, 1 credit is deducted for that turn.
-* If an agent uses **GPT-5**, 15 credits are deducted for that turn.
+* If an agent uses **gpt-5**, 15 credits are deducted for that turn.
 
 :::info
 In a complex workflow where multiple agents interact, the total cost is the sum of the credits required for each agent's individual participation.

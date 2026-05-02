@@ -59,9 +59,9 @@ const config: Config = {
         theme: {
           customCss: './src/css/custom.css',
         },
-        gtag: {
-          trackingID: 'G-50T925X4N9',
-        },
+        // gtag: {
+        //   trackingID: 'G-50T925X4N9',
+        // },
         sitemap: {
           changefreq: 'daily',
           priority: 0.8,
@@ -73,6 +73,13 @@ const config: Config = {
   ],
 
   plugins: [
+    [
+      '@docusaurus/plugin-google-gtag',
+      {
+        trackingID: 'G-50T925X4N9',
+        anonymizeIP: true,
+      },
+    ],
     // Note: Homepage redirect is handled by src/pages/index.* instead
     // '@docusaurus/plugin-client-redirects' removed: root redirect conflicted with trailingSlash
   ],
