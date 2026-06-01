@@ -6,7 +6,7 @@
     "docusaurus": "docusaurus",
     "start": "NODE_OPTIONS=--localstorage-file=.docusaurus/site-storage.json docusaurus start",
     "swizzle": "docusaurus swizzle",
-    "build:ci": "docusaurus build",
+    "build:ci": "NODE_OPTIONS=--localstorage-file=.docusaurus/site-storage.json docusaurus build",
     "build": "NODE_OPTIONS=--localstorage-file=.docusaurus/site-storage.json docusaurus build",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",
