@@ -1,0 +1,113 @@
+---
+title: "GitHub"
+description: "Connect SVAHNAR to GitHub to allow AI agents to read files, create issues, open pull requests, and manage repositories."
+keywords: ['github', 'oauth', 'svahnar', 'repository', 'issues', 'pull requests', 'connect']
+---
+
+import { Steps, Step } from '@site/src/components/Steps/Steps';
+
+# GitHub
+
+Connect SVAHNAR to your **GitHub account** to give agents the ability to read and write files, manage issues, and create pull requests in your repositories.
+
+---
+
+## What Agents Can Do
+
+| Operation | Description |
+|---|---|
+| **read_file** | Read the contents of a file in a repository |
+| **write_file** | Create a new file in a repository |
+| **update_file** | Modify an existing file |
+| **delete_file** | Remove a file from a repository |
+| **list_files** | List all files in the active branch |
+| **create_issue** | Open a new issue |
+| **list_issues** | List open issues |
+| **create_pr** | Open a new pull request |
+
+---
+
+## Connecting GitHub
+
+<Steps>
+<Step>
+
+### Open Connections
+
+Go to the **Connections** page in the SVAHNAR Platform.
+
+</Step>
+<Step>
+
+### Connect GitHub
+
+Click **Connect** on the **GitHub** provider card.
+
+A GitHub OAuth popup opens.
+
+</Step>
+<Step>
+
+### Authorize
+
+Review the requested permissions and click **Authorize SVAHNAR**.
+
+:::tip Organization Repositories
+To access repositories in a GitHub organization, you may need an organization admin to approve the OAuth app in the organization's settings under **Third-party access**.
+:::
+
+</Step>
+<Step>
+
+### Confirm Connection
+
+The popup closes. The **GitHub** card updates to **Connected**.
+
+</Step>
+</Steps>
+
+---
+
+## Using GitHub in an Agent
+
+```yaml title="agent.yaml" showLineNumbers
+create_agent_network:
+  agent-1:
+    agent_name: "Code_Manager"
+    LLM_config:
+      params:
+        model: "gpt-5"
+    tools:
+      tool_assigned:
+        - name: GitHub
+          config:
+            repo: "your-org/your-repo"
+            Branch: "main"
+    agent_function:
+      - "Help the user read files and create issues in the repository."
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+For detailed tool configuration, see the [GitHub Tool](/docs/Tools/ToolList/GitHubTool) reference.
+
+---
+
+## Permissions Requested
+
+| Scope | Purpose |
+|---|---|
+| `repo` | Full access to public and private repositories |
+| `read:user` | Read your GitHub profile information |
+| `user:email` | Access your verified email addresses |
+
+---
+
+## Disconnect
+
+Click **Disconnect** on the GitHub card. SVAHNAR removes the stored token.
+
+:::note
+GitHub does not support the standard RFC 7009 revocation protocol. You can also manually revoke SVAHNAR's access from **GitHub → Settings → Applications → Authorized OAuth Apps**.
+:::

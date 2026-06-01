@@ -1,0 +1,102 @@
+---
+title: "Salesforce"
+description: "Connect SVAHNAR to Salesforce CRM to allow AI agents to query, create, and update CRM records."
+keywords: ['salesforce', 'crm', 'oauth', 'svahnar', 'connect', 'records']
+---
+
+import { Steps, Step } from '@site/src/components/Steps/Steps';
+
+# Salesforce
+
+Connect SVAHNAR to your **Salesforce org** to give agents the ability to query, create, and update CRM records.
+
+---
+
+## What Agents Can Do
+
+| Capability | Description |
+|---|---|
+| **Query Records** | Run SOQL queries to retrieve accounts, contacts, leads, opportunities |
+| **Create Records** | Create new CRM objects (contacts, leads, cases, etc.) |
+| **Update Records** | Modify existing record fields |
+| **Search** | Search across Salesforce objects |
+
+---
+
+## Connecting Salesforce
+
+<Steps>
+<Step>
+
+### Open Connections
+
+Go to the **Connections** page in the SVAHNAR Platform.
+
+</Step>
+<Step>
+
+### Connect Salesforce
+
+Click **Connect** on the **Salesforce** provider card.
+
+A Salesforce login popup opens.
+
+</Step>
+<Step>
+
+### Log In and Authorize
+
+Log in to your Salesforce org and click **Allow** to grant SVAHNAR access.
+
+:::tip Sandbox vs Production
+Salesforce authorization defaults to your **production org**. If you want to connect a **Sandbox**, contact support — sandbox authorization uses a different endpoint (`https://test.salesforce.com`).
+:::
+
+</Step>
+<Step>
+
+### Confirm Connection
+
+The popup closes. The **Salesforce** card updates to **Connected**.
+
+</Step>
+</Steps>
+
+---
+
+## Using Salesforce in an Agent
+
+```yaml title="agent.yaml" showLineNumbers
+create_agent_network:
+  agent-1:
+    agent_name: "CRM_Assistant"
+    LLM_config:
+      params:
+        model: "gpt-5"
+    tools:
+      tool_assigned:
+        - name: Salesforce
+    agent_function:
+      - "Help the user look up Salesforce accounts and contacts, and create new leads."
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+For detailed tool configuration, see the [Salesforce Tool](/docs/Tools/ToolList/Salesforce) reference.
+
+---
+
+## Permissions Requested
+
+| Scope | Purpose |
+|---|---|
+| `api` | Access Salesforce data via the REST API |
+| `refresh_token` | Maintain persistent access |
+| `openid` | Authenticate your identity |
+
+---
+
+## Disconnect
+
+Click **Disconnect** on the Salesforce card. SVAHNAR calls Salesforce's revocation endpoint and deletes the stored token.

@@ -26,6 +26,7 @@ To add an MCP server to an agent, use the `mcp_assigned` field within the `tools
   - **headers**: A dictionary of HTTP headers for authentication or metadata.
     - **Authorization**: Used for Bearer tokens or API keys (e.g., `"Bearer xoxb-..."`).
     - **Accept**: Usually `"text/event-stream, application/json"` for MCP SSE connections.
+  - **oauth_provider_id**: The UUID of your custom OAuth provider connection (see [Custom OAuth Clients](/docs/Connections/CustomOAuthClient)). When specified, SVAHNAR automatically fetches and silently refreshes the OAuth access token on behalf of the user, injecting it as an `Authorization: Bearer <token>` header.
 
 ### Example Agent Configuration
 
@@ -46,14 +47,21 @@ create_agent_network:
         - name: Arxiv
           hitl: true
       mcp_assigned:
-        - name: testing-mcp
+        # Option A: Authenticating using a Custom OAuth Connection (Recommended)
+        - name: slack-mcp
           hitl: true
           config:
-            url: http://127.0.0.1:8007/mcp
-            transport: streamable_http
+            url: https://mcp.slack.com/mcp
+            transport: sse
+            oauth_provider_id: "21af5063-05d2-4081-9e44-c3e2573b234f"
+        # Option B: Authenticating using static headers with Keyvault secret placeholders
+        - name: github-mcp
+          hitl: false
+          config:
+            url: https://api.githubcopilot.com/mcp
+            transport: sse
             headers:
-             Authorization: "Bearer xoxb-user-token-here" 
-             Accept: "text/event-stream, application/json"
+              Authorization: "Bearer ${GITHUB_PAT}"
     incoming_edge:
       - Start
     outgoing_edge: []
@@ -70,11 +78,21 @@ For security reasons, the **`stdio` transport is intentionally disabled** for us
 
 ## Authentication Support
 
-SVAHNAR supports the following header-based authentication types for MCP:
+SVAHNAR supports several options to securely authenticate with remote MCP servers:
 
-- **Bearer Tokens**: Standard for OAuth2-protected APIs.
-- **API Keys**: Can be passed via custom headers (e.g., `x-api-key`) or the `Authorization` header.
+### 1. Custom OAuth Connections (Recommended)
+By providing an `oauth_provider_id` in the config, SVAHNAR automatically manages the full OAuth 2.0 lifecycle on behalf of the user—including secure token storage and background silent refresh. The retrieved access token is dynamically injected into the MCP server requests as an `Authorization: Bearer <token>` header. See the [Custom OAuth Clients Guide](/docs/Connections/CustomOAuthClient) for detailed setup.
+
+### 2. Static Headers with Keyvault Placeholders
+You can also supply static authentication tokens or API keys directly in the `headers` dictionary. To keep secrets secure and avoid hardcoding credentials in your YAML files, you can reference variables saved in your **SVAHNAR Keyvault** using the `${VARIABLE_NAME}` syntax:
+
+```yaml
+headers:
+  Authorization: "Bearer ${MY_API_TOKEN}"
+```
+
+SVAHNAR will decrypt and substitute the placeholder values securely at runtime.
+
+### 3. Other Header-Based Methods
+- **API Keys**: Can be passed via custom headers (e.g. `x-api-key: ${API_KEY}`).
 - **Basic Auth**: Supported via the `Authorization` header with Base64 encoded credentials.
-
-> [!NOTE]
-> While you can provide tokens obtained via OAuth2, the platform does not currently manage the full OAuth2 lifecycle (e.g., automatic token refresh). Ensure your tokens are valid for the duration of the agent session.

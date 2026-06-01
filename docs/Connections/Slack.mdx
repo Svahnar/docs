@@ -1,0 +1,105 @@
+---
+title: "Slack"
+description: "Connect SVAHNAR to Slack to let your AI agents read channels, send messages, and interact with your workspace."
+keywords: ['slack', 'oauth', 'svahnar', 'connect', 'slack messages', 'agent tools']
+---
+
+import { Steps, Step } from '@site/src/components/Steps/Steps';
+
+# Slack
+
+Connect SVAHNAR to your **Slack workspace** to let agents read channels, send messages, and schedule messages.
+
+---
+
+## What Agents Can Do
+
+| Operation | Description |
+|---|---|
+| **get_channel** | Retrieve information about a Slack channel |
+| **get_message** | Fetch messages from a specific channel |
+| **send_message** | Send a message to a channel immediately |
+| **schedule_message** | Schedule a message to post at a future time |
+
+---
+
+## Connecting Slack
+
+<Steps>
+<Step>
+
+### Open Connections
+
+Go to the **Connections** page in the SVAHNAR Platform.
+
+</Step>
+<Step>
+
+### Connect Slack
+
+Click **Connect** on the **Slack** provider card.
+
+A Slack OAuth popup will open.
+
+</Step>
+<Step>
+
+### Authorize and Select Workspace
+
+Select the workspace you want to connect, review the requested permissions, and click **Allow**.
+
+:::tip Multi-workspace
+Slack OAuth connects to one workspace at a time. If your organization uses multiple Slack workspaces, you will need to connect each separately.
+:::
+
+</Step>
+<Step>
+
+### Confirm Connection
+
+The popup closes. The **Slack** card updates to **Connected**.
+
+</Step>
+</Steps>
+
+---
+
+## Using Slack in an Agent
+
+```yaml title="agent.yaml" showLineNumbers
+create_agent_network:
+  agent-1:
+    agent_name: "Slack_Notifier"
+    LLM_config:
+      params:
+        model: "gpt-5"
+    tools:
+      tool_assigned:
+        - name: Slack
+    agent_function:
+      - "When asked, send a summary message to the #general channel in Slack."
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+For detailed tool configuration, see the [Slack Tool](/docs/Tools/ToolList/Slack) reference.
+
+---
+
+## Permissions Requested
+
+| Scope | Purpose |
+|---|---|
+| `channels:read` | View channel names and information |
+| `channels:history` | Read messages in channels |
+| `chat:write` | Send messages as SVAHNAR |
+| `users:read` | View user profile information |
+| `files:read` | Access shared files |
+| `search:read` | Search workspace content |
+
+---
+
+## Disconnect
+
+Click **Disconnect** on the Slack card. SVAHNAR calls Slack's revocation endpoint and removes your stored token immediately.

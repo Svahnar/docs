@@ -1,0 +1,227 @@
+---
+title: "OAuth Connections"
+description: "Connect SVAHNAR to external services like Google, Slack, Microsoft Outlook, Atlassian, Box, GitHub, Notion, Salesforce, and SharePoint using secure OAuth 2.0 authorization. Use custom OAuth clients to connect any service — including private MCP servers."
+keywords: ['oauth', 'connections', 'integrations', 'google', 'slack', 'atlassian', 'svahnar', 'connect']
+---
+
+import { Steps, Step } from '@site/src/components/Steps/Steps';
+
+# OAuth Connections
+
+Connect SVAHNAR to your external services — Google, Slack, Microsoft Outlook, Atlassian (Jira + Confluence), Box, GitHub, Notion, and Salesforce — using secure **OAuth 2.0** authorization.
+
+Once connected, your AI agents can interact with those services on your behalf without you ever sharing your passwords or API keys directly with the platform.
+
+---
+
+## 💡 How It Works
+
+OAuth Connections uses the industry-standard **OAuth 2.0** protocol. Here is the flow:
+
+1. You click **Connect** on a provider card in the SVAHNAR dashboard.
+2. SVAHNAR opens the provider's official login page in a new window.
+3. You approve the requested permissions in that window.
+4. The provider sends a secure token back to SVAHNAR.
+5. SVAHNAR **encrypts** the token and stores it — your agents can now call that service on your behalf.
+
+Your credentials are **never stored in plain text**. All tokens are encrypted at rest using Fernet symmetric encryption (AES-128-CBC).
+
+---
+
+## 🔌 Supported Providers
+
+| Provider | What Your Agents Can Do |
+|---|---|
+| **Google** (Gmail · Drive · Calendar) | Read and send emails, access Drive files, create and read calendar events |
+| **Slack** | Read channels and messages, send messages, schedule messages |
+| **Microsoft Outlook** | Read mail, send emails, view and create calendar events |
+| **Atlassian** (Jira + Confluence) | Create and search Jira issues, read and write Confluence pages; ingest Confluence pages into Knowledge Repositories |
+| **Box** | Ingest Box files into Knowledge Repositories |
+| **SharePoint** | Ingest SharePoint site pages and document libraries into Knowledge Repositories |
+| **GitHub** | Read/write files, create issues and pull requests |
+| **Notion** | Read and write Notion pages and databases |
+| **Salesforce** | Query and manage Salesforce CRM records |
+
+---
+
+## 🛠️ Custom OAuth Providers
+
+The built-in providers above are pre-configured for convenience, but SVAHNAR is not limited to them.
+
+You can register **any OAuth 2.0 service** — an internal API, a private SaaS tool, or an MCP server your team controls — as a custom OAuth connection. You supply your own Client ID, Client Secret, and OAuth endpoints; SVAHNAR handles token storage, automatic refresh, and injection into agent requests.
+
+→ **[Creating a Custom OAuth Client](./CustomOAuthClient)** — full guide with field-by-field explanations and provider-specific examples.
+
+---
+
+## 🤖 Using OAuth with MCP Servers
+
+Custom OAuth clients unlock a powerful capability: connecting agents to **any MCP (Model Context Protocol) server that requires authentication**.
+
+Set `oauth_provider_id` in your MCP server config, and SVAHNAR automatically injects a valid `Authorization: Bearer <token>` header into every request — refreshing the token silently when it expires.
+
+```yaml title="agent.yaml"
+tools:
+  mcp_assigned:
+    - name: my-protected-mcp-server
+      config:
+        url: "https://mcp.my-company.com/mcp"
+        transport: http
+        oauth_provider_id: "<uuid-of-your-custom-provider>"
+```
+
+See the [Custom OAuth Clients](./CustomOAuthClient#-using-custom-providers-with-mcp-servers) guide for full details and examples.
+
+
+<Steps>
+<Step>
+
+### Navigate to Connections
+
+From the SVAHNAR Platform, open the **Connections** page from the left-hand navigation.
+
+You will see a card for each supported provider showing its current status: **Connected** or **Not Connected**.
+
+</Step>
+<Step>
+
+### Click Connect
+
+Find the provider you want to connect and click the **Connect** button on its card.
+
+- For most providers (Google, Slack, Atlassian, GitHub, Notion, Salesforce, Outlook) a **popup window** opens with that provider's official login and permission screen.
+- For **SharePoint** and **custom providers using Client Credentials** grant type, the connection is instant — no popup is needed. SVAHNAR fetches the token directly from the OAuth server using your Client ID and Secret.
+
+</Step>
+<Step>
+
+### Approve Permissions
+
+In the popup, log in to the provider account you want SVAHNAR to access and click **Allow** (or **Authorize**).
+
+The popup will close automatically when authorization is complete.
+
+:::tip Use the right account
+Make sure you are logged in to the correct account in the popup — for example, the Google Workspace account your team uses, not a personal Gmail account.
+:::
+
+</Step>
+<Step>
+
+### Verify the Connection
+
+Back on the Connections page, the provider card will refresh to show **Connected** along with the connection date.
+
+Your agents can now use that provider's tools.
+
+</Step>
+</Steps>
+
+---
+
+## 🔄 Token Refresh
+
+OAuth tokens expire periodically (typically every hour). SVAHNAR handles refresh **automatically** — you do not need to reconnect every hour.
+
+- When an agent calls a connected service, SVAHNAR checks if the token is about to expire (within 60 seconds).
+- If it is, SVAHNAR silently obtains a fresh token using the stored refresh token.
+- If for some reason automatic refresh fails, the provider card will show **Reconnect** — simply click it to re-authorize.
+
+You can also manually trigger a refresh from the Connections page using the **Refresh Token** button on any connected card.
+
+---
+
+## 🔌 Disconnect a Provider
+
+To revoke SVAHNAR's access to a provider:
+
+1. Open the **Connections** page.
+2. Find the connected provider.
+3. Click **Disconnect**.
+
+SVAHNAR will:
+- Notify the provider to revoke the token (where the provider supports this, e.g., Google, Slack, Box, Salesforce).
+- Delete the stored token from its database immediately.
+
+:::warning
+After disconnecting, any agents that rely on that provider will stop working until you reconnect.
+:::
+
+---
+
+## 🤝 Using Connected Services in Agents
+
+Once a provider is connected, you can use its tools in any agent configuration without providing credentials.
+
+For tools like **Gmail**, **Google Drive**, **Slack**, **Jira**, **Outlook**, and **Notion**, the agent automatically uses your stored OAuth token — no `api_key` field needed in the tool config.
+
+```yaml title="agent.yaml" showLineNumbers
+create_agent_network:
+  agent-1:
+    agent_name: "My_Assistant"
+    LLM_config:
+      params:
+        model: "gpt-5"
+    tools:
+      tool_assigned:
+        # Gmail — uses your connected Google account automatically
+        - name: Gmail
+        # Slack — uses your connected Slack workspace automatically
+        - name: Slack
+    agent_function:
+      - "Help the user manage their emails and send Slack messages."
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+For **MCP servers** that require authentication, use `oauth_provider_id` with a [custom OAuth client](./CustomOAuthClient):
+
+```yaml title="agent.yaml" showLineNumbers
+create_agent_network:
+  agent-1:
+    agent_name: "MCP_Agent"
+    LLM_config:
+      params:
+        model: "gpt-4o"
+    tools:
+      mcp_assigned:
+        - name: my-mcp-server
+          config:
+            url: "https://mcp.example.com/mcp"
+            transport: http
+            oauth_provider_id: "<uuid-of-your-provider>"
+    agent_function:
+      - "Use the MCP server to complete the task."
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+---
+
+## 🔐 Security & Privacy
+
+| What | How SVAHNAR protects it |
+|---|---|
+| **Access tokens** | Fernet-encrypted (AES-128-CBC) before storage; never stored in plain text |
+| **Refresh tokens** | Also Fernet-encrypted; used only to silently renew access tokens |
+| **Scopes** | SVAHNAR only requests the minimum permissions needed for its tools |
+| **Revocation** | RFC 7009 token revocation is sent to the provider on disconnect |
+| **Isolation** | Your tokens are scoped to your user account — other users in your org cannot use them |
+
+---
+
+## 🚑 Troubleshooting
+
+**The popup didn't open**
+> Your browser may have blocked the popup. Allow popups for `platform.svahnar.com` in your browser settings and try again.
+
+**I see "Reconnect" on a provider that was connected**
+> The stored token has expired and could not be automatically refreshed. Click **Reconnect** to re-authorize.
+
+**My agent gets a permission error even though I'm connected**
+> The tool may require a scope that wasn't granted during the original authorization. Disconnect and reconnect to re-trigger the full permission screen, ensuring you approve all requested scopes.
+
+**I connected the wrong account**
+> Disconnect the provider, then reconnect and log in to the correct account in the popup.
