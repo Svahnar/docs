@@ -1,0 +1,244 @@
+---
+title: "Google"
+description: "Connect SVAHNAR to Google services — Gmail, Google Drive, and Google Calendar — using OAuth 2.0 for use in AI agent tools."
+keywords: ['google', 'gmail', 'google drive', 'google calendar', 'oauth', 'svahnar', 'connect']
+---
+
+import { Steps, Step } from '@site/src/components/Steps/Steps';
+
+# Google
+
+Connect SVAHNAR to your **Google account** to give your agents access to Gmail, Google Drive, and Google Calendar.
+
+---
+
+## What Agents Can Do
+
+| Service | Capabilities |
+|---|---|
+| **Gmail** | Read inbox, search emails, send emails, reply to threads |
+| **Google Drive** | List files, read file contents, search Drive |
+| **Google Calendar** | List events, create events, check availability |
+
+---
+
+## Connecting Your Google Account
+
+<Steps>
+<Step>
+
+### Open Connections
+
+Go to the **Connections** page in the SVAHNAR Platform.
+
+</Step>
+<Step>
+
+### Connect Google
+
+Click **Connect** on the **Google** provider card.
+
+A Google sign-in popup will open.
+
+</Step>
+<Step>
+
+### Sign in and Approve
+
+Log in to the Google account you want to connect, then click **Allow** on the permissions screen.
+
+:::important
+SVAHNAR will request access to **Gmail, Drive, and Calendar**. You must approve all three scopes for all Google tools to work correctly.
+
+If you click **Allow** without granting all scopes, only some tools will function.
+:::
+
+</Step>
+<Step>
+
+### Confirm Connection
+
+The popup closes automatically. The **Google** card on the Connections page will update to **Connected**.
+
+</Step>
+</Steps>
+
+---
+
+## Using Google Tools in an Agent
+
+Once connected, use Google tools by name — no API key needed:
+
+```yaml title="agent.yaml" showLineNumbers
+create_agent_network:
+  agent-1:
+    agent_name: "Email_Assistant"
+    LLM_config:
+      params:
+        model: "gpt-5"
+    tools:
+      tool_assigned:
+        - name: Gmail
+        - name: GoogleDrive
+        - name: GoogleCalendar
+    agent_function:
+      - "Help the user read their emails, find files in Drive, and check their calendar."
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+For detailed tool configuration, see:
+- [Gmail Tool](/docs/Tools/ToolList/Gmail)
+- [Google Drive Tool](/docs/Tools/ToolList/GoogleDrive)
+- [Google Calendar Tool](/docs/Tools/ToolList/GoogleCalendar)
+
+---
+
+## Permissions Requested
+
+SVAHNAR requests the following Google OAuth scopes:
+
+| Scope | Purpose |
+|---|---|
+| `gmail.readonly` | Read and search your emails |
+| `gmail.send` | Send emails on your behalf |
+| `drive.readonly` | Read and list files in Drive |
+| `calendar.events` | Read and create calendar events |
+
+---
+
+## Token Refresh
+
+Google access tokens expire after **1 hour**. SVAHNAR automatically refreshes them using the stored refresh token — no action is needed from you.
+
+:::tip Persistent Refresh
+During authorization, SVAHNAR requests `access_type=offline` and `prompt=consent` to ensure a refresh token is always issued. Without a refresh token, SVAHNAR can only use your connection for about one hour.
+:::
+
+---
+
+## Using a Custom Google OAuth App
+
+If your organization wants to use its own Google Cloud project credentials instead of SVAHNAR's built-in Google app, you can register a **Custom OAuth Client**. This is useful when you need:
+
+- Your own Google Workspace domain branding on the consent screen
+- Specific scopes not included in the default connection (e.g., Google Sheets, Google Tasks)
+- A dedicated OAuth app for compliance or auditing purposes
+
+### Step 1 — Set Up Your Google Cloud Project
+
+1. Go to the [Google Cloud Console](https://console.cloud.google.com/) and select or create a project.
+2. Navigate to **APIs & Services → Credentials**.
+3. Click **Create Credentials → OAuth 2.0 Client IDs**.
+4. Select **Web application** as the application type.
+5. Add the following **Authorized redirect URI**:
+   ```
+   https://api.platform.svahnar.com/oauth/callback
+   ```
+6. Click **Create**. Copy the **Client ID** and **Client Secret**.
+7. Go to **APIs & Services → Library** and enable the APIs your agents need:
+   - **Gmail API** — for email tools
+   - **Google Drive API** — for Drive tools
+   - **Google Calendar API** — for Calendar tools
+
+### Step 2 — Register in SVAHNAR
+
+Navigate to **Connections → + New Connection** and fill in these fields:
+
+| Field | Value |
+|---|---|
+| **Provider Name** | `Google Workspace` *(or any label you prefer)* |
+| **Provider Type** | `Google` |
+| **Client ID** | *(from Google Cloud Console → Credentials)* |
+| **Client Secret** | *(from Google Cloud Console → Credentials)* |
+| **Grant Type** | `Authorization Code` |
+| **Token URL** | `https://oauth2.googleapis.com/token` |
+| **Authorization URL** | `https://accounts.google.com/o/oauth2/v2/auth` |
+| **Revocation URL** | `https://oauth2.googleapis.com/revoke` |
+| **Default Scopes** | Add one per line — see table below |
+| **Extra Auth Params** | `access_type` = `offline`, `prompt` = `consent` |
+
+#### Scope Reference
+
+| Scope | What It Enables |
+|---|---|
+| `https://www.googleapis.com/auth/gmail.readonly` | Read and search Gmail |
+| `https://www.googleapis.com/auth/gmail.send` | Send email from Gmail |
+| `https://www.googleapis.com/auth/drive.readonly` | Read files in Google Drive |
+| `https://www.googleapis.com/auth/calendar.events` | Read and create Calendar events |
+| `https://www.googleapis.com/auth/spreadsheets` | Read and write Google Sheets |
+| `https://www.googleapis.com/auth/tasks` | Read and write Google Tasks |
+
+:::note Why `access_type=offline` and `prompt=consent`?
+- `access_type=offline` tells Google to issue a **refresh token** so SVAHNAR can renew access in the background without asking you to log in again.
+- `prompt=consent` forces the consent screen to appear even if the user has previously authorized the app — this ensures a fresh refresh token is always returned.
+
+Omitting either parameter means SVAHNAR can only use your Google connection for approximately one hour before it expires.
+:::
+
+### Step 3 — Connect and Use in Agents
+
+After creating the custom provider, click **Connect** on its card to complete the OAuth flow. Then reference it in agents just like any built-in Google tool — the token is injected automatically.
+
+---
+
+## Using Google OAuth with MCP Servers
+
+If you have an MCP (Model Context Protocol) server that calls Google APIs on behalf of users — for example, a custom Google Sheets MCP server — you can use your registered custom Google OAuth client to inject a Bearer token automatically.
+
+```yaml title="agent.yaml" showLineNumbers
+create_agent_network:
+  agent-1:
+    agent_name: "Sheets_Agent"
+    LLM_config:
+      params:
+        model: "gpt-5"
+    tools:
+      mcp_assigned:
+        - name: google-sheets-server
+          config:
+            url: "https://your-mcp-server.example.com/mcp"
+            transport: http
+            oauth_provider_id: "<uuid-of-your-google-custom-provider>"
+    agent_function:
+      - "Read and update data in the specified Google Sheet."
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+When `oauth_provider_id` is set, SVAHNAR automatically:
+1. Fetches the valid access token for the connected user.
+2. Refreshes it silently if it has expired (using the refresh token or client credentials grant).
+3. Injects it as an `Authorization: Bearer <token>` header on every MCP request.
+
+Your MCP server receives a standard Bearer token and can use it to call Google APIs directly — no credential management required on the server side.
+
+:::tip Find your provider UUID
+After creating a custom OAuth client in SVAHNAR, its UUID is shown on the **Connections** page when you hover over the provider card, or in the URL when you click into its settings.
+:::
+
+---
+
+## Disconnect
+
+To revoke SVAHNAR's access:
+
+1. Click **Disconnect** on the Google card in Connections.
+2. SVAHNAR calls Google's token revocation endpoint and deletes your stored token.
+
+You can also revoke access directly from your [Google Account security settings](https://myaccount.google.com/permissions).
+
+---
+
+## Troubleshooting
+
+**"Google didn't return a refresh token"**
+> This happens if you have previously authorized SVAHNAR and Google cached the approval without issuing a new refresh token. Disconnect, then reconnect. SVAHNAR forces a fresh consent screen with `prompt=consent` to ensure a new refresh token is issued.
+
+**"Insufficient permission" error in agent**
+> One or more of the required scopes was not approved. Disconnect and reconnect, approving all requested permissions.
+
+**MCP server receives a 401 even though the provider is connected**
+> The cached token may have been revoked externally. On the Connections page, click **Refresh Token** on your Google provider card, then retry the agent.

@@ -1,0 +1,108 @@
+---
+title: "Microsoft Outlook"
+description: "Connect SVAHNAR to Microsoft Outlook and the Microsoft Graph API for email, calendar, and meeting management in your AI agents."
+keywords: ['microsoft', 'outlook', 'calendar', 'email', 'oauth', 'svahnar', 'graph api']
+---
+
+import { Steps, Step } from '@site/src/components/Steps/Steps';
+
+# Microsoft Outlook
+
+Connect SVAHNAR to your **Microsoft account** to give agents access to Outlook mail and calendar via the Microsoft Graph API.
+
+---
+
+## What Agents Can Do
+
+| Operation | Description |
+|---|---|
+| **important_mail** | Retrieve high-priority flagged messages |
+| **mail_from_address** | Find emails from a specific sender |
+| **content_search_in_mail** | Search mailbox content by keyword |
+| **send_mail** | Send an email on your behalf |
+| **event_for_week** | Retrieve calendar events for a date range |
+| **all_event** | List all calendar events |
+| **all_calendar** | List all calendars in your account |
+| **schedule_meet** | Create a calendar meeting or event |
+
+---
+
+## Connecting Microsoft Outlook
+
+<Steps>
+<Step>
+
+### Open Connections
+
+Go to the **Connections** page in the SVAHNAR Platform.
+
+</Step>
+<Step>
+
+### Connect Outlook
+
+Click **Connect** on the **Microsoft Outlook** provider card.
+
+A Microsoft sign-in popup will open.
+
+</Step>
+<Step>
+
+### Sign in and Approve
+
+Log in to your Microsoft account (personal, work, or school) and approve the requested permissions.
+
+:::info Work & School Accounts
+If your organization requires admin consent for third-party apps, you may see a message that administrator approval is required. Contact your Microsoft 365 admin to grant consent for SVAHNAR in your organization's Azure Active Directory.
+:::
+
+</Step>
+<Step>
+
+### Confirm Connection
+
+The popup closes. The **Microsoft Outlook** card updates to **Connected**.
+
+</Step>
+</Steps>
+
+---
+
+## Using Outlook in an Agent
+
+```yaml title="agent.yaml" showLineNumbers
+create_agent_network:
+  agent-1:
+    agent_name: "Outlook_Assistant"
+    LLM_config:
+      params:
+        model: "gpt-5"
+    tools:
+      tool_assigned:
+        - name: Outlook
+    agent_function:
+      - "Help the user check their important emails and schedule meetings."
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+For detailed tool configuration, see the [Outlook Tool](/docs/Tools/ToolList/Outlook) reference.
+
+---
+
+## Permissions Requested
+
+| Permission | Purpose |
+|---|---|
+| `Mail.Read` | Read emails in your mailbox |
+| `Mail.Send` | Send emails on your behalf |
+| `Calendars.ReadWrite` | Read and create calendar events |
+| `User.Read` | Read your basic profile information |
+| `offline_access` | Maintain access via refresh tokens |
+
+---
+
+## Disconnect
+
+Click **Disconnect** on the Microsoft Outlook card. SVAHNAR deletes the stored token immediately. Microsoft tokens expire naturally — there is no active revocation step on Microsoft's end.

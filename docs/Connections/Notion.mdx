@@ -1,0 +1,109 @@
+---
+title: "Notion"
+description: "Connect SVAHNAR to Notion to allow AI agents to read, create, and update Notion pages and databases."
+keywords: ['notion', 'oauth', 'svahnar', 'connect', 'pages', 'databases']
+---
+
+import { Steps, Step } from '@site/src/components/Steps/Steps';
+
+# Notion
+
+Connect SVAHNAR to your **Notion workspace** to give agents the ability to read and write pages and databases.
+
+---
+
+## What Agents Can Do
+
+| Capability | Description |
+|---|---|
+| **Read Pages** | Retrieve the content of Notion pages |
+| **Create Pages** | Create new pages in a workspace or database |
+| **Update Pages** | Edit existing page content and properties |
+| **Search** | Search across accessible pages and databases |
+
+---
+
+## Connecting Notion
+
+<Steps>
+<Step>
+
+### Open Connections
+
+Go to the **Connections** page in the SVAHNAR Platform.
+
+</Step>
+<Step>
+
+### Connect Notion
+
+Click **Connect** on the **Notion** provider card.
+
+A Notion authorization popup opens.
+
+</Step>
+<Step>
+
+### Select Pages to Share
+
+Notion asks you to select **which pages** SVAHNAR can access. You can choose individual pages, entire sections, or all pages in your workspace.
+
+:::tip Share what you need
+You can always expand or restrict which pages SVAHNAR can access by going to **Settings → My connections** in Notion and updating the page selection for SVAHNAR.
+:::
+
+Click **Allow access**.
+
+</Step>
+<Step>
+
+### Confirm Connection
+
+The popup closes. The **Notion** card updates to **Connected**.
+
+</Step>
+</Steps>
+
+---
+
+## Using Notion in an Agent
+
+```yaml title="agent.yaml" showLineNumbers
+create_agent_network:
+  agent-1:
+    agent_name: "Notion_Assistant"
+    LLM_config:
+      params:
+        model: "gpt-5"
+    tools:
+      tool_assigned:
+        - name: Notion
+    agent_function:
+      - "Search the user's Notion workspace and help them find and update pages."
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+For detailed tool configuration, see the [Notion Tool](/docs/Tools/ToolList/Notion) reference.
+
+---
+
+## Token Behavior
+
+Notion tokens **do not expire** — once connected, you remain connected indefinitely until you explicitly disconnect.
+
+---
+
+## Disconnect
+
+Click **Disconnect** on the Notion card. SVAHNAR removes the stored token.
+
+You can also revoke access directly from your Notion workspace under **Settings → My connections**.
+
+---
+
+## Troubleshooting
+
+**"Page not found" or "Insufficient permissions"**
+> The page you are trying to access may not have been shared with SVAHNAR. In Notion, go to **Settings → My connections → SVAHNAR** and add the relevant pages to the shared list.

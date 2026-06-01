@@ -119,6 +119,28 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'html',
+      value: '<div style="margin-top: 20px; margin-bottom: 8px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; color: var(--ifm-color-primary); text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.9;"><svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="16" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg> CONNECTIONS</div>',
+      defaultStyle: true,
+    },
+    'Connections/Overview',
+    'Connections/CustomOAuthClient',
+    // {
+    //   type: 'category',
+    //   label: 'Providers',
+    //   collapsed: false,
+    //   items: [
+    //     'Connections/Google',
+    //     'Connections/Slack',
+    //     'Connections/Outlook',
+    //     'Connections/Atlassian',
+    //     'Connections/Box',
+    //     'Connections/GitHub',
+    //     'Connections/Notion',
+    //     'Connections/Salesforce',
+    //   ],
+    // },
+    {
+      type: 'html',
       value: '<div style="margin-top: 20px; margin-bottom: 8px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; color: var(--ifm-color-primary); text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.9;"><svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="16" width="16" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg> RESOURCES</div>',
       defaultStyle: true,
     },

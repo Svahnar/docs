@@ -1,0 +1,33 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "🧹 Kill Ghost Port 3002",
+            "type": "shell",
+            "command": "fuser -k 3002/tcp || true", 
+            "presentation": {
+                "reveal": "never",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Documentation Service",
+            "type": "shell",
+            "command": "bash -ic 'PORT=3002 npm start'",
+            "presentation": { "group": "documentation-group", "panel": "new" },
+            "dependsOn": [
+                "🧹 Kill Ghost Port 3002"
+            ]
+        },
+        {
+            "label": "🚀 Start Documentation Service Stack",
+            "dependsOn": [
+                "Documentation Service"
+            ],
+            "dependsOrder": "parallel",
+            "runOptions": {
+                "runOn": "folderOpen"
+            }
+        }
+    ]
+}

@@ -25,7 +25,7 @@ const config: Config = {
 
   onBrokenLinks: 'throw',
 
-  clientModules: ['./src/client-modules/sidebar-scroll.ts'],
+  clientModules: ['./src/client-modules/sidebar-scroll.ts', './src/client-modules/gtag-shim.ts'],
 
   // Even if you don't use internationalization, you can use this field to set
   // useful metadata like html lang. For example, if your site is Chinese, you

@@ -1,0 +1,90 @@
+---
+title: "Box"
+description: "Connect SVAHNAR to Box to ingest Box files into your Knowledge Repositories for AI-powered search and retrieval."
+keywords: ['box', 'oauth', 'svahnar', 'connect', 'knowledge repository', 'file storage']
+---
+
+import { Steps, Step } from '@site/src/components/Steps/Steps';
+
+# Box
+
+Connect SVAHNAR to your **Box account** to ingest Box files into a Knowledge Repository. Once indexed, agents can search and retrieve content from those files using semantic search.
+
+---
+
+## What It Enables
+
+Box is used as a **Knowledge Repository connector** — it lets you index files stored in Box into SVAHNAR's vector search engine so agents can retrieve information from them.
+
+| Capability | Description |
+|---|---|
+| **File ingestion** | Import a Box file by its file ID into a Knowledge Repository |
+| **Semantic search** | Agents can search across ingested Box documents |
+
+:::info
+The Box connection is used specifically for document ingestion into Knowledge Repositories. Agents access the indexed content via the [KnowledgeRepo](/docs/Tools/ToolList/KnowledgeRepo) tool — not by querying Box directly.
+:::
+
+---
+
+## Connecting Box
+
+<Steps>
+<Step>
+
+### Open Connections
+
+Go to the **Connections** page in the SVAHNAR Platform.
+
+</Step>
+<Step>
+
+### Connect Box
+
+Click **Connect** on the **Box** provider card.
+
+A Box authorization popup opens.
+
+</Step>
+<Step>
+
+### Authorize
+
+Log in to your Box account and click **Grant access to Box** to allow SVAHNAR to read your files.
+
+</Step>
+<Step>
+
+### Confirm Connection
+
+The popup closes. The **Box** card updates to **Connected**.
+
+</Step>
+</Steps>
+
+---
+
+## Ingesting Box Files into a Knowledge Repository
+
+Once connected, navigate to your **Knowledge Repository** in the SVAHNAR dashboard:
+
+1. Open the repository you want to populate.
+2. Click **Add Connector → Box**.
+3. Enter the **Box File ID** of the document you want to ingest. (The file ID appears in the URL when viewing a file in Box: `https://app.box.com/file/{file_id}`)
+4. Click **Sync** — SVAHNAR downloads the file, extracts its text, and indexes it.
+
+---
+
+## Disconnect
+
+Click **Disconnect** on the Box card. SVAHNAR calls Box's revocation endpoint and deletes the stored token.
+
+---
+
+## Troubleshooting
+
+**"File not found" or "No access"**
+> Ensure the Box file is in a folder that your Box account has access to. Files in folders owned by other users require explicit sharing.
+
+**Token expired / agent returns an error**
+> Box tokens expire after 1 hour. SVAHNAR automatically refreshes them. If you see an error, click **Refresh Token** on the Box card, or disconnect and reconnect.

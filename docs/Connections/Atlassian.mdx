@@ -1,0 +1,143 @@
+---
+title: "Atlassian (Jira + Confluence)"
+description: "Connect SVAHNAR to Atlassian Cloud to use Jira and Confluence in your AI agents for issue tracking, project management, and knowledge base operations."
+keywords: ['atlassian', 'jira', 'confluence', 'oauth', 'svahnar', 'connect', 'issue tracking']
+---
+
+import { Steps, Step } from '@site/src/components/Steps/Steps';
+
+# Atlassian (Jira + Confluence)
+
+Connect SVAHNAR to your **Atlassian Cloud** account to give agents access to both **Jira** and **Confluence** with a single authorization.
+
+---
+
+## What Agents Can Do
+
+### Jira
+| Operation | Description |
+|---|---|
+| **JQL Search** | Search for issues using Jira Query Language |
+| **Create Issue** | Create a new bug, task, or story |
+| **Update Issue** | Modify fields on an existing issue |
+| **Get Issue Details** | Retrieve full details of a specific issue |
+| **List Projects** | List available Jira projects |
+
+### Confluence
+| Operation | Description |
+|---|---|
+| **Create Page** | Create a new Confluence page in a space |
+| **Read Page** | Retrieve the content of a page |
+| **Update Page** | Update the content of an existing page |
+
+---
+
+## Connecting Atlassian
+
+<Steps>
+<Step>
+
+### Open Connections
+
+Go to the **Connections** page in the SVAHNAR Platform.
+
+</Step>
+<Step>
+
+### Connect Atlassian
+
+Click **Connect** on the **Atlassian** provider card.
+
+An Atlassian authorization popup opens.
+
+</Step>
+<Step>
+
+### Authorize and Choose Site
+
+Log in to your Atlassian account. If you have multiple Atlassian sites (workspaces), select the one you want SVAHNAR to access, then click **Accept**.
+
+:::important
+SVAHNAR requests access to both Jira and Confluence scopes. Accepting grants agents access to both services on the selected site.
+:::
+
+</Step>
+<Step>
+
+### Confirm Connection
+
+The popup closes. The **Atlassian** card updates to **Connected**.
+
+</Step>
+</Steps>
+
+---
+
+## Using Jira and Confluence in Agents
+
+```yaml title="agent.yaml" showLineNumbers
+create_agent_network:
+  agent-1:
+    agent_name: "Project_Manager"
+    LLM_config:
+      params:
+        model: "gpt-5"
+    tools:
+      tool_assigned:
+        - name: Jira
+        - name: Confluence  # for KR connector (document ingestion)
+    agent_function:
+      - "Search Jira for open bugs assigned to the user and summarize them."
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+For detailed tool configuration, see the [Jira Tool](/docs/Tools/ToolList/JiraTool) reference.
+
+---
+
+## Knowledge Repository: Ingest Confluence Pages
+
+In addition to the Jira agent tool, you can use your Atlassian connection to **import Confluence pages** directly into a Knowledge Repository. This allows agents to answer questions based on your team's Confluence documentation.
+
+See the [Confluence Connector](/docs/KnowledgeRepository/Connectors/Confluence) for setup instructions.
+
+---
+
+## Knowledge Repository: Ingest SharePoint Pages
+
+You can also ingest content from **Microsoft SharePoint** into a Knowledge Repository, giving agents access to your team's SharePoint documentation and files.
+
+See the [SharePoint Connector](/docs/KnowledgeRepository/Connectors/SharePoint) for setup instructions.
+
+---
+
+## Permissions Requested
+
+| Scope | Purpose |
+|---|---|
+| `read:jira-work` | Read Jira issues and project data |
+| `write:jira-work` | Create and update Jira issues |
+| `manage:jira-project` | Access project metadata |
+| `read:confluence-space.summary` | View Confluence space titles and lists |
+| `read:confluence-content.all` | Read Confluence page body and text content |
+| `read:confluence-content.attachments` | Read and download file attachments on pages |
+| `write:confluence-content` | Create and update Confluence pages |
+| `offline_access` | Maintain access via refresh tokens (required for background Knowledge Repository sync) |
+
+---
+
+## Disconnect
+
+Click **Disconnect** on the Atlassian card. SVAHNAR removes the stored token. Atlassian does not currently support RFC 7009 token revocation — the token will expire naturally on Atlassian's end.
+
+---
+
+## Troubleshooting
+
+**"No Atlassian site found"**
+> Ensure your Atlassian account has at least one active Cloud site. SVAHNAR does not support Atlassian Data Center (on-premises) installations.
+
+**"Jira returns results from the wrong site"**
+> Disconnect and reconnect, selecting the correct Atlassian site in the authorization popup.

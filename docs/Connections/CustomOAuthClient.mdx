@@ -1,0 +1,470 @@
+---
+title: "Custom OAuth Clients"
+description: "Register your own OAuth 2.0 application in SVAHNAR to connect any service — including private MCP servers — using your own client credentials."
+keywords: ['oauth', 'custom', 'client id', 'client secret', 'authorization url', 'token url', 'grant type', 'pkce', 'mcp', 'svahnar']
+---
+
+import { Steps, Step } from '@site/src/components/Steps/Steps';
+
+# Custom OAuth Clients
+
+In addition to the built-in providers (Google, Slack, Atlassian, etc.), SVAHNAR lets you register **your own OAuth 2.0 application** from any service — whether that's an internal API, a third-party SaaS tool, or an MCP server you control.
+
+Once registered, agents can use the provider's access token automatically when calling MCP servers or custom tools that require OAuth authentication.
+
+---
+
+## 📋 Before You Start
+
+You will need to create an **OAuth application** in the target service's developer console first. This usually means:
+
+1. Going to that service's developer portal (e.g., Google Cloud Console, Slack API, GitHub Developer Settings).
+2. Creating a new **OAuth App** or **API Client**.
+3. Setting the **Redirect URI** to:
+   ```
+   https://api.platform.svahnar.com/oauth/callback
+   ```
+4. Noting down the **Client ID** and **Client Secret** it gives you.
+
+---
+
+## ➕ Creating a Custom OAuth Connection
+
+<Steps>
+<Step>
+
+### Open the Connections Page
+
+Navigate to **Connections** in the left-hand sidebar.
+
+Click the **+ New Connection** (or **Create OAuth Connection**) button in the top right.
+
+</Step>
+<Step>
+
+### Fill in the Provider Details
+
+A modal will open. Fill in the fields described in detail in the [Field Reference](#-field-reference) section below.
+
+</Step>
+<Step>
+
+### Save and Connect
+
+Click **Create Connection**. The provider will appear in your connections list.
+
+Click **Connect** on its card to trigger the OAuth authorization flow — a popup will open to the provider's login page where you approve access.
+
+For **Client Credentials** grant type, there is no popup — SVAHNAR fetches the token automatically in the background.
+
+</Step>
+<Step>
+
+### Use It in Agents
+
+Once connected, reference this provider in any MCP server tool config using `oauth_provider_id`:
+
+```yaml title="agent.yaml"
+tools:
+  mcp_assigned:
+    - name: my-internal-api
+      config:
+        url: "https://api.my-company.com/mcp"
+        transport: http
+        oauth_provider_id: "<uuid-of-your-provider>"
+```
+
+SVAHNAR will automatically inject a valid `Authorization: Bearer <token>` header into every MCP request, refreshing silently when needed.
+
+</Step>
+</Steps>
+
+---
+
+## 📖 Field Reference
+
+### Required Fields
+
+#### Provider Name *(required)*
+A human-readable label you give this connection. It appears on the Connections page and in logs.
+
+**Example:** `Acme CRM`, `Internal Analytics API`, `My Slack App`
+
+---
+
+#### Client ID *(required)*
+The public identifier for your OAuth application, issued by the provider when you created the app in their developer console.
+
+Think of it as the **username** of your application — it is not secret.
+
+**Example:** `1234567890-abc.apps.googleusercontent.com` (Google), `A01234B56CD` (Slack)
+
+---
+
+#### Client Secret *(required)*
+The private password for your OAuth application. **Treat this like a password — never share it.**
+
+SVAHNAR encrypts this with Fernet (AES-128-CBC) before storing it. It is never visible again after you save.
+
+:::caution
+Do not paste your Client Secret into chat, tickets, or emails. Only enter it here in the SVAHNAR UI.
+:::
+
+---
+
+#### Token URL *(required)*
+The endpoint SVAHNAR calls to **exchange an authorization code for an access token**, or to **refresh an expired token**.
+
+This is always provided in the OAuth service's documentation.
+
+| Provider | Token URL |
+|---|---|
+| Google | `https://oauth2.googleapis.com/token` |
+| Slack | `https://slack.com/api/oauth.v2.access` |
+| GitHub | `https://github.com/login/oauth/access_token` |
+| Microsoft | `https://login.microsoftonline.com/{tenant}/oauth2/v2.0/token` |
+| Atlassian | `https://auth.atlassian.com/oauth/token` |
+| Box | `https://api.box.com/oauth2/token` |
+
+---
+
+#### Grant Type *(required)*
+How the OAuth flow works. Choose based on who is authenticating:
+
+| Grant Type | When to Use |
+|---|---|
+| **Authorization Code** (default) | A specific user must log in and approve access. The popup flow. Use this for Google, Slack, GitHub, Notion, Atlassian, etc. |
+| **Client Credentials** | No user is involved. Your application authenticates directly using Client ID + Secret. Use this for server-to-server APIs like SharePoint (Azure AD) or internal machine-to-machine services. |
+
+:::tip Client Credentials = no popup
+When using **Client Credentials**, SVAHNAR fetches a token in the background automatically — there is no popup for the user to click through. It also auto-renews when the token expires.
+:::
+
+---
+
+### Optional Fields
+
+#### Provider Type *(optional)*
+A category hint used by SVAHNAR for **icon selection** and internal MCP tool mapping. Choose the closest match from the list, or leave it as **Custom** if your provider is not listed.
+
+This does not affect how the OAuth flow works.
+
+---
+
+#### Description *(optional)*
+A short note for yourself and your team explaining what this connection is for.
+
+**Example:** `"Acme Corp's internal project management API — used by the PM agent."`
+
+---
+
+#### Authorization URL *(required when Grant Type = Authorization Code)*
+The URL where SVAHNAR sends the user to **log in and approve permissions**. This is the page that opens in the popup.
+
+| Provider | Authorization URL |
+|---|---|
+| Google | `https://accounts.google.com/o/oauth2/v2/auth` |
+| Slack | `https://slack.com/oauth/v2/authorize` |
+| GitHub | `https://github.com/login/oauth/authorize` |
+| Microsoft | `https://login.microsoftonline.com/{tenant}/oauth2/v2.0/authorize` |
+| Atlassian | `https://auth.atlassian.com/authorize` |
+| Box | `https://account.box.com/api/oauth2/authorize` |
+
+Not shown for **Client Credentials** grant type since no user redirect is needed.
+
+---
+
+#### Default Scopes *(optional)*
+The **permissions** your application requests from the provider. Add one scope per line using the **+ Add Scope** button.
+
+Scopes define exactly what data and actions your agent is allowed to perform.
+
+**Examples:**
+- Google Calendar read: `https://www.googleapis.com/auth/calendar.readonly`
+- Slack messaging: `chat:write`, `channels:read`
+- GitHub repos: `repo`
+- Microsoft Graph: `https://graph.microsoft.com/.default`
+
+:::tip Minimal scope principle
+Only request the scopes your agent actually needs. Over-permissioned tokens are a security risk if a token is ever compromised.
+:::
+
+---
+
+### Advanced Configuration
+
+Click **Advanced Configuration** to reveal these options. Most users won't need to change them.
+
+---
+
+#### Revocation URL *(Advanced, optional)*
+The endpoint SVAHNAR calls to **revoke the token** when you click **Disconnect**. This is defined in [RFC 7009](https://datatracker.ietf.org/doc/html/rfc7009).
+
+If provided, SVAHNAR will actively invalidate the token at the provider on disconnect rather than just deleting it locally. This is important for security — it ensures the token can't be reused even if it's somehow obtained.
+
+| Provider | Revocation URL |
+|---|---|
+| Google | `https://oauth2.googleapis.com/revoke` |
+| Slack | `https://slack.com/api/auth.revoke` |
+| GitHub | *(not supported — omit this field)* |
+| Microsoft | `https://login.microsoftonline.com/{tenant}/oauth2/v2.0/logout` |
+
+---
+
+#### Provider Domain URL *(Advanced, optional)*
+The base URL of the service. Used for display purposes and internal URL construction. Not required for the OAuth flow itself.
+
+**Example:** `https://api.acme.com`, `https://app.notion.so`
+
+---
+
+#### Auth Method *(Advanced)*
+How SVAHNAR sends your Client ID and Secret to the Token URL when exchanging codes or refreshing tokens. The correct value depends on what the provider expects.
+
+| Method | Behaviour | Use when |
+|---|---|---|
+| **Client Secret Post** (default) | Sends `client_id` and `client_secret` as POST body parameters | Most providers (Google, Atlassian, Box, GitHub) |
+| **Client Secret Basic** | Sends credentials as an HTTP Basic Authorization header | Some providers require this (RFC 6749 §2.3.1) |
+
+When in doubt, leave this as **Client Secret Post**.
+
+---
+
+#### Supports PKCE *(Advanced)*
+**Proof Key for Code Exchange** — an extra security measure for the Authorization Code flow, defined in [RFC 7636](https://datatracker.ietf.org/doc/html/rfc7636). Check this box if:
+
+- The provider's documentation says PKCE is required or recommended.
+- You are connecting a mobile or single-page app registration (public clients).
+
+Most server-side OAuth apps (with a Client Secret) do **not** need PKCE.
+
+---
+
+#### Extra Auth Params *(Advanced, optional)*
+Additional query parameters appended to the Authorization URL when redirecting the user to the provider's login page. Add key-value pairs using **+ Add Param**.
+
+This is for provider-specific requirements that don't fit standard OAuth fields.
+
+**Common examples:**
+
+| Key | Value | Why |
+|---|---|---|
+| `access_type` | `offline` | **Google only** — required to receive a refresh token so SVAHNAR can renew access without asking the user again |
+| `prompt` | `consent` | **Google only** — forces the permission screen to show even if the user has approved before (useful when changing scopes or ensuring a fresh refresh token) |
+| `response_type` | `code` | Usually set automatically; some providers need it explicit |
+
+:::note
+Without `access_type=offline` for Google, you will not receive a refresh token. This means SVAHNAR can only use the connection for about 1 hour before it expires.
+:::
+
+---
+
+## 🔁 Token Lifecycle
+
+Once saved, SVAHNAR handles the token lifecycle automatically:
+
+1. **First connect** — user clicks Connect → popup opens → user approves → access token + refresh token stored (encrypted).
+2. **Each agent call** — SVAHNAR checks Redis cache for a valid token. Cache TTL is 55 minutes.
+3. **Token expiry** — If the token is within 60 seconds of expiry, SVAHNAR silently refreshes it using the refresh token (for Authorization Code) or re-fetches via Client Credentials.
+4. **Disconnect** — Token revoked at provider (if Revocation URL is set), then deleted locally.
+
+---
+
+## 🔌 Using Custom Providers with MCP Servers
+
+This is the most powerful use case for custom OAuth clients: connecting SVAHNAR agents to **any MCP server that requires OAuth authentication**.
+
+### How It Works
+
+When you add `oauth_provider_id` to an MCP server config, SVAHNAR:
+
+1. Looks up the registered OAuth provider by UUID.
+2. Fetches and decrypts the stored access token for the current user.
+3. Automatically refreshes the token if it has expired.
+4. Injects `Authorization: Bearer <access_token>` into **every HTTP request** made to that MCP server.
+
+Your MCP server simply validates the incoming Bearer token against the OAuth provider — SVAHNAR handles all credential management transparently.
+
+### Supported MCP Transports
+
+| Transport value in YAML | Behaviour |
+|---|---|
+| `http` | Streamable HTTP (recommended for most servers) |
+| `streamable_http` | Alias for `http` — same behaviour |
+| `sse` | Server-Sent Events — also uses HTTP with Bearer header injection |
+
+:::note
+`stdio` transport is intentionally disabled for security. Only HTTP-based transports support OAuth header injection.
+:::
+
+### Agent YAML Syntax
+
+```yaml title="agent.yaml" showLineNumbers
+create_agent_network:
+  agent-1:
+    agent_name: "My_OAuth_MCP_Agent"
+    LLM_config:
+      params:
+        model: "gpt-4o"
+    tools:
+      mcp_assigned:
+        - name: my-protected-server          # human-readable name
+          config:
+            url: "https://mcp.example.com/mcp"
+            transport: http
+            oauth_provider_id: "<uuid>"      # UUID from the Connections page
+    agent_function:
+      - "Use the MCP server tools to complete the task."
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+You can also combine OAuth MCP tools with built-in tools:
+
+```yaml title="agent.yaml" showLineNumbers
+create_agent_network:
+  agent-1:
+    agent_name: "Combined_Agent"
+    LLM_config:
+      params:
+        model: "gpt-4o"
+    tools:
+      tool_assigned:
+        - name: Gmail                        # built-in tool, uses its own OAuth
+      mcp_assigned:
+        - name: custom-crm
+          config:
+            url: "https://crm.example.com/mcp"
+            transport: http
+            oauth_provider_id: "<uuid-of-crm-provider>"
+    agent_function:
+      - "Read emails and sync relevant info into the CRM."
+    incoming_edge:
+      - Start
+    outgoing_edge: []
+```
+
+### Static Headers (Alternative to OAuth)
+
+If your MCP server uses API key authentication instead of OAuth, you can pass static headers directly:
+
+```yaml title="agent.yaml"
+tools:
+  mcp_assigned:
+    - name: my-api-server
+      config:
+        url: "https://api.example.com/mcp"
+        transport: http
+        headers:
+          Authorization: "Bearer ${MY_API_KEY}"   # resolved from Key Vault
+          X-Custom-Header: "my-value"
+```
+
+Use `${VARIABLE_NAME}` placeholders to reference secrets stored in your SVAHNAR Key Vault — the values are resolved at runtime and never stored in the agent YAML.
+
+---
+
+## 💡 Real-World Examples
+
+### Example 1: Google Workspace (Custom App)
+
+Your organization has its own Google Cloud project and wants agents to use Gmail and Google Sheets with custom branding on the consent screen.
+
+| Field | Value |
+|---|---|
+| Provider Name | `Google Workspace` |
+| Provider Type | `Google` |
+| Client ID | *(from Google Cloud Console → Credentials → OAuth 2.0 Client IDs)* |
+| Client Secret | *(from Google Cloud Console → Credentials → OAuth 2.0 Client IDs)* |
+| Grant Type | `Authorization Code` |
+| Token URL | `https://oauth2.googleapis.com/token` |
+| Authorization URL | `https://accounts.google.com/o/oauth2/v2/auth` |
+| Revocation URL | `https://oauth2.googleapis.com/revoke` |
+| Default Scopes | `https://www.googleapis.com/auth/gmail.readonly`<br/>`https://www.googleapis.com/auth/gmail.send`<br/>`https://www.googleapis.com/auth/spreadsheets`<br/>`https://www.googleapis.com/auth/drive.readonly` |
+| Extra Auth Params | `access_type` = `offline`, `prompt` = `consent` |
+
+After connecting, use it with an MCP server that calls Google Sheets:
+
+```yaml title="agent.yaml"
+tools:
+  mcp_assigned:
+    - name: google-sheets-mcp
+      config:
+        url: "https://sheets-mcp.my-company.com/mcp"
+        transport: http
+        oauth_provider_id: "<uuid-of-google-workspace-provider>"
+```
+
+---
+
+### Example 2: Connecting a Custom Slack App
+
+You've built a Slack app for your company's workspace and want agents to post to internal channels.
+
+| Field | Value |
+|---|---|
+| Provider Name | `Company Slack App` |
+| Provider Type | `Slack` |
+| Client ID | *(from Slack API → Basic Information)* |
+| Client Secret | *(from Slack API → Basic Information)* |
+| Grant Type | `Authorization Code` |
+| Token URL | `https://slack.com/api/oauth.v2.access` |
+| Authorization URL | `https://slack.com/oauth/v2/authorize` |
+| Default Scopes | `chat:write`, `channels:read`, `channels:history` |
+
+---
+
+### Example 3: Azure AD / SharePoint (Machine-to-Machine)
+
+Your organization uses SharePoint and you want an agent to sync documents. No user popup needed — Azure AD issues tokens directly to your registered app.
+
+| Field | Value |
+|---|---|
+| Provider Name | `Azure AD SharePoint` |
+| Provider Type | `SharePoint` |
+| Client ID | *(from Azure App Registration → Application (client) ID)* |
+| Client Secret | *(from Azure App Registration → Certificates & secrets)* |
+| Grant Type | `Client Credentials (machine-to-machine)` |
+| Token URL | `https://login.microsoftonline.com/{your-tenant-id}/oauth2/v2.0/token` |
+| Default Scopes | `https://graph.microsoft.com/.default` |
+
+---
+
+### Example 4: Internal API with OAuth 2.0
+
+Your team has built an internal REST API that issues tokens via Client Credentials. You want agents to call it via an MCP server.
+
+| Field | Value |
+|---|---|
+| Provider Name | `Internal Analytics API` |
+| Provider Type | `Custom` |
+| Client ID | *(from your API's developer console)* |
+| Client Secret | *(from your API's developer console)* |
+| Grant Type | `Client Credentials` |
+| Token URL | `https://auth.internal.example.com/oauth/token` |
+| Default Scopes | `read:reports`, `write:dashboards` |
+
+```yaml title="agent.yaml"
+tools:
+  mcp_assigned:
+    - name: analytics-mcp
+      config:
+        url: "https://analytics-mcp.internal.example.com/mcp"
+        transport: http
+        oauth_provider_id: "<uuid-of-internal-api-provider>"
+```
+
+With Client Credentials, SVAHNAR automatically fetches and renews the token — no user interaction ever required.
+
+---
+
+## 🗑️ Deleting a Custom Connection
+
+To delete a custom OAuth connection you created:
+
+1. Open the **Connections** page.
+2. Find your custom provider under **My Custom Connections**.
+3. Click the **trash** icon.
+
+This will permanently remove the provider registration and revoke any stored tokens. Agents configured with this provider's `oauth_provider_id` will stop working until you create a new provider.
