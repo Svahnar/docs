@@ -50,7 +50,7 @@ The built-in providers above are pre-configured for convenience, but SVAHNAR is 
 
 You can register **any OAuth 2.0 service** — an internal API, a private SaaS tool, or an MCP server your team controls — as a custom OAuth connection. You supply your own Client ID, Client Secret, and OAuth endpoints; SVAHNAR handles token storage, automatic refresh, and injection into agent requests.
 
-→ **[Creating a Custom OAuth Client](./CustomOAuthClient)** — full guide with field-by-field explanations and provider-specific examples.
+→ **[Creating a Custom OAuth Client](./CustomOAuthClient.mdx)** — full guide with field-by-field explanations and provider-specific examples.
 
 ---
 
@@ -70,7 +70,7 @@ tools:
         oauth_provider_id: "<uuid-of-your-custom-provider>"
 ```
 
-See the [Custom OAuth Clients](./CustomOAuthClient#-using-custom-providers-with-mcp-servers) guide for full details and examples.
+See the [Custom OAuth Clients](./CustomOAuthClient.mdx#-using-custom-providers-with-mcp-servers) guide for full details and examples.
 
 
 <Steps>
@@ -175,7 +175,7 @@ create_agent_network:
     outgoing_edge: []
 ```
 
-For **MCP servers** that require authentication, use `oauth_provider_id` with a [custom OAuth client](./CustomOAuthClient):
+For **MCP servers** that require authentication, use `oauth_provider_id` with a [custom OAuth client](./CustomOAuthClient.mdx):
 
 ```yaml title="agent.yaml" showLineNumbers
 create_agent_network:
