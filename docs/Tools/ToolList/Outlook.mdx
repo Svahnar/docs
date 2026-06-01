@@ -23,12 +23,29 @@ The Outlook tool interacts with the Microsoft Graph API to perform common mailbo
 
 | Operation | Description |
 | --- | --- |
+| `list_messages` | List the latest email messages in the user's inbox (supports paging/sorting). |
+| `get_message` | Retrieve details of a single email message by message ID. |
 | `important_mail` | Retrieve messages flagged as high importance. |
-| `mail_from_address` | specific messages from a specific sender. |
-| `content_search_in_mail` | Perform a free-text search across the mailbox. |
-| `send_mail` | Send emails on behalf of the user. |
-| `schedule_meet` | Create calendar events and invite attendees. |
-| `event_for_week` | specific events for a specific date range. |
+| `mail_from_address` | Retrieve email messages from a specific sender address. |
+| `content_search_in_mail` | Perform a free-text search across mailbox messages. |
+| `messages_today` | Retrieve all emails received today dynamically. |
+| `unread_messages` | Retrieve all unread emails in the user's inbox. |
+| `send_mail` | Send a new email (supports plain text or HTML bodies). |
+| `reply_to_message` | Reply to an existing email message by ID. |
+| `forward_message` | Forward an existing email message to other recipients. |
+| `create_draft` | Create a new draft email in the user's mailbox. |
+| `delete_message` | Delete an email message by ID. |
+| `mark_as_read` | Mark an email message as read by ID. |
+| `flag_message` | Flag/star an email message by ID for follow-up. |
+| `list_folders` | List all mail folders in the user's mailbox. |
+| `meetings_today` | Retrieve all calendar events and meetings scheduled for today dynamically. |
+| `meetings_tomorrow` | Retrieve all calendar events and meetings scheduled for tomorrow dynamically. |
+| `next_meeting` | Retrieve the very next upcoming calendar meeting/event. |
+| `event_for_week` | Retrieve calendar events for a specific date range (or the next 7 days by default). |
+| `all_event` | Retrieve all upcoming calendar events (subject, organizer, start, end, location, etc.). |
+| `all_calendar` | List all calendar folders associated with the user's account. |
+| `schedule_meet` | Create calendar events/meetings and invite attendees (supports locations and descriptions). |
+| `delete_event` | Delete a calendar event by ID. |
 
 ### 2. Authentication
 
