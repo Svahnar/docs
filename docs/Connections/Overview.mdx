@@ -212,6 +212,28 @@ create_agent_network:
 
 ---
 
+## 📜 Supported OAuth & OpenID Connect Specifications
+
+SVAHNAR's OAuth engine is compliant with modern security standards and supports the following protocols out of the box:
+
+- **RFC 6749 (The OAuth 2.0 Authorization Framework)**: Supports standard flows (Authorization Code and Client Credentials).
+- **RFC 6750 (Bearer Token Usage)**: Transmits and accepts bearer tokens securely in HTTP headers.
+- **RFC 7009 (Token Revocation)**: Actively revokes tokens at the authorization server when a connection is disconnected.
+- **RFC 7523 (JWT Profile for Client Auth)**: Supports authenticating clients with JSON Web Tokens (JWT) for secure server-to-server exchanges.
+- **RFC 7591 (Dynamic Client Registration)**: Registers client metadata dynamically on authorization servers that support dynamic onboarding.
+- **RFC 7592 (Dynamic Client Registration Management)**: Actively manages dynamically registered clients, including automated client deregistration upon provider deletion.
+- **RFC 7636 (Proof Key for Code Exchange - PKCE)**: Mitigates interception attacks for public clients by generating and verifying random code challenges.
+- **RFC 7662 (OAuth 2.0 Token Introspection)**: Inspects token status and metadata directly from the authorization server.
+- **RFC 8414 (OAuth 2.0 Authorization Server Metadata)**: Performs metadata discovery from well-known endpoints to automatically resolve auth, token, and registration URIs.
+- **RFC 8628 (OAuth 2.0 Device Authorization Grant)**: Supports token authorization flows for input-constrained devices.
+- **RFC 9068 (JWT Profile for Access Tokens)**: Validates access tokens in JWT format against public keys.
+- **RFC 9101 (JWT-Secured Authorization Request - JAR)**: Passes authorization request parameters securely inside signed JWTs.
+- **RFC 9207 (Authorization Server Issuer Identification)**: Prevents mix-up attacks by verifying authorization server issuer parameters.
+- **OpenID Connect 1.0**: Fetches identity credentials via standard OIDC token claims and UserInfo endpoints.
+- **OpenID Connect RP-Initiated Logout 1.0**: Formally requests logout of the end-user session from the OpenID Provider.
+
+---
+
 ## 🚑 Troubleshooting
 
 **The popup didn't open**
