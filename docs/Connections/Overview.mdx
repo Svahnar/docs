@@ -48,7 +48,7 @@ Your credentials are **never stored in plain text**. All tokens are encrypted at
 
 The built-in providers above are pre-configured for convenience, but SVAHNAR is not limited to them.
 
-You can register **any OAuth 2.0 service** — an internal API, a private SaaS tool, or an MCP server your team controls — as a custom OAuth connection. You supply your own Client ID, Client Secret, and OAuth endpoints; SVAHNAR handles token storage, automatic refresh, and injection into agent requests.
+You can register **any OAuth 2.0 service** — an internal API, a private SaaS tool, or an MCP server your team controls — as a custom OAuth connection. You supply your own Client ID, Client Secret, and OAuth endpoints; SVAHNAR handles token storage, automatic refresh, and injection into agent requests. Advanced capabilities like Dynamic Client Registration (**RFC 7591** / **RFC 7592**) and Token Introspection (**RFC 7662**) are supported out of the box.
 
 → **[Creating a Custom OAuth Client](./CustomOAuthClient.mdx)** — full guide with field-by-field explanations and provider-specific examples.
 
@@ -140,7 +140,7 @@ To revoke SVAHNAR's access to a provider:
 3. Click **Disconnect**.
 
 SVAHNAR will:
-- Notify the provider to revoke the token (where the provider supports this, e.g., Google, Slack, Box, Salesforce).
+- Notify the provider to revoke the token (complying with **RFC 7009**, sending both the `access_token` and the `refresh_token` to ensure full revocation at the authorization server).
 - Delete the stored token from its database immediately.
 
 :::warning
