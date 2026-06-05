@@ -241,6 +241,13 @@ If provided, SVAHNAR will actively invalidate the token at the provider on disco
 
 ---
 
+#### Introspection URL *(Advanced, optional)*
+The endpoint SVAHNAR calls to **introspect/inspect the status of an access token** directly on the Authorization Server. This is defined in [RFC 7662](https://datatracker.ietf.org/doc/html/rfc7662).
+
+If provided, you can click the **Introspect Token** action button on your connected provider's card in the Connections page. This will call the introspection endpoint, verify the token's active status, and show diagnostic metadata (such as scopes, client identity, and expiration) returned by the AS.
+
+---
+
 #### Provider Domain URL *(Advanced, optional)*
 The base URL of the service. Used for display purposes and internal URL construction. Not required for the OAuth flow itself.
 
@@ -299,7 +306,7 @@ Without `access_type=offline` for Google, you will not receive a refresh token. 
 
 ---
 
-## 🔁 Token Lifecycle
+## 🔁 Token Lifecycle & AS Management
 
 Once saved, SVAHNAR handles the token lifecycle automatically:
 
@@ -307,6 +314,13 @@ Once saved, SVAHNAR handles the token lifecycle automatically:
 2. **Each agent call** — SVAHNAR checks Redis cache for a valid token. Cache TTL is 55 minutes.
 3. **Token expiry** — If the token is within 60 seconds of expiry, SVAHNAR silently refreshes it using the refresh token (for Authorization Code) or re-fetches via Client Credentials.
 4. **Disconnect** — Token revoked at provider (if Revocation URL is set), then deleted locally.
+
+### 🛠️ Client Management & Diagnostics
+For custom OAuth providers, SVAHNAR includes premium actions on the Connections dashboard to manage and diagnose your setup:
+- **Sync AS**: Fetches the current client registration metadata directly from the Authorization Server (AS) using the registration client URI and access token (complying with **RFC 7592**).
+- **Sync AS** and **Push AS** actions display a details modal containing the JSON client registration metadata returned by the AS.
+- **Push AS**: Pushes the current local client registration configuration back to the AS to update the remote metadata.
+- **Introspect Token**: Instantly calls the AS introspection endpoint (complying with **RFC 7662**) to verify token status and displays its raw active/inactive state and metadata.
 
 ---
 
