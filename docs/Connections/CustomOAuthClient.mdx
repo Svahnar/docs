@@ -125,6 +125,17 @@ This is always provided in the OAuth service's documentation.
 | Microsoft | `https://login.microsoftonline.com/{tenant}/oauth2/v2.0/token` |
 | Atlassian | `https://auth.atlassian.com/oauth/token` |
 | Box | `https://api.box.com/oauth2/token` |
+| Notion | `https://api.notion.com/v1/oauth/token` |
+
+:::note Clean URLs
+If your provider (such as Notion) gives you a Token URL with extra query parameters in their developer documentation, paste the URL **without** them. SVAHNAR constructs and appends these parameters internally.
+
+* **Example:** If the provider documentation lists:
+  `https://api.notion.com/v1/oauth/token?grant_type=authorization_code`
+  
+  You should only enter:
+  `https://api.notion.com/v1/oauth/token`
+:::
 
 ---
 
@@ -169,6 +180,17 @@ The URL where SVAHNAR sends the user to **log in and approve permissions**. This
 | Microsoft | `https://login.microsoftonline.com/{tenant}/oauth2/v2.0/authorize` |
 | Atlassian | `https://auth.atlassian.com/authorize` |
 | Box | `https://account.box.com/api/oauth2/authorize` |
+| Notion | `https://api.notion.com/v1/oauth/authorize` |
+
+:::note Clean URLs
+If your provider (such as Notion) gives you an Authorization URL with extra query parameters in their developer documentation, paste the URL **without** them. SVAHNAR constructs and appends these parameters (like `client_id`, `redirect_uri`, `response_type`, and `state`) internally.
+
+* **Example:** If the provider documentation lists:
+  `https://api.notion.com/v1/oauth/authorize?client_id=YOUR_CLIENT_ID&response_type=code&owner=user`
+  
+  You should only enter:
+  `https://api.notion.com/v1/oauth/authorize`
+:::
 
 Not shown for **Client Credentials** grant type since no user redirect is needed.
 
@@ -224,9 +246,19 @@ How SVAHNAR sends your Client ID and Secret to the Token URL when exchanging cod
 | Method | Behaviour | Use when |
 |---|---|---|
 | **Client Secret Post** (default) | Sends `client_id` and `client_secret` as POST body parameters | Most providers (Google, Atlassian, Box, GitHub) |
-| **Client Secret Basic** | Sends credentials as an HTTP Basic Authorization header | Some providers require this (RFC 6749 §2.3.1) |
+| **Client Secret Basic** | Sends credentials as an HTTP Basic Authorization header | Some providers require this (e.g., Notion; RFC 6749 §2.3.1) |
 
 When in doubt, leave this as **Client Secret Post**.
+
+:::note Clean URLs
+If your provider (such as Notion) gives you an Authorization URL with extra query parameters in their developer documentation, paste the URL **without** them. SVAHNAR constructs and appends these parameters (like `client_id`, `redirect_uri`, `response_type`, and `state`) internally.
+
+* **Example:** If the provider documentation lists:
+  `https://api.notion.com/v1/oauth/authorize?client_id=YOUR_CLIENT_ID&response_type=code&owner=user`
+  
+  You should only enter:
+  `https://api.notion.com/v1/oauth/authorize`
+:::
 
 ---
 
