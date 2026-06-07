@@ -247,3 +247,6 @@ SVAHNAR's OAuth engine is compliant with modern security standards and supports 
 
 **I connected the wrong account**
 > Disconnect the provider, then reconnect and log in to the correct account in the popup.
+
+**I get "No registration_client_uri or registration_access_token found" when clicking Sync AS or Push AS**
+> SVAHNAR dynamically registers the client application at the provider the first time you click **Connect** on its card. Prior to this initial connection, these AS endpoints cannot be queried because the registration client URI and access token do not exist yet. Simply connect the integration once, and then these synchronization tools will become active.

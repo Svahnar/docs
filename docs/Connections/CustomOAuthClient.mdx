@@ -322,6 +322,10 @@ For custom OAuth providers, SVAHNAR includes premium actions on the Connections 
 - **Push AS**: Pushes the current local client registration configuration back to the AS to update the remote metadata.
 - **Introspect Token**: Instantly calls the AS introspection endpoint (complying with **RFC 7662**) to verify token status and displays its raw active/inactive state and metadata.
 
+:::info Dynamic Registration Prerequisite
+DCR client management actions (**Sync AS** / **Push AS**) require the client to have been dynamically registered with the provider first. This registration is automatically performed when you click **Connect** on the provider card for the first time. Attempting to sync or push configuration prior to the first connection will result in a `No registration_client_uri or registration_access_token found` error.
+:::
+
 ---
 
 ## 🔌 Using Custom Providers with MCP Servers
