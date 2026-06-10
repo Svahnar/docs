@@ -4,10 +4,10 @@
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",
-    "start": "NODE_OPTIONS=--localstorage-file=.docusaurus/site-storage.json docusaurus start",
+    "start": "node scripts/generate-llms.js && NODE_OPTIONS=--localstorage-file=.docusaurus/site-storage.json docusaurus start",
     "swizzle": "docusaurus swizzle",
-    "build:ci": "NODE_OPTIONS=--localstorage-file=.docusaurus/site-storage.json docusaurus build",
-    "build": "NODE_OPTIONS=--localstorage-file=.docusaurus/site-storage.json docusaurus build",
+    "build:ci": "node scripts/generate-llms.js && NODE_OPTIONS=--localstorage-file=.docusaurus/site-storage.json docusaurus build",
+    "build": "node scripts/generate-llms.js && NODE_OPTIONS=--localstorage-file=.docusaurus/site-storage.json docusaurus build",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",
     "serve": "docusaurus serve",
