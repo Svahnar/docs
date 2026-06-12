@@ -86,7 +86,7 @@ const config: Config = {
 
 
   themeConfig: {
-    image: 'img/docusaurus-social-card.jpg', // Default OG image for all pages
+    image: 'https://content.svahnar.com/website/seo/opengraph/og-main.webp', // Default OG image for all pages
 
 
     navbar: {
