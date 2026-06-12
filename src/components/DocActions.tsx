@@ -1,11 +1,26 @@
 import React, { useState, useEffect, useRef } from 'react';
+import {
+  FaXTwitter,
+  FaLinkedin,
+  FaFacebook,
+  FaWhatsapp,
+  FaRedditAlien,
+  FaEnvelope,
+  FaShare,
+} from 'react-icons/fa6';
 
 export default function DocActions(): React.JSX.Element {
   const [isOpen, setIsOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
   const [markdownText, setMarkdownText] = useState('');
   const [toastMessage, setToastMessage] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const handleOpenShare = () => {
+    setShowShareModal(true);
+    setIsOpen(false);
+  };
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -27,6 +42,18 @@ export default function DocActions(): React.JSX.Element {
       url = url.replace(window.location.origin, 'https://docs.svahnar.com');
     }
     return url;
+  };
+
+  // Helper to get a clean page title (without Docusaurus site suffixes like " | SVAHNAR Docs")
+  const getCleanTitle = () => {
+    if (typeof document === 'undefined') return 'SVAHNAR Docs';
+    const title = document.title;
+    const parts = title.split(/[|•-]/);
+    if (parts.length > 1) {
+      const mainTitle = parts[0].trim();
+      return mainTitle || title;
+    }
+    return title;
   };
 
   // Helper to extract markdown client-side
@@ -171,24 +198,35 @@ export default function DocActions(): React.JSX.Element {
   return (
     <>
       <div className="doc-actions-wrapper" ref={dropdownRef}>
-        <div className="doc-actions-split">
-          <button className="doc-actions-main-btn" onClick={handleCopy} title="Copy page as clean Markdown">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '14px', height: '14px' }}>
-              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-            </svg>
-            Copy page
-          </button>
-          <div className="doc-actions-divider"></div>
+        <div className="doc-actions-container">
+          <div className="doc-actions-split">
+            <button className="doc-actions-main-btn" onClick={handleCopy} title="Copy page as clean Markdown">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '14px', height: '14px' }}>
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              Copy page
+            </button>
+            <div className="doc-actions-divider"></div>
+            <button 
+              className="doc-actions-toggle-btn" 
+              onClick={() => setIsOpen(!isOpen)} 
+              title="More actions for LLMs & AI Agents"
+              aria-expanded={isOpen}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: '12px', height: '12px' }}>
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+          </div>
+
           <button 
-            className="doc-actions-toggle-btn" 
-            onClick={() => setIsOpen(!isOpen)} 
-            title="More actions for LLMs & AI Agents"
-            aria-expanded={isOpen}
+            className="doc-actions-share-btn" 
+            onClick={() => setShowShareModal(true)} 
+            title="Share this page"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: '12px', height: '12px' }}>
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
+            <FaShare size={12} style={{ marginRight: '4px' }} />
+            Share
           </button>
         </div>
 
@@ -212,6 +250,10 @@ export default function DocActions(): React.JSX.Element {
                 <path d="m3.127 10.604 3.135-1.76.053-.153-.053-.085H6.11l-.525-.032-1.791-.048-1.554-.065-1.505-.08-.38-.081L0 7.832l.036-.234.32-.214.455.04 1.009.069 1.513.105 1.097.064 1.626.17h.259l.036-.105-.089-.065-.068-.064-1.566-1.062-1.695-1.121-.887-.646-.48-.327-.243-.306-.104-.67.435-.48.585.04.15.04.593.456 1.267.981 1.654 1.218.242.202.097-.068.012-.049-.109-.181-.9-1.626-.96-1.655-.428-.686-.113-.411a2 2 0 0 1-.068-.484l.496-.674L4.446 0l.662.089.279.242.411.94.666 1.48 1.033 2.014.302.597.162.553.06.17h.105v-.097l.085-1.134.157-1.392.154-1.792.052-.504.25-.605.497-.327.387.186.319.456-.045.294-.19 1.23-.37 1.93-.243 1.29h.142l.161-.16.654-.868 1.097-1.372.484-.545.565-.601.363-.287h.686l.505.751-.226.775-.707.895-.585.759-.839 1.13-.524.904.048.072.125-.012 1.897-.403 1.024-.186 1.223-.21.553.258.06.263-.218.536-1.307.323-1.533.307-2.284.54-.028.02.032.04 1.029.098.44.024h1.077l2.005.15.525.346.315.424-.053.323-.807.411-3.631-.863-.872-.218h-.12v.073l.726.71 1.331 1.202 1.667 1.55.084.383-.214.302-.226-.032-1.464-1.101-.565-.497-1.28-1.077h-.084v.113l.295.432 1.557 2.34.08.718-.112.234-.404.141-.444-.08-.911-1.28-.94-1.44-.759-1.291-.093.053-.448 4.821-.21.246-.484.186-.403-.307-.214-.496.214-.98.258-1.28.21-1.016.19-1.263.112-.42-.008-.028-.092.012-.953 1.307-1.448 1.957-1.146 1.227-.274.109-.477-.247.045-.44.266-.39 1.586-2.018.956-1.25.617-.723-.004-.105h-.036l-4.212Z"/>
               </svg>
               Open in Claude
+            </button>
+            <button className="doc-actions-dropdown-item" onClick={handleOpenShare}>
+              <FaShare />
+              Share Page
             </button>
             <a className="doc-actions-dropdown-item" href="/llms.txt" target="_blank" onClick={() => setIsOpen(false)}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -246,7 +288,7 @@ export default function DocActions(): React.JSX.Element {
               </p>
             </div>
             <div className="markdown-modal-footer">
-              <button className="doc-actions-btn" onClick={() => {
+              <button className="doc-actions-modal-btn doc-actions-modal-btn-primary" onClick={() => {
                 navigator.clipboard.writeText(markdownText).then(() => {
                   showToast('Markdown copied!');
                   setShowModal(false);
@@ -254,9 +296,110 @@ export default function DocActions(): React.JSX.Element {
               }}>
                 Copy & Close
               </button>
-              <button className="doc-actions-btn" onClick={() => setShowModal(false)}>
+              <button className="doc-actions-modal-btn doc-actions-modal-btn-secondary" onClick={() => setShowModal(false)}>
                 Close
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showShareModal && (
+        <div className="markdown-modal-overlay" onClick={() => setShowShareModal(false)}>
+          <div className="markdown-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="markdown-modal-header">
+              <h3>Share this page</h3>
+              <button className="markdown-modal-close" onClick={() => setShowShareModal(false)}>×</button>
+            </div>
+            <div className="markdown-modal-content">
+              {/* Copy Link Section */}
+              <div style={{ marginBottom: '24px' }}>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', marginBottom: '8px' }}>
+                  Copy Link
+                </label>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <input
+                    type="text"
+                    className="doc-actions-input"
+                    readOnly
+                    value={getAbsoluteUrl()}
+                    onClick={(e) => (e.target as HTMLInputElement).select()}
+                  />
+                  <button
+                    className="doc-actions-modal-btn doc-actions-modal-btn-primary"
+                    onClick={() => {
+                      navigator.clipboard.writeText(getAbsoluteUrl()).then(() => {
+                        showToast('Link copied!');
+                      });
+                    }}
+                  >
+                    Copy
+                  </button>
+                </div>
+              </div>
+
+              {/* Social Media Grid */}
+              <div>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', marginBottom: '12px' }}>
+                  Share to social media
+                </label>
+                <div className="share-social-grid" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                  <a
+                    href={`https://x.com/intent/tweet?url=${encodeURIComponent(getAbsoluteUrl())}&text=${encodeURIComponent(`Check out ${getCleanTitle()} on SVAHNAR! 🚀`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="share-social-btn x-twitter"
+                    title="Share on X"
+                  >
+                    <FaXTwitter size={20} />
+                  </a>
+                  <a
+                    href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(getAbsoluteUrl())}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="share-social-btn linkedin"
+                    title="Share on LinkedIn"
+                  >
+                    <FaLinkedin size={20} />
+                  </a>
+                  <a
+                    href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(getAbsoluteUrl())}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="share-social-btn facebook"
+                    title="Share on Facebook"
+                  >
+                    <FaFacebook size={20} />
+                  </a>
+                  <a
+                    href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`${getCleanTitle()} 🚀 ${getAbsoluteUrl()}`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="share-social-btn whatsapp"
+                    title="Share on WhatsApp"
+                  >
+                    <FaWhatsapp size={20} />
+                  </a>
+                  <a
+                    href={`https://www.reddit.com/submit?url=${encodeURIComponent(getAbsoluteUrl())}&title=${encodeURIComponent(getCleanTitle())}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="share-social-btn reddit"
+                    title="Share on Reddit"
+                  >
+                    <FaRedditAlien size={20} />
+                  </a>
+                  <a
+                    href={`mailto:?subject=${encodeURIComponent(getCleanTitle())}&body=${encodeURIComponent(`I found this useful page on SVAHNAR:\n\n${getAbsoluteUrl()}`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="share-social-btn email"
+                    title="Share via Email"
+                  >
+                    <FaEnvelope size={20} />
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         </div>
