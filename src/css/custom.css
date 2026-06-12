@@ -13,6 +13,8 @@
   --ifm-code-font-size: 85%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.05); /* Subtle highlight */
   --ifm-background-color: #f5f4ef;
+  --ifm-navbar-background-color: var(--ifm-background-color);
+  --ifm-footer-background-color: var(--ifm-background-color);
 }
 /* ::selection { */
   /* background-color: #ff6700; Bright orange */
@@ -20,7 +22,7 @@
 /* } */
 
 /* For readability concerns, use lighter shades in dark mode. */
-[data-theme='dark'] {
+html[data-theme='dark'] {
   .header-github-link {
     &:hover {
       opacity: 0.6;
@@ -40,6 +42,8 @@
   --ifm-color-primary-lightest: #fafafa; /* Pure White */
   --docusaurus-highlighted-code-line-bg: rgba(255, 255, 255, 0.1); /* Subtle highlight */
   --ifm-background-color: #121212;
+  --ifm-navbar-background-color: #121212;
+  --ifm-footer-background-color: #121212;
 }
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap');
 
@@ -51,6 +55,10 @@
   font-family: 'Open Sans', sans-serif;
   padding-left: 12px;
   padding-right: 12px;
+}
+
+.theme-doc-sidebar-container {
+  border-right: none !important;
 }
 
 .menu__link--active {
@@ -729,6 +737,175 @@ html[data-theme='dark'] .doc-actions-modal-btn-secondary:hover {
 html[data-theme='dark'] .doc-actions-input {
   border-color: #2e3035;
   background-color: #121212;
+}
+
+/* Footer Styles to match svahnarweb.github.io */
+.footer {
+  position: relative;
+  overflow: hidden;
+  padding-top: 5rem;
+  padding-bottom: 3rem;
+}
+
+/* Top Accent Glow */
+.footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #ff6700, transparent);
+  opacity: 0.3;
+}
+
+.footer-brand-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.5rem;
+  max-width: 320px;
+}
+
+.footer-description {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--ifm-color-emphasis-600);
+  margin: 0;
+}
+
+html[data-theme='dark'] .footer-description {
+  color: #a0aec0; /* gray.400 */
+}
+
+.footer-social-links {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.footer-social-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: var(--ifm-color-emphasis-600) !important;
+  transition: all 0.2s;
+}
+
+html[data-theme='dark'] .footer-social-link {
+  color: #a0aec0 !important;
+}
+
+.footer-social-link:hover {
+  color: #ff6700 !important;
+  background-color: var(--ifm-color-emphasis-100);
+  transform: translateY(-2px);
+  text-decoration: none;
+}
+
+html[data-theme='dark'] .footer-social-link:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.footer-social-link svg {
+  display: block;
+}
+
+/* Bottom Copyright Bar */
+.footer__bottom {
+  margin-top: 5rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--ifm-color-emphasis-200);
+  text-align: left !important;
+}
+
+html[data-theme='dark'] .footer__bottom {
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+.footer__bottom a {
+  color: #ff6700;
+  text-decoration: none;
+}
+
+.footer__bottom a:hover {
+  text-decoration: underline;
+}
+
+/* Fix columns grid layout for footer */
+.footer__col {
+  margin-bottom: 2rem;
+}
+
+/* Custom styling for titles of columns */
+.footer__title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ifm-color-emphasis-900);
+  opacity: 0.8;
+  margin-bottom: 1.25rem;
+}
+
+html[data-theme='dark'] .footer__title {
+  color: #ffffff;
+}
+
+/* Item Links */
+.footer__items {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.footer__item {
+  margin-bottom: 0.75rem;
+  line-height: 1.5;
+}
+
+.footer__link-item {
+  font-size: 0.9rem;
+  color: var(--ifm-color-emphasis-600) !important;
+  text-decoration: none !important;
+  transition: color 0.2s ease-in;
+}
+
+html[data-theme='dark'] .footer__link-item {
+  color: #a0aec0 !important;
+}
+
+.footer__link-item:hover {
+  color: #ff6700 !important;
+}
+
+/* Footer logo styling (from original config style block) */
+.theme-logo img {
+  height: 40px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.theme-logo .logo-dark {
+  display: none;
+}
+
+html[data-theme="dark"] .theme-logo .logo-light,
+html.theme-dark .theme-logo .logo-light,
+html.dark .theme-logo .logo-light,
+:root.dark .theme-logo .logo-light {
+  display: none;
+}
+
+html[data-theme="dark"] .theme-logo .logo-dark,
+html.theme-dark .theme-logo .logo-dark,
+html.dark .theme-logo .logo-dark,
+:root.dark .theme-logo .logo-dark {
+  display: inline-block;
 }
 
 
