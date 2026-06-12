@@ -1,0 +1,112 @@
+# SVAHNAR AI Developer Documentation
+
+This file serves as a plain-text index of the SVAHNAR documentation, optimized for LLMs, AI agents, and developers.
+
+
+## Get Started
+
+- [Overview | SVAHNAR AI Developer Docs](/docs/GetStarted/Overview): Get an overview of SVAHNAR, the AI agent platform for building, deploying, and managing intelligent agents at scale.
+- [Quickstart | SVAHNAR AI Developer Docs](/docs/GetStarted/Quickstart): Start building with SVAHNAR in minutes. Follow this quickstart to create, configure, and run your first AI agent.
+- [Models | SVAHNAR AI Developer Docs](/docs/GetStarted/Models): Explore the large language models (LLMs) supported by SVAHNAR, including GPT-4o, GPT-5, Llama, and Deepseek.
+
+## AI Framework
+
+- [Introduction Configuration Guide | SVAHNAR Docs](/docs/AgenticNetwork/introduction): Learn the fundamentals of SVAHNAR's AI framework and how agentic networks enable multi-agent orchestration.
+- [Create Simple Agent Configuration Guide | SVAHNAR Docs](/docs/AgenticNetwork/Create_simple_agent): Step-by-step guide to creating a simple AI agent on SVAHNAR using YAML configuration.
+- [Create Agentic Network Configuration Guide | SVAHNAR Docs](/docs/AgenticNetwork/Create_agentic_network): Learn how to build and configure multi-agent networks on SVAHNAR for complex, collaborative AI workflows.
+- [Agent Configuration Reference Guide | SVAHNAR Docs](/docs/AgenticNetwork/Agent_configuration): Complete reference for configuring AI agents on SVAHNAR, including LLM settings, tools, edges, and agent functions.
+
+## Configuration
+
+- [Initialization Reference Guide | SVAHNAR Docs](/docs/AgenticNetwork/Configuration/Initialization): Learn how to configure the initialization settings for your SVAHNAR AI agents.
+- [LLM Reference Guide | SVAHNAR Docs](/docs/AgenticNetwork/Configuration/LLM): Configure the large language model (LLM) for your SVAHNAR agents, including model selection, temperature, and parameters.
+- [Tools Reference Guide | SVAHNAR Docs](/docs/AgenticNetwork/Configuration/Tools): Learn how to configure and assign tools to your SVAHNAR agents for enhanced capabilities.
+- [Agent Function Reference Guide | SVAHNAR Docs](/docs/AgenticNetwork/Configuration/Agent_function): Configure agent functions in SVAHNAR to control agent behavior, prompts, and decision logic.
+- [Edges Reference Guide | SVAHNAR Docs](/docs/AgenticNetwork/Configuration/Edges): Configure edges in SVAHNAR agentic networks to define routing logic and agent-to-agent communication.
+
+## Agents
+
+- [Validate Agent | SVAHNAR AI Developer Docs](/docs/Agents/validate_config): Learn how to validate your SVAHNAR agent YAML configuration before deployment to catch errors early.
+- [Test Agent | SVAHNAR AI Developer Docs](/docs/Agents/test_agent): Learn how to test your SVAHNAR AI agent to verify its behavior, responses, and tool usage before going live.
+- [Create Agent | SVAHNAR AI Developer Docs](/docs/Agents/create_agent): Follow this guide to create and deploy an AI agent on SVAHNAR using the console or YAML configuration.
+- [Run Agent | SVAHNAR AI Developer Docs](/docs/Agents/run_agent): Learn how to run and execute your SVAHNAR AI agent, trigger workflows, and monitor real-time responses.
+- [Get Agent Details | SVAHNAR AI Developer Docs](/docs/Agents/get_agent_details): Retrieve detailed information about a specific SVAHNAR AI agent, including its configuration and status.
+- [List All Agents | SVAHNAR AI Developer Docs](/docs/Agents/list_agents): View and manage all your AI agents on the SVAHNAR platform from a single list view.
+- [Update Agent | SVAHNAR AI Developer Docs](/docs/Agents/update_agent_info): Learn how to update the configuration, name, and settings of an existing SVAHNAR AI agent.
+- [Delete Agent | SVAHNAR AI Developer Docs](/docs/Agents/delete_agent): Learn how to permanently delete an AI agent from your SVAHNAR workspace.
+
+## Keyvault
+
+- [Keyvault | SVAHNAR AI Developer Docs](/docs/Keyvault/Keyvault): Learn how to securely store, manage, and revoke API keys and credentials using SVAHNAR Keyvault. Centralized secret management with encryption at rest and in...
+
+## MCP
+
+- [Model Context Protocol (MCP) Usage | SVAHNAR AI Developer Docs](/docs/MCP/usage): Learn how to configure and use Model Context Protocol (MCP) servers to extend SVAHNAR agent capabilities with dynamic tool integration.
+
+## Tools
+
+- [Understanding Tools | SVAHNAR AI Developer Docs](/docs/Tools/Understanding_Tools): Learn how tools work in SVAHNAR AI agents, including how LLMs call tools to take real-world actions.
+- [Custom Instruction | SVAHNAR AI Developer Docs](/docs/Tools/Custom_Instruction): Learn how to use Custom Instruction in SVAHNAR. Add tool-specific instructions to guide AI agent behavior for individual tool calls.
+- [Human-in-the-Loop (HITL) | SVAHNAR AI Developer Docs](/docs/Tools/HITL): Learn how to use Human-in-the-Loop (HITL) in SVAHNAR. Enable Human-in-the-Loop intervention to allow human administrators to approve, modify, or reject AI ag...
+- [List of Tools | SVAHNAR AI Developer Docs](/docs/Tools/list_of_tools): Browse the complete list of tools available in SVAHNAR, from web search and databases to CRM, email, and more.
+
+## Tools List
+
+- [REST API Tool Integration Guide | SVAHNAR Docs](/docs/Tools/ToolList/API): Configure the SVAHNAR REST API tool to let your agents make custom HTTP requests to any external REST API.
+- [AWS Lambda Tool Integration Guide | SVAHNAR Docs](/docs/Tools/ToolList/AWS_Lambda): Trigger AWS Lambda serverless functions directly from your SVAHNAR AI agents for custom backend logic.
+- [AWS SES Tool Integration Guide | SVAHNAR Docs](/docs/Tools/ToolList/AWS_SES_send_email): Send transactional emails from your SVAHNAR AI agents using Amazon Simple Email Service (SES).
+- [Arxiv Tool Integration Guide | SVAHNAR Docs](/docs/Tools/ToolList/Arxiv): Enable SVAHNAR agents to search and retrieve academic papers from Arxiv for research and analysis workflows.
+- [Calendly Tool Integration Guide | SVAHNAR Docs](/docs/Tools/ToolList/Calendly): Automate scheduling and meeting management with the SVAHNAR Calendly tool integration for AI agents.
+- [Database Tool Tool Integration Guide | SVAHNAR Docs](/docs/Tools/ToolList/DatabaseTool): Enable SVAHNAR AI agents to read and write to databases using the Database Tool with full SQL support.
+- [Database Tool (Read-Only) Tool Integration Guide | SVAHNAR Docs](/docs/Tools/ToolList/DatabaseToolReadOnly): Allow SVAHNAR AI agents to safely query databases in read-only mode without risk of data modification.
+- [Discord Tool Integration Guide | SVAHNAR Docs](/docs/Tools/ToolList/Discord): Send messages and interact with Discord channels directly from your SVAHNAR AI agents.
+- [GitHub Tool Integration Guide | SVAHNAR Docs](/docs/Tools/ToolList/GitHubTool): Manage GitHub repositories, issues, and pull requests directly from your SVAHNAR AI agents.
+- [GitLab Tool Integration Guide | SVAHNAR Docs](/docs/Tools/ToolList/Gitlab): Connect your SVAHNAR AI agents to GitLab to manage repositories, pipelines, and issues programmatically.
+- [Gmail Tool Integration Guide | SVAHNAR Docs](/docs/Tools/ToolList/Gmail): Read, send, and manage Gmail emails directly from your SVAHNAR AI agents with full OAuth integration.
+- [Google Calendar Tool Integration Guide | SVAHNAR Docs](/docs/Tools/ToolList/GoogleCalendar): Let your SVAHNAR AI agents create, update, and manage Google Calendar events and schedules automatically.
+- [Google Drive Tool Integration Guide | SVAHNAR Docs](/docs/Tools/ToolList/GoogleDrive): Enable SVAHNAR AI agents to read, write, and manage files and folders in Google Drive.
+- [Google Finance Tool Integration Guide | SVAHNAR Docs](/docs/Tools/ToolList/GoogleFinance): Fetch real-time and historical stock market data via Google Finance in your SVAHNAR AI agents.
+- [Google Flights Tool Integration Guide | SVAHNAR Docs](/docs/Tools/ToolList/GoogleFlight): Search for flights and travel data using Google Flights within your SVAHNAR AI agent workflows.
+- [Google Hotels Tool Integration Guide | SVAHNAR Docs](/docs/Tools/ToolList/GoogleHotel): Search for hotels and accommodation options using Google Hotels within your SVAHNAR AI agents.
+- [Google Jobs Tool Integration Guide | SVAHNAR Docs](/docs/Tools/ToolList/GoogleJobs): Search and retrieve job listings from Google Jobs within your SVAHNAR AI agent workflows.
+- [Google Scholar Tool Integration Guide | SVAHNAR Docs](/docs/Tools/ToolList/GoogleScholar): Enable SVAHNAR AI agents to search academic research and citations via Google Scholar.
+- [HubSpot Tool Integration Guide | SVAHNAR Docs](/docs/Tools/ToolList/HubSpot): Connect your SVAHNAR AI agents to HubSpot CRM to manage contacts, deals, and marketing workflows.
+- [Jira Tool Integration Guide | SVAHNAR Docs](/docs/Tools/ToolList/JiraTool): Create, update, and manage Jira issues and projects directly from your SVAHNAR AI agents.
+- [Knowledge Repo Tool Integration Guide | SVAHNAR Docs](/docs/Tools/ToolList/KnowledgeRepo): Enable SVAHNAR AI agents to perform semantic search over your Knowledge Repositories for RAG workflows.
+- [Notion Tool Integration Guide | SVAHNAR Docs](/docs/Tools/ToolList/Notion): Manage Notion pages, databases, and blocks directly from your SVAHNAR AI agents with full API integration.
+- [Outlook & Calendar Tool Integration Guide | SVAHNAR Docs](/docs/Tools/ToolList/Outlook): Read, send, and manage Microsoft Outlook emails and calendar events from your SVAHNAR AI agents.
+- [Pinecone Tool Integration Guide | SVAHNAR Docs](/docs/Tools/ToolList/Pinecone): Perform semantic, lexical, and hybrid vector searches on Pinecone indexes from your SVAHNAR AI agents.
+- [Reddit Tool Integration Guide | SVAHNAR Docs](/docs/Tools/ToolList/Reddit): Search Reddit discussions, threads, and comments from your SVAHNAR AI agents for community insights.
+- [Salesforce Tool Integration Guide | SVAHNAR Docs](/docs/Tools/ToolList/Salesforce): Query and manage Salesforce CRM data, accounts, and opportunities directly from your SVAHNAR AI agents.
+- [Slack Tool Integration Guide | SVAHNAR Docs](/docs/Tools/ToolList/Slack): Send messages, read channels, and manage Slack workspaces directly from your SVAHNAR AI agents.
+- [Tavily Tool Integration Guide | SVAHNAR Docs](/docs/Tools/ToolList/Tavily): Empower SVAHNAR AI agents with real-time web search using Tavily, the search engine built for AI.
+- [Twilio SMS Tool Integration Guide | SVAHNAR Docs](/docs/Tools/ToolList/Twilio_sms): Send SMS notifications and alerts from your SVAHNAR AI agents using Twilio's messaging API.
+- [Twilio WhatsApp Tool Integration Guide | SVAHNAR Docs](/docs/Tools/ToolList/Twilio_whatsapp): Send automated WhatsApp messages from your SVAHNAR AI agents using Twilio's WhatsApp API.
+- [Weather Tool Integration Guide | SVAHNAR Docs](/docs/Tools/ToolList/Weather): Fetch real-time weather conditions and forecasts for any city using OpenWeatherMap in SVAHNAR agents.
+- [Wikidata Tool Integration Guide | SVAHNAR Docs](/docs/Tools/ToolList/WikiData): Query structured factual data about people, places, and events from Wikidata in your SVAHNAR agents.
+- [Wikipedia Tool Integration Guide | SVAHNAR Docs](/docs/Tools/ToolList/Wikipedia): Enable SVAHNAR AI agents to search Wikipedia for article summaries and encyclopedic knowledge.
+- [WolframAlpha Tool Integration Guide | SVAHNAR Docs](/docs/Tools/ToolList/Wolframalpha): Solve mathematical problems and complex factual queries using WolframAlpha in your SVAHNAR AI agents.
+- [Yahoo Finance Tool Integration Guide | SVAHNAR Docs](/docs/Tools/ToolList/YahooFinance): Retrieve stock prices, financial metrics, and market data via Yahoo Finance in your SVAHNAR AI agents.
+- [Zapier Tool Integration Guide | SVAHNAR Docs](/docs/Tools/ToolList/Zapier): Trigger Zapier Zaps from your SVAHNAR AI agents to connect with thousands of third-party applications.
+- [Zerodha Kite Tool Integration Guide | SVAHNAR Docs](/docs/Tools/ToolList/Zerodha): Fetch market data, place trades, and manage portfolios via Zerodha Kite Connect in your SVAHNAR AI agents.
+- [Webpage Search Tool Integration Guide | SVAHNAR Docs](/docs/Tools/ToolList/webpage_search): Enable SVAHNAR AI agents to extract and read content from any public web page URL for analysis.
+
+## Knowledge Repo
+
+- [KnowledgeRepository | SVAHNAR AI Developer Docs](/docs/KnowledgeRepository/Overview): Learn how SVAHNAR's KnowledgeRepository enables Retrieval-Augmented Generation (RAG) for your AI agents with semantic search.
+
+## Connectors
+
+- [AWS S3 | SVAHNAR AI Developer Docs](/docs/KnowledgeRepository/Connectors/AWS_S3): Connect your AWS S3 buckets as a knowledge source for SVAHNAR's KnowledgeRepository and RAG pipelines.
+- [Confluence | SVAHNAR AI Developer Docs](/docs/KnowledgeRepository/Connectors/Confluence): Integrate Atlassian Confluence as a knowledge source for SVAHNAR's AI agents via the KnowledgeRepository.
+- [SharePoint | SVAHNAR AI Developer Docs](/docs/KnowledgeRepository/Connectors/Sharepoint): Connect Microsoft SharePoint as a knowledge source for SVAHNAR's KnowledgeRepository and AI agent RAG workflows.
+- [URL | SVAHNAR AI Developer Docs](/docs/KnowledgeRepository/Connectors/URL): Connect web URLs as a knowledge source for your SVAHNAR KnowledgeRepository to enable URL-based RAG.
+
+## OAuth Connections
+
+- [Connect SVAHNAR to OAuth Connections | OAuth Setup](/docs/Connections/Overview): Connect SVAHNAR to external services like Google, Slack, Microsoft Outlook, Atlassian, Box, GitHub, Notion, Salesforce, and SharePoint using secure OAuth 2.0...
+- [Connect SVAHNAR to Custom OAuth Clients | OAuth Setup](/docs/Connections/CustomOAuthClient): Register your own OAuth 2.0 application in SVAHNAR to connect any service — including private MCP servers — using your own client credentials.
+
+## Resources
+
+- [JSON to YAML Conversion Guide | SVAHNAR AI Developer Docs](/docs/additional/YAML_Conversion_Guide): Learn how to convert JSON agent configurations to YAML format for use with the SVAHNAR platform.
