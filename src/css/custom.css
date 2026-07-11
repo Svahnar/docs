@@ -230,75 +230,88 @@ button:hover {
 /* Feature grid and visual card styles for Overview landing page */
 .feature-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
-  margin-top: 24px;
-  margin-bottom: 40px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
 }
 
 .feature-card {
-  background-color: var(--ifm-card-background-color, var(--ifm-background-color));
-  border: 1px solid var(--ifm-color-emphasis-200);
-  border-radius: 8px;
-  padding: 24px;
   display: flex;
   flex-direction: column;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: pointer;
+  background-color: var(--ifm-background-surface);
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 1rem;
+  overflow: hidden;
   text-decoration: none !important;
+  color: inherit !important;
+  transition: all 0.2s ease-in-out;
+  padding: 1.5rem;
 }
 
 .feature-card:hover {
-  transform: translateY(-4px);
   border-color: #ff6700;
-  box-shadow: 0 12px 20px rgba(255, 103, 0, 0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
+}
+
+html[data-theme='dark'] .feature-card:hover {
+  box-shadow: 0 4px 12px rgba(255, 103, 0, 0.1);
 }
 
 .feature-card-header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
 }
 
 .feature-card-icon {
-  width: 24px;
-  height: 24px;
-  color: #ff6700;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.5rem;
+  background-color: var(--ifm-color-emphasis-100);
+  color: var(--ifm-color-emphasis-700);
+  transition: color 0.2s ease-in-out;
 }
 
 .feature-card-icon svg {
-  width: 100%;
-  height: 100%;
+  width: 20px;
+  height: 20px;
+}
+
+.feature-card:hover .feature-card-icon {
+  color: #ff6700;
 }
 
 .feature-card h3 {
+  font-size: 1.125rem;
   margin: 0;
-  font-size: 1.15rem;
-  font-weight: 600;
-  color: var(--ifm-color-emphasis-900);
+  font-weight: 500;
 }
 
 .feature-card p {
-  margin: 0;
   font-size: 0.9rem;
   color: var(--ifm-color-emphasis-600);
-  line-height: 1.5;
-  flex-grow: 1;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  flex: 1;
 }
 
 .feature-card-link {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin-top: 16px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #ff6700 !important;
-  text-decoration: none !important;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--ifm-color-emphasis-600);
+  transition: color 0.2s ease-in-out;
+}
+
+.feature-card:hover .feature-card-link {
+  color: #ff6700;
 }
 
 .feature-card-link svg {
