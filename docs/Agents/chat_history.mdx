@@ -11,7 +11,7 @@ When interacting with the Agent Service API (e.g., `/api/v1/run-agent`), you mus
 ## Expected Format
 The `chat_history` field must be a list of dictionaries with the following structure:
 
-```json
+```json showLineNumbers
 [
   {
     "role": "user",
@@ -37,7 +37,7 @@ To convert the raw output from the Agent Service into this format, follow these 
 ## Using the SDK
 The `svahnar` Python SDK provides a helper method `generate_chat_history` to simplify the creation of the chat history.
 
-```python
+```python showLineNumbers
 from svahnar import Svahnar
 
 client = Svahnar()

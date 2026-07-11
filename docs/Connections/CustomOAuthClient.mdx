@@ -64,7 +64,7 @@ For **Client Credentials** grant type, there is no popup — SVAHNAR fetches the
 
 Once connected, reference this provider in any MCP server tool config using `oauth_provider_id`:
 
-```yaml title="agent.yaml"
+```yaml title="agent.yaml" showLineNumbers
 tools:
   mcp_assigned:
     - name: my-internal-api
@@ -407,7 +407,7 @@ create_agent_network:
 
 If your MCP server uses API key authentication instead of OAuth, you can pass static headers directly:
 
-```yaml title="agent.yaml"
+```yaml title="agent.yaml" showLineNumbers
 tools:
   mcp_assigned:
     - name: my-api-server
@@ -466,7 +466,7 @@ Your organization has its own Google Cloud project and wants agents to use Gmail
 
 After connecting, use it with an MCP server that calls Google Sheets:
 
-```yaml title="agent.yaml"
+```yaml title="agent.yaml" showLineNumbers
 tools:
   mcp_assigned:
     - name: google-sheets-mcp
@@ -525,7 +525,7 @@ Your team has built an internal REST API that issues tokens via Client Credentia
 | Token URL | `https://auth.internal.example.com/oauth/token` |
 | Default Scopes | `read:reports`, `write:dashboards` |
 
-```yaml title="agent.yaml"
+```yaml title="agent.yaml" showLineNumbers
 tools:
   mcp_assigned:
     - name: analytics-mcp

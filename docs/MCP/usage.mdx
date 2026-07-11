@@ -30,7 +30,7 @@ To add an MCP server to an agent, use the `mcp_assigned` field within the `tools
 
 ### Example Agent Configuration
 
-```yaml
+```yaml showLineNumbers
 create_agent_network:
   agent-1:
     agent_name: Agent_1
@@ -86,7 +86,7 @@ By providing an `oauth_provider_id` in the config, SVAHNAR automatically manages
 ### 2. Static Headers with Keyvault Placeholders
 You can also supply static authentication tokens or API keys directly in the `headers` dictionary. To keep secrets secure and avoid hardcoding credentials in your YAML files, you can reference variables saved in your **SVAHNAR Keyvault** using the `${VARIABLE_NAME}` syntax:
 
-```yaml
+```yaml showLineNumbers
 headers:
   Authorization: "Bearer ${MY_API_TOKEN}"
 ```

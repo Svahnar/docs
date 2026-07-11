@@ -60,7 +60,7 @@ Custom OAuth clients unlock a powerful capability: connecting agents to **any MC
 
 Set `oauth_provider_id` in your MCP server config, and SVAHNAR automatically injects a valid `Authorization: Bearer <token>` header into every request — refreshing the token silently when it expires.
 
-```yaml title="agent.yaml"
+```yaml title="agent.yaml" showLineNumbers
 tools:
   mcp_assigned:
     - name: my-protected-mcp-server
