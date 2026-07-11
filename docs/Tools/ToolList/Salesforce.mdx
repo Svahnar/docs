@@ -52,7 +52,7 @@ The security token is **separate from your password** and is not the same as you
 
 Unlike SQL, **SOQL (Salesforce Object Query Language)** queries a single object at a time and requires you to explicitly name every field you want returned. There is no `SELECT *`.
 
-```sql
+```sql showLineNumbers
 -- Correct: explicit field list
 SELECT Id, Name, Email, Phone FROM Contact WHERE AccountId = '001XXXXXXXXXXXXXXX' LIMIT 10
 
@@ -166,7 +166,7 @@ In enterprise Salesforce instances, API access may be restricted by your org's a
 To confirm your credentials are working:
 
 1. Trigger a test agent run using the `list_objects` operation:
-```json
+```json showLineNumbers
 {
   "operation": "list_objects"
 }

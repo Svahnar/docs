@@ -54,7 +54,7 @@ For security, we recommend storing these credentials in the **SVAHNAR Key Vault*
 In your agent's configuration, assign the `AWS_Lambda` tool and specify the target function.
 
 
-```yaml
+```yaml showLineNumbers
 tool_assigned:
   - name: AWS_Lambda
     config:
@@ -75,7 +75,7 @@ You can pass arguments to your Lambda function in two ways(via yaml file) instea
 **Method A: Direct Values**
 Hardcode specific values directly into the YAML configuration.
 
-```yaml
+```yaml showLineNumbers
 payload: |-
   payload:
     action: "sync_users"
@@ -86,7 +86,7 @@ payload: |-
 **Method B: Key Vault Variables**
 Inject secure secrets dynamically using the `${Variable}` syntax.
 
-```yaml
+```yaml showLineNumbers
 payload: |-
   payload:
     api_token: "${MySecureToken}"

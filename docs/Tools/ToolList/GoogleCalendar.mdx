@@ -31,7 +31,7 @@ The Google Calendar tool interacts with the **Google Calendar API v3** to manage
 
 Every payload must include a `task` and a `params` object:
 
-```json
+```json showLineNumbers
 {
   "task": "search",
   "params": {
@@ -53,7 +53,7 @@ This tool uses **Google OAuth 2.0** — a `client_id` + `client_secret` pair tha
 
 All event times must specify both a `dateTime` and a `timeZone` field inside the `start` and `end` objects. Always pass an explicit timezone — never assume UTC unless the user explicitly wants it.
 
-```json
+```json showLineNumbers
 {
   "dateTime": "2023-10-28T14:00:00",
   "timeZone": "Asia/Kolkata"
@@ -187,7 +187,7 @@ If you already created OAuth credentials for Google Drive or Gmail, add this red
 
 ### `search` — Fetch Upcoming Events
 
-```json
+```json showLineNumbers
 {
   "task": "search",
   "params": {
@@ -206,7 +206,7 @@ If you already created OAuth credentials for Google Drive or Gmail, add this red
 
 ### `create` — Create a One-Time Event
 
-```json
+```json showLineNumbers
 {
   "task": "create",
   "params": {
@@ -242,7 +242,7 @@ If you already created OAuth credentials for Google Drive or Gmail, add this red
 
 ### `repeat` — Create a Recurring Event
 
-```json
+```json showLineNumbers
 {
   "task": "repeat",
   "params": {
@@ -267,7 +267,7 @@ If you already created OAuth credentials for Google Drive or Gmail, add this red
 
 ### `add_attendees` — Add Attendees to an Existing Event
 
-```json
+```json showLineNumbers
 {
   "task": "add_attendees",
   "params": {

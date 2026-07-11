@@ -211,7 +211,7 @@ Never commit this key to version control or hardcode it in config files. Use SVA
 To confirm your API key is working:
 
 1. Trigger a test agent run with a minimal payload:
-```json
+```json showLineNumbers
 {
   "engine": "google_hotels",
   "q": "Mumbai",
@@ -330,7 +330,7 @@ Never hardcode your `api_key` in plain text files. Use SVAHNAR Key Vault referen
 
 If the user wants to see more options beyond the first page, pass the `next_page_token` from the previous response into the next query. Do not change any other parameters — only add the token.
 
-```json
+```json showLineNumbers
 {
   "engine": "google_hotels",
   "q": "Goa Beach Resort",
