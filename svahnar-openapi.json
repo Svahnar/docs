@@ -1,0 +1,1558 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "SVAHNAR API",
+    "description": "Welcome to the official SVAHNAR API Reference!\n\nHere you can find all the endpoints you need to interact with SVAHNAR programmatically.\n\n### Additional Resources\n- [Main Website](https://www.svahnar.com)\n- [Support & Contact](https://www.svahnar.com/contact)\n- [Developer Guide](/docs/GetStarted/Overview)",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.svahnar.com"
+    }
+  ],
+  "paths": {
+    "/v1/agents/run": {
+      "post": {
+        "tags": [
+          "Agent Operations"
+        ],
+        "summary": "Run a deployed Agent",
+        "description": "Execute an agent by sending the provided message to the agent service. Returns a detailed response containing the conversation messages, logs, and metadata.",
+        "operationId": "run_agent_v1_agents_run_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/agents/test": {
+      "post": {
+        "tags": [
+          "Agent Operations"
+        ],
+        "summary": "Test an Agent with YAML configuration",
+        "description": "Test an agent by providing a YAML configuration (as a file or string) along with a message. The agent processes the message and returns a response without creating a persistent agent.",
+        "operationId": "test_agent_v1_agents_test_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_test_agent_v1_agents_test_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/agents/validate": {
+      "post": {
+        "tags": [
+          "Agent Operations"
+        ],
+        "summary": "Validate Agent YAML configuration",
+        "description": "Validates the agent network configuration provided as a YAML file or string. Only files with a .yaml or .yml extension are accepted.",
+        "operationId": "validate_agent_v1_agents_validate_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_validate_agent_v1_agents_validate_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentValidationResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/agents/create": {
+      "post": {
+        "tags": [
+          "Agent Management"
+        ],
+        "summary": "Create a new Agent",
+        "description": "Upload a YAML configuration file to create and deploy a new agent. Optionally provide an agent icon (required for AgentStore deployments).",
+        "operationId": "create_agent_v1_agents_create_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_create_agent_v1_agents_create_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateAgentResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/agents/delete": {
+      "delete": {
+        "tags": [
+          "Agent Management"
+        ],
+        "summary": "Delete an Agent",
+        "description": "Delete a single agent by its ID. Only the creator can delete their agents.",
+        "operationId": "delete_agent_v1_agents_delete_delete",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteAgentInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteAgentResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/agents/bulk-delete": {
+      "delete": {
+        "tags": [
+          "Agent Management"
+        ],
+        "summary": "Bulk delete Agents",
+        "description": "Delete multiple agents by their IDs. Only the creator can delete their agents.",
+        "operationId": "delete_many_agents_v1_agents_bulk_delete_delete",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteAgentsInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulkDeleteResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/agents/get-agent/{agent_id}": {
+      "get": {
+        "tags": [
+          "Agent Management"
+        ],
+        "summary": "Get Agent details",
+        "description": "Retrieve detailed information about a specific agent by its ID. The user must have access to the agent (via personal agents or team membership).",
+        "operationId": "get_agent_details_v1_agents_get_agent__agent_id__get",
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The unique identifier of the agent.",
+              "title": "Agent Id"
+            },
+            "description": "The unique identifier of the agent."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentDetailWithYamlNote"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/agents/download-agent/{agent_id}": {
+      "get": {
+        "tags": [
+          "Agent Management"
+        ],
+        "summary": "Download Agent YAML configuration",
+        "description": "Download the YAML configuration file for a specific agent. Only the creator of the agent can download the configuration.",
+        "operationId": "download_agent_yaml_v1_agents_download_agent__agent_id__get",
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The unique identifier of the agent.",
+              "title": "Agent Id"
+            },
+            "description": "The unique identifier of the agent."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/agents/list-agents": {
+      "get": {
+        "tags": [
+          "Agent Management"
+        ],
+        "summary": "List all Agents",
+        "description": "List all agents the authenticated user has access to, including personal agents, agents shared via teams, and agents created by the user. Supports pagination via offset and limit query parameters.",
+        "operationId": "list_agents_v1_agents_list_agents_get",
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Number of items to skip.",
+              "default": 0,
+              "title": "Offset"
+            },
+            "description": "Number of items to skip."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 1000,
+              "minimum": 1,
+              "description": "Maximum number of items to return.",
+              "default": 1000,
+              "title": "Limit"
+            },
+            "description": "Maximum number of items to return."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/agents/update": {
+      "put": {
+        "tags": [
+          "Agent Management"
+        ],
+        "summary": "Update Agent",
+        "description": "Update an agent's name, description, deployment target, icon, generated questions, or reconfigure its YAML. Only the creator of the agent can perform this operation.",
+        "operationId": "update_agent_v1_agents_update_put",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_update_agent_v1_agents_update_put"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/credits/get": {
+      "get": {
+        "tags": [
+          "Credits"
+        ],
+        "summary": "Get remaining credits",
+        "description": "Get the remaining credits for the current organization.",
+        "operationId": "get_credits_endpoint_v1_credits_get_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreditsResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Login",
+        "description": "Login to the API",
+        "operationId": "auth_login_v1_auth_login_post",
+        "parameters": [
+          {
+            "name": "include_ids",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Include Ids"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AdditionalMetadata": {
+        "properties": {
+          "thread_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Thread Id"
+          }
+        },
+        "type": "object",
+        "title": "AdditionalMetadata"
+      },
+      "AgentDetailResponse": {
+        "properties": {
+          "agent_id": {
+            "type": "string",
+            "title": "Agent Id",
+            "description": "Unique identifier of the agent."
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "Name of the agent."
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "description": "Description of the agent."
+          },
+          "agent_icon": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Icon",
+            "description": "Presigned S3 URL of the agent icon."
+          },
+          "is_creator": {
+            "type": "boolean",
+            "title": "Is Creator",
+            "description": "Whether the requesting user is the creator of this agent."
+          },
+          "hosted_to": {
+            "type": "string",
+            "title": "Hosted To",
+            "description": "Deployment target: 'AgentStore' or 'Organization'."
+          },
+          "uploaded_by": {
+            "$ref": "#/components/schemas/UploadedByInfo",
+            "description": "Information about the agent creator."
+          }
+        },
+        "type": "object",
+        "required": [
+          "agent_id",
+          "name",
+          "description",
+          "is_creator",
+          "hosted_to",
+          "uploaded_by"
+        ],
+        "title": "AgentDetailResponse",
+        "description": "Single agent detail response with tracing metadata."
+      },
+      "AgentDetailWithYamlNote": {
+        "properties": {
+          "agent_id": {
+            "type": "string",
+            "title": "Agent Id",
+            "description": "Unique identifier of the agent."
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "Name of the agent."
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "description": "Description of the agent."
+          },
+          "agent_icon": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Icon",
+            "description": "Presigned S3 URL of the agent icon."
+          },
+          "is_creator": {
+            "type": "boolean",
+            "title": "Is Creator",
+            "description": "Whether the requesting user is the creator of this agent."
+          },
+          "hosted_to": {
+            "type": "string",
+            "title": "Hosted To",
+            "description": "Deployment target: 'AgentStore' or 'Organization'."
+          },
+          "uploaded_by": {
+            "$ref": "#/components/schemas/UploadedByInfo",
+            "description": "Information about the agent creator."
+          },
+          "request_metadata": {
+            "$ref": "#/components/schemas/ResponseMeta",
+            "description": "Response metadata including request ID."
+          },
+          "yaml_configuration": {
+            "type": "string",
+            "title": "Yaml Configuration",
+            "description": "A note directing the user to the download endpoint for the YAML configuration."
+          }
+        },
+        "type": "object",
+        "required": [
+          "agent_id",
+          "name",
+          "description",
+          "is_creator",
+          "hosted_to",
+          "uploaded_by",
+          "yaml_configuration"
+        ],
+        "title": "AgentDetailWithYamlNote",
+        "description": "Agent detail returned by the get-agent endpoint, includes a note about YAML config."
+      },
+      "AgentExecutionDetails": {
+        "properties": {
+          "reasoning": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reasoning",
+            "default": ""
+          },
+          "toolcalls": {
+            "items": {
+              "$ref": "#/components/schemas/ToolCall"
+            },
+            "type": "array",
+            "title": "Toolcalls"
+          },
+          "toolresponse": {
+            "items": {},
+            "type": "array",
+            "title": "Toolresponse"
+          },
+          "llmresponse": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Llmresponse",
+            "default": ""
+          },
+          "hitl": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hitl"
+          }
+        },
+        "type": "object",
+        "title": "AgentExecutionDetails"
+      },
+      "AgentListResponse": {
+        "properties": {
+          "request_metadata": {
+            "$ref": "#/components/schemas/ResponseMeta",
+            "description": "Response metadata including request ID."
+          },
+          "agents": {
+            "items": {
+              "$ref": "#/components/schemas/AgentDetailResponse"
+            },
+            "type": "array",
+            "title": "Agents",
+            "description": "List of agents the user has access to."
+          }
+        },
+        "type": "object",
+        "title": "AgentListResponse"
+      },
+      "AgentResponse": {
+        "properties": {
+          "request_metadata": {
+            "$ref": "#/components/schemas/ResponseMeta",
+            "description": "Response metadata including request ID."
+          },
+          "response": {
+            "items": {
+              "additionalProperties": {
+                "$ref": "#/components/schemas/AgentExecutionDetails"
+              },
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Response"
+          },
+          "usage": {
+            "$ref": "#/components/schemas/UsageStats"
+          },
+          "additional_metadata": {
+            "$ref": "#/components/schemas/AdditionalMetadata"
+          }
+        },
+        "type": "object",
+        "required": [
+          "response",
+          "usage",
+          "additional_metadata"
+        ],
+        "title": "AgentResponse"
+      },
+      "AgentValidationResponse": {
+        "properties": {
+          "request_metadata": {
+            "$ref": "#/components/schemas/ResponseMeta",
+            "description": "Response metadata including request ID."
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "description": "The result status of the validation."
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "description": "Detailed message about the validation outcome."
+          },
+          "suggestion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Suggestion",
+            "description": "Optional suggestion if any errors were found."
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "message"
+        ],
+        "title": "AgentValidationResponse"
+      },
+      "Body_create_agent_v1_agents_create_post": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "The agent's name. Supports Unicode characters."
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "description": "A brief description of the agent."
+          },
+          "deploy_to": {
+            "type": "string",
+            "title": "Deploy To",
+            "description": "Where to deploy the agent. Options: 'AgentStore' or 'Organization'."
+          },
+          "yaml_file": {
+            "type": "string",
+            "format": "binary",
+            "title": "Yaml File",
+            "description": "The YAML configuration for the agent."
+          },
+          "agent_icon": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "binary"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Icon"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "description",
+          "deploy_to",
+          "yaml_file"
+        ],
+        "title": "Body_create_agent_v1_agents_create_post"
+      },
+      "Body_test_agent_v1_agents_test_post": {
+        "properties": {
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message",
+            "description": "The message or command to be sent to the agent."
+          },
+          "yaml_file": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "binary"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Yaml File",
+            "description": "YAML file to test the agent."
+          },
+          "yaml_string": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Yaml String",
+            "description": "YAML string to test the agent."
+          },
+          "agent_history": {
+            "type": "string",
+            "title": "Agent History",
+            "description": "List of prior messages; defaults to empty list.",
+            "default": "[]"
+          },
+          "thread_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Thread Id",
+            "description": "Unique identifier for the chat session."
+          },
+          "hitl_decision": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "approve",
+                  "edit",
+                  "reject"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hitl Decision",
+            "description": "Human-in-the-loop decision."
+          }
+        },
+        "type": "object",
+        "title": "Body_test_agent_v1_agents_test_post"
+      },
+      "Body_update_agent_v1_agents_update_put": {
+        "properties": {
+          "agent_id": {
+            "type": "string",
+            "title": "Agent Id",
+            "description": "The ID of the agent to update."
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name",
+            "description": "New name for the agent."
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description",
+            "description": "New description for the agent."
+          },
+          "deploy_to": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deploy To",
+            "description": "New deployment target: 'AgentStore' or 'Organization'."
+          },
+          "yaml_file": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "binary"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Yaml File",
+            "description": "The new YAML configuration file."
+          },
+          "agent_icon": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "binary"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Icon",
+            "description": "New agent icon."
+          }
+        },
+        "type": "object",
+        "required": [
+          "agent_id"
+        ],
+        "title": "Body_update_agent_v1_agents_update_put"
+      },
+      "Body_validate_agent_v1_agents_validate_post": {
+        "properties": {
+          "yaml_file": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "binary"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Yaml File",
+            "description": "YAML file to validate."
+          },
+          "yaml_string": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Yaml String",
+            "description": "YAML string to validate."
+          }
+        },
+        "type": "object",
+        "title": "Body_validate_agent_v1_agents_validate_post"
+      },
+      "BulkDeleteResponse": {
+        "properties": {
+          "request_metadata": {
+            "$ref": "#/components/schemas/ResponseMeta",
+            "description": "Response metadata including request ID."
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "description": "Summary of the deletion operation."
+          },
+          "deleted_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Deleted Ids",
+            "description": "IDs of the agents that were successfully deleted."
+          },
+          "error_details": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Details",
+            "description": "Details of agents that failed to be deleted."
+          }
+        },
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "title": "BulkDeleteResponse",
+        "description": "Response after deleting multiple agents."
+      },
+      "CreateAgentResponse": {
+        "properties": {
+          "request_metadata": {
+            "$ref": "#/components/schemas/ResponseMeta",
+            "description": "Response metadata including request ID."
+          },
+          "agent_id": {
+            "type": "string",
+            "title": "Agent Id",
+            "description": "Unique identifier of the created agent."
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "description": "Human-readable result message."
+          }
+        },
+        "type": "object",
+        "required": [
+          "agent_id",
+          "message"
+        ],
+        "title": "CreateAgentResponse",
+        "description": "Response after creating a new agent."
+      },
+      "CreditUsage": {
+        "properties": {
+          "agent_name": {
+            "type": "string",
+            "title": "Agent Name"
+          },
+          "number_of_runs": {
+            "type": "integer",
+            "title": "Number Of Runs"
+          },
+          "credit_consumed": {
+            "type": "number",
+            "title": "Credit Consumed"
+          }
+        },
+        "type": "object",
+        "required": [
+          "agent_name",
+          "number_of_runs",
+          "credit_consumed"
+        ],
+        "title": "CreditUsage"
+      },
+      "CreditsResponse": {
+        "properties": {
+          "request_metadata": {
+            "$ref": "#/components/schemas/ResponseMeta",
+            "description": "Response metadata including request ID."
+          },
+          "credits_remaining": {
+            "type": "number",
+            "title": "Credits Remaining",
+            "description": "Number of credits remaining for the organization.",
+            "examples": [
+              100.0
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "credits_remaining"
+        ],
+        "title": "CreditsResponse",
+        "description": "Response containing remaining credits."
+      },
+      "DeleteAgentInput": {
+        "properties": {
+          "agent_id": {
+            "type": "string",
+            "title": "Agent Id",
+            "description": "The ID of the agent to delete."
+          }
+        },
+        "type": "object",
+        "required": [
+          "agent_id"
+        ],
+        "title": "DeleteAgentInput"
+      },
+      "DeleteAgentResponse": {
+        "properties": {
+          "request_metadata": {
+            "$ref": "#/components/schemas/ResponseMeta",
+            "description": "Response metadata including request ID."
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "description": "Summary of the deletion operation."
+          },
+          "deleted_id": {
+            "type": "string",
+            "title": "Deleted Id",
+            "description": "ID of the agent that was successfully deleted."
+          }
+        },
+        "type": "object",
+        "required": [
+          "message",
+          "deleted_id"
+        ],
+        "title": "DeleteAgentResponse",
+        "description": "Response after deleting a single agent."
+      },
+      "DeleteAgentsInput": {
+        "properties": {
+          "agent_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Agent Ids",
+            "description": "The list of agent IDs to delete."
+          }
+        },
+        "type": "object",
+        "required": [
+          "agent_ids"
+        ],
+        "title": "DeleteAgentsInput"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "LoginResponse": {
+        "properties": {
+          "request_metadata": {
+            "$ref": "#/components/schemas/ResponseMeta",
+            "description": "Response metadata including request ID."
+          },
+          "first_name": {
+            "type": "string",
+            "title": "First Name",
+            "description": "First name of the authenticated user.",
+            "examples": [
+              "John"
+            ]
+          },
+          "last_name": {
+            "type": "string",
+            "title": "Last Name",
+            "description": "Last name of the authenticated user.",
+            "examples": [
+              "Doe"
+            ]
+          },
+          "email": {
+            "type": "string",
+            "title": "Email",
+            "description": "Email address of the authenticated user.",
+            "examples": [
+              "[EMAIL_ADDRESS]"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "first_name",
+          "last_name",
+          "email"
+        ],
+        "title": "LoginResponse",
+        "description": "Response containing authentication token and user info."
+      },
+      "MessageResponse": {
+        "properties": {
+          "request_metadata": {
+            "$ref": "#/components/schemas/ResponseMeta",
+            "description": "Response metadata including request ID."
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "description": "Human-readable result message.",
+            "examples": [
+              "Operation completed successfully."
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "title": "MessageResponse",
+        "description": "Simple response containing a message string."
+      },
+      "ResponseMeta": {
+        "properties": {
+          "request_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Request Id",
+            "description": "Unique request identifier for tracing and support."
+          }
+        },
+        "type": "object",
+        "title": "ResponseMeta"
+      },
+      "RunRequest": {
+        "properties": {
+          "agent_id": {
+            "type": "string",
+            "title": "Agent Id",
+            "description": "Unique identifier for the agent."
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message",
+            "description": "The message or command to be sent to the agent."
+          },
+          "agent_history": {
+            "anyOf": [
+              {
+                "items": {},
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent History",
+            "description": "List of prior messages; defaults to empty list."
+          },
+          "thread_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Thread Id",
+            "description": "Unique identifier for the chat session."
+          },
+          "hitl_decision": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "approve",
+                  "edit",
+                  "reject"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hitl Decision",
+            "description": "Human-in-the-loop decision for the agent."
+          }
+        },
+        "type": "object",
+        "required": [
+          "agent_id",
+          "message"
+        ],
+        "title": "RunRequest"
+      },
+      "ToolCall": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "arguments": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Arguments"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "ToolCall"
+      },
+      "UploadedByInfo": {
+        "properties": {
+          "user_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Id",
+            "description": "ID of the user who created the agent."
+          },
+          "user_email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Email",
+            "description": "Email of the user who created the agent."
+          }
+        },
+        "type": "object",
+        "title": "UploadedByInfo",
+        "description": "Information about the user who uploaded / created the agent."
+      },
+      "UsageStats": {
+        "properties": {
+          "credits_charged": {
+            "items": {
+              "$ref": "#/components/schemas/CreditUsage"
+            },
+            "type": "array",
+            "title": "Credits Charged"
+          },
+          "total_credits_charged": {
+            "type": "number",
+            "title": "Total Credits Charged",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "title": "UsageStats"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    },
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}

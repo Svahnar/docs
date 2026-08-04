@@ -921,6 +921,60 @@ html.dark .theme-logo .logo-dark,
   display: inline-block;
 }
 
+/* Sign In Navbar Button Styles */
+.nav-button {
+  background-color: var(--ifm-color-primary) !important;
+  color: var(--ifm-background-color) !important;
+  border-radius: 6px !important;
+  padding: 6px 16px !important;
+  margin-left: 12px;
+  border: none !important;
+}
 
+/* Hide external link icon SVG for all navbar links */
+svg[class*="iconExternalLink"] {
+  display: none !important;
+}
 
+.nav-button:hover {
+  opacity: 0.8;
+  color: var(--ifm-background-color) !important;
+}
 
+html[data-theme='dark'] .nav-button {
+  background-color: #ff6700 !important;
+  color: #fff !important;
+}
+
+html[data-theme='dark'] .nav-button:hover {
+  opacity: 0.9;
+  background-color: #e65c00 !important;
+}
+
+/* Postman CLI icon fix for OpenAPI Code Snippets */
+.openapi-tabs__code-item--postman-cli {
+  color: #ff6c37;
+}
+
+.openapi-tabs__code-item--postman-cli::after {
+  content: "";
+  width: var(--code-tab-logo-width, 16px);
+  height: var(--code-tab-logo-height, 16px);
+  background: url("https://raw.githubusercontent.com/devicons/devicon/master/icons/postman/postman-original.svg") no-repeat;
+  background-size: contain;
+  margin-block: auto;
+}
+
+/* Custom NProgress (Loading Bar) Styles */
+#nprogress .bar {
+  background: #ff6700 !important;
+}
+
+#nprogress .peg {
+  box-shadow: 0 0 10px #ff6700, 0 0 5px #ff6700 !important;
+}
+
+#nprogress .spinner-icon {
+  border-top-color: #ff6700 !important;
+  border-left-color: #ff6700 !important;
+}
