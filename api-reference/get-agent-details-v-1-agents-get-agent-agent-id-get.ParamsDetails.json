@@ -1,0 +1,1 @@
+{"parameters":[{"name":"agent_id","in":"path","required":true,"schema":{"type":"string","description":"The unique identifier of the agent.","title":"Agent Id"},"description":"The unique identifier of the agent."}]}

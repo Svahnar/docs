@@ -48,6 +48,7 @@ const config: Config = {
       {
         docs: {
           sidebarPath: './sidebars.ts',
+          docItemComponent: '@theme/ApiItem',
           // createRedirects is not supported in the current version of @docusaurus/preset-classic
           // If needed, consider using a plugin or middleware for handling redirects.
           // Please change this to your repo.
@@ -82,7 +83,35 @@ const config: Config = {
     ],
     // Note: Homepage redirect is handled by src/pages/index.* instead
     // '@docusaurus/plugin-client-redirects' removed: root redirect conflicted with trailingSlash
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        id: 'api-reference',
+        path: 'api-reference',
+        routeBasePath: 'api-reference',
+        sidebarPath: './sidebars-api.ts',
+        docItemComponent: '@theme/ApiItem',
+      },
+    ],
+    [
+      'docusaurus-plugin-openapi-docs',
+      {
+        id: 'api', // plugin id
+        docsPluginId: 'api-reference', // configured for new api-reference instance
+        config: {
+          svahnar: {
+            specPath: './svahnar-openapi.json',
+            outputDir: 'api-reference',
+            sidebarOptions: {
+              groupPathsBy: 'tag',
+            },
+          }
+        }
+      },
+    ],
   ],
+
+  themes: ['docusaurus-theme-openapi-docs'],
 
 
   themeConfig: {
@@ -104,8 +133,21 @@ const config: Config = {
           position: 'left',
           label: 'Docs',
         },
+        {
+          type: 'docSidebar',
+          sidebarId: 'apiSidebar',
+          docsPluginId: 'api-reference',
+          position: 'left',
+          label: 'API Reference',
+        },
         // {to: '/guides', label: 'Guides', position: 'left'},
         // {to: '/releasenotes', label: 'Release notes', position: 'left'},
+        {
+          href: 'https://platform.svahnar.com',
+          label: 'Sign In',
+          position: 'right',
+          className: 'button button--primary nav-button',
+        },
         {
           href: 'https://github.com/orgs/Svahnar/repositories',
           className: 'header-github-link',
