@@ -35,9 +35,9 @@ This file serves as a plain-text index of the SVAHNAR documentation, optimized f
 - [Update Agent | SVAHNAR AI Developer Docs](/docs/Agents/update_agent_info): Learn how to update the configuration, name, and settings of an existing SVAHNAR AI agent.
 - [Delete Agent | SVAHNAR AI Developer Docs](/docs/Agents/delete_agent): Learn how to permanently delete an AI agent from your SVAHNAR workspace.
 
-## Keyvault
+## Key Vault
 
-- [Keyvault | SVAHNAR AI Developer Docs](/docs/Keyvault/Keyvault): Learn how to securely store, manage, and revoke API keys and credentials using SVAHNAR Keyvault. Centralized secret management with encryption at rest and in...
+- [Key Vault | SVAHNAR AI Developer Docs](/docs/Keyvault/Keyvault): Learn how to securely store, manage, and revoke API keys and credentials using SVAHNAR Key Vault. Centralized secret management with encryption at rest and in...
 
 ## MCP
 

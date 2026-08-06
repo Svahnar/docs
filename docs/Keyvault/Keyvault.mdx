@@ -1,25 +1,25 @@
 ---
-title: "Keyvault | SVAHNAR AI Developer Docs"
-description: "Learn how to securely store, manage, and revoke API keys and credentials using SVAHNAR Keyvault. Centralized secret management with encryption at rest and in..."
-keywords: ['keyvault', 'api key management', 'secret management', 'credentials', 'svahnar', 'secure storage', 'ai agent', 'developer documentation', 'api keys', 'secure vault']
+title: "Key Vault | SVAHNAR AI Developer Docs"
+description: "Learn how to securely store, manage, and revoke API keys and credentials using SVAHNAR Key Vault. Centralized secret management with encryption at rest and in..."
+keywords: ['Key Vault', 'api key management', 'secret management', 'credentials', 'svahnar', 'secure storage', 'ai agent', 'developer documentation', 'api keys', 'secure vault']
 slug: "/Keyvault"
-sidebar_label: "Keyvault"
+sidebar_label: "Key Vault"
 ---
 import { Steps, Step } from '@site/src/components/Steps/Steps';
 
-# Keyvault
+# Key Vault
 
 Securely store and manage your API keys, credentials, and sensitive data.
 
-**Short summary**: Keyvault is a centralized, secure store where users add keys and secret values (API keys, credentials, tokens, etc.). Secrets remain stored until the user explicitly revokes them. Storing secrets in Keyvault reduces exposure and ensures controlled access across the platform.
+**Short summary**: Key Vault is a centralized, secure store where users add keys and secret values (API keys, credentials, tokens, etc.). Secrets remain stored until the user explicitly revokes them. Storing secrets in Key Vault reduces exposure and ensures controlled access across the platform.
 
 ## 💡 Core Concepts
 
-To use Keyvault effectively, you should understand these key concepts.
+To use Key Vault effectively, you should understand these key concepts.
 
 ### 1. Secret
 
-A **Secret** is a key/value pair where `key` is the identifier (e.g., `OPENAI_API_KEY`) and `value` is the sensitive content (the actual key string). The Keyvault stores the secret securely so it can be retrieved by authorized agents and services at runtime.
+A **Secret** is a key/value pair where `key` is the identifier (e.g., `OPENAI_API_KEY`) and `value` is the sensitive content (the actual key string). The Key Vault stores the secret securely so it can be retrieved by authorized agents and services at runtime.
 
 ### 2. Revocation
 
@@ -27,7 +27,7 @@ Secrets live indefinitely **until** you explicitly revoke them. Revoking a secre
 
 ### 3. Protection
 
-Keyvault encrypts your keys both at rest and in transit. Once saved, **no one** (not even you or the administrators) can view the plaintext value of the secret again. You can only revoke it.
+Key Vault encrypts your keys both at rest and in transit. Once saved, **no one** (not even you or the administrators) can view the plaintext value of the secret again. You can only revoke it.
 
 ### 4. System Set Tokens
 
@@ -41,11 +41,11 @@ There are system set tokens that SVAHNAR sets for certain tools and agents used 
 
 ### Add a Secret
 
-    Adding keys to the Keyvault ensures sensitive values are securely stored and retrievable only by authorized services.
+    Adding keys to the Key Vault ensures sensitive values are securely stored and retrievable only by authorized services.
 
-    1.  **Navigate to Keyvault**
+    1.  **Navigate to Key Vault**
         *   From the **header**, click **Keys**.
-        *   In the left-hand sidebar, click **Key vault** to open the Keyvault panel.
+        *   In the left-hand sidebar, click **Key vault** to open the Key Vault panel.
     2.  **Click Add Keys**
         *   Press the **Create Keys** (or **+ Add Secret**) button.
         *   A modal will open where you can enter the key details.
@@ -58,7 +58,7 @@ There are system set tokens that SVAHNAR sets for certain tools and agents used 
 
     {/* // import Video from '@site/src/components/Video'; */}
 
-    {/* <Video src="https://content.svahnar.com/docs.svahnar.com/Keyvault/adding_secret.mp4" /> */}
+    {/* <Video src="https://content.svahnar.com/docs.svahnar.com/Key Vault/adding_secret.mp4" /> */}
 
 ### Use in an Agent
 
@@ -123,7 +123,7 @@ tools:
 ## 🚑 Troubleshooting
 
 *   **Secret not working / "Authentication Failed"**
-    *   Ensure the **Key Name** in your YAML matches exactly what is in Keyvault.
+    *   Ensure the **Key Name** in your YAML matches exactly what is in Key Vault.
     *   Check for typos in `${key_name}`.
     *   If using YAML, ensure you used double quotes: `"${key_name}"`.
 

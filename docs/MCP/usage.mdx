@@ -54,7 +54,7 @@ create_agent_network:
             url: https://mcp.slack.com/mcp
             transport: sse
             oauth_provider_id: "21af5063-05d2-4081-9e44-c3e2573b234f"
-        # Option B: Authenticating using static headers with Keyvault secret placeholders
+        # Option B: Authenticating using static headers with Key Vault secret placeholders
         - name: github-mcp
           hitl: false
           config:
@@ -83,8 +83,8 @@ SVAHNAR supports several options to securely authenticate with remote MCP server
 ### 1. Custom OAuth Connections (Recommended)
 By providing an `oauth_provider_id` in the config, SVAHNAR automatically manages the full OAuth 2.0 lifecycle on behalf of the user—including secure token storage and background silent refresh. The retrieved access token is dynamically injected into the MCP server requests as an `Authorization: Bearer <token>` header. See the [Custom OAuth Clients Guide](/docs/Connections/CustomOAuthClient) for detailed setup.
 
-### 2. Static Headers with Keyvault Placeholders
-You can also supply static authentication tokens or API keys directly in the `headers` dictionary. To keep secrets secure and avoid hardcoding credentials in your YAML files, you can reference variables saved in your **SVAHNAR Keyvault** using the `${VARIABLE_NAME}` syntax:
+### 2. Static Headers with Key Vault Placeholders
+You can also supply static authentication tokens or API keys directly in the `headers` dictionary. To keep secrets secure and avoid hardcoding credentials in your YAML files, you can reference variables saved in your **SVAHNAR Key Vault** using the `${VARIABLE_NAME}` syntax:
 
 ```yaml showLineNumbers
 headers:
