@@ -72,7 +72,7 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
-      label: 'Keyvault',
+      label: 'Key Vault',
       collapsed: true,
       items: [
         'Keyvault/Keyvault',

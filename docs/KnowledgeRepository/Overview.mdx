@@ -1,99 +1,102 @@
 ---
-title: "KnowledgeRepository | SVAHNAR AI Developer Docs"
+title: "Knowledge Repository | SVAHNAR AI Developer Docs"
 description: "Learn how SVAHNAR's KnowledgeRepository enables Retrieval-Augmented Generation (RAG) for your AI agents with semantic search."
 keywords: ['knowledge repository', 'rag', 'retrieval augmented generation', 'svahnar', 'semantic search', 'ai agent', 'developer documentation', 'knowledgerepository']
-sidebar_label: "KnowledgeRepository"
+sidebar_label: "Knowledge Repository"
 ---
 import Video from '@site/src/components/Video';
 import { Steps, Step } from '@site/src/components/Steps/Steps';
 
-# KnowledgeRepository
+# Knowledge Repository
 
-Empower your agents with **semantic search** capabilities by connecting them to your documents.
+Connect your agents to your documents to give them powerful **semantic search** capabilities.
 
-This guide will walk you through configuring the **KnowledgeRepo** tool to enable Agentic-Retrieval-Augmented Generation (A-RAG), allowing your agents to give answers grounded in your specific data.
+This guide walks you through configuring the **KnowledgeRepo** tool. By enabling Agentic-Retrieval-Augmented Generation (A-RAG), your agents can provide accurate answers based directly on your own data.
 
 ## 💡 Core Concepts
 
-To configure this tool, you need to understand how data ingestion and search scoping work.
+Before diving into configuration, it helps to understand how data ingestion and search scoping work.
 
-### 1. How it works
-The KnowledgeRepository (KR) indexes your documents so agents can retrieve, analyze, and answer queries based on that content rather than hallucinating. 
+### 1. How it Works
+The Knowledge Repository (KR) indexes your documents, allowing agents to retrieve and analyze relevant content to answer queries accurately instead of hallucinating. 
 
-1.  **Ingest:** Upload documents (PDFs) directly or use SVAHNAR Connectors.
-2.  **Index:** The repository preprocesses content (including OCR for image-based PDFs) for semantic search.
-3.  **Query:** Agents fetch relevant information to produce accurate answers.
+1.  **Ingest:** Upload your documents (like PDFs) directly, or sync them automatically using SVAHNAR Connectors.
+2.  **Index:** The repository processes your content, including performing OCR on image-based PDFs—to prepare it for semantic search.
+3.  **Query:** Agents fetch the most relevant information to generate accurate, context-aware answers.
 
 ### 2. Supported Data Sources
-You can upload files manually or use **Connectors** to index external sources automatically:
+You can manually upload files or use **Connectors** to automatically sync with external sources:
 * [URL](/docs/KnowledgeRepository/Connectors/URL.mdx)
 * [AWS S3](/docs/KnowledgeRepository/Connectors/AWS_S3)
 * [Confluence](/docs/KnowledgeRepository/Connectors/Confluence)
 * [SharePoint](/docs/KnowledgeRepository/Connectors/Sharepoint)
 
-### 3. Search Scoping (Filtering)
-You can restrict the search to specific data subsets using IDs:
+### 3. Search Scoping
+You can narrow down an agent's search to specific subsets of your data using IDs:
 
-* **Knowledge Repo ID (`k_repo_id`):** Restricts search to a specific repository UUID.
-* **Document ID (`doc_id`):** Restricts search to a specific document UUID within a repository.
+* **Knowledge Repo ID (`k_repo_id`):** Limits the search to a specific repository.
+* **Document ID (`doc_id`):** Limits the search to a single document within a repository.
+
+### 4. Page-Aware Smart Chunking
+To ensure your agents have the best context possible, the repository uses an intelligent chunking strategy:
+* **Page-Wise Chunking:** Documents are processed page by page. If a paragraph overflows onto the next page, context is maintained without being lost.
+* **Smart Length Constraints:** For long, continuous documents, the text is strategically broken down based on both length and context to ensure smooth retrieval.
 
 :::info Access Control
-**Permissions are inherited.** If a user has permission to access an agent associated with a KnowledgeRepository in your organization, they automatically inherit access to that repository. You do not need to configure separate permissions.
+**Permissions are inherited.** If a user has access to an agent connected to a Knowledge Repository, they automatically get access to that repository's data. No separate configuration is needed.
 :::
 
 ---
 
 ## ⚙️ Configuration Steps
 
-Follow these steps to integrate the KnowledgeRepository with your agent.
+Follow these steps to connect your agent to a Knowledge Repository.
 
 <Steps>
 <Step>
 
 ### Prepare your Repository
 
-Before configuring the agent, ensure your documents are uploaded and indexed.
+Before configuring your agent, make sure your documents are uploaded and fully indexed.
 
-1.  Navigate to the **KnowledgeRepository** section in the SVAHNAR dashboard.
-2.  Create a new Repository or identify an existing one.
-3.  Upload your PDFs or configure a Connector (e.g., AWS S3, Confluence).
-4.  Copy the **Repository UUID** (and optional **Document UUID** if scoping is required).
+1.  Go to the **KnowledgeRepository** section in your SVAHNAR dashboard.
+2.  Create a new repository or select an existing one.
+3.  Upload your files or set up a Connector (like AWS S3 or Confluence).
+4.  Copy the **Repository UUID** (and the **Document UUID** if you want to restrict searches to a specific file).
 
-:::tip Best Practice
-Upload canonical, versioned copies of documents when possible to avoid indexing transient drafts.
-:::
-</Step>
-
-<Step>
-
-### Configure Tool in Agent
-
-Add the `KnowledgeRepo` tool to your agent's configuration YAML.
-
-**Key Configuration Parameter:**
-* `k_repo_id`: The unique UUID of the repository you want this agent to search.
 
 </Step>
 
 <Step>
 
-### Define Agent Function
+### Add the Tool to your Agent
 
-Instruct your agent on *when* to use this tool in the `agent_function` section.
+Add the `KnowledgeRepo` tool to your agent's YAML configuration.
 
-* **Example Instruction:** "If the user asks about internal HR policies, use the KnowledgeRepo tool to find the answer."
-* **Query Input:** The agent will automatically generate the `query` string based on the user's natural language question.
+**Key Parameter:**
+* `k_repo_id`: The UUID of the repository you want the agent to search.
+
+</Step>
+
+<Step>
+
+### Instruct your Agent
+
+Tell your agent *when* to use this tool within the `agent_function` section.
+
+* **Example:** *"If the user asks about internal HR policies, use the KnowledgeRepo tool to find the answer."*
+* **How it works:** The agent automatically generates the search query based on the user's natural language prompt.
 
 </Step>
 </Steps>
 
 ---
 
-## 📚 Practical Recipes (Examples)
+## 📚 Examples
 
 ### Recipe 1: Basic Global Search
 
-> **Use Case:** An agent that searches an entire KnowledgeRepository to answer questions.
+**Use Case:** An agent that searches across an entire Knowledge Repository.
 
 ```yaml showLineNumbers
 create_vertical_agent_network:
@@ -113,12 +116,11 @@ create_vertical_agent_network:
     incoming_edge:
       - Start
     outgoing_edge: []
-
 ```
 
 ### Recipe 2: Scoped Search (Specific Document)
 
-> **Use Case:** An agent restricted to searching a specific document within a repository (e.g., searching only the "Employee Handbook").
+**Use Case:** An agent restricted to a single document within a repository, like an "Employee Handbook".
 
 ```yaml showLineNumbers
 create_vertical_agent_network:
@@ -146,20 +148,19 @@ create_vertical_agent_network:
 ## 🚑 Troubleshooting
 
 * **"Invalid KnowledgeRepository ID" Error**
-  * Ensure the `k_repo_id` provided is a valid UUID format.
-  * Check for whitespace characters pasted accidentally into the YAML.
-
+  * Make sure your `k_repo_id` is in a valid UUID format.
+  * Check for any accidental spaces in your YAML file.
 
 * **"You do not have permission to access..."**
-  * This occurs if the `k_repo_id` exists but belongs to a different organization and is not marked as `is_global`.
-  * **Private Repos:** Only the creator and authorized organization members can access them. verify the ownership of the KnowledgeRepository.
-
+  * This happens if the `k_repo_id` belongs to another organization and isn't marked as `is_global`.
+  * **Private Repositories:** Only the creator and authorized organization members have access. Double-check who owns the repository.
 
 * **Poor Search Results**
-  * Ensure the documents have finished **Indexing**. Large PDFs may take a few moments to process (especially if OCR is required).
-  * Verify that the documents contain text and are not just flattened images without OCR processing.
+  * Check if your documents have finished **Indexing**. Large PDFs, especially those requiring OCR, can take a while to process.
+  * Ensure your documents contain actual text, not just flattened images without OCR.
 
+---
 
-## 💰 Additional Credit Consumption
+## 💰 Credit Consumption
 
-The KnowledgeRepo tool consumes credits based on the number of pages in the documents it indexes. Each page (up to legal size) consumes one credit.
+The KnowledgeRepo tool consumes credits based on the number of pages it indexes. Each page (up to legal size) uses `0.2` credits.
