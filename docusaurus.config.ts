@@ -25,7 +25,7 @@ const config: Config = {
 
   onBrokenLinks: 'throw',
 
-  clientModules: ['./src/client-modules/sidebar-scroll.ts', './src/client-modules/gtag-shim.ts'],
+  clientModules: ['./src/client-modules/sidebar-scroll.ts', './src/client-modules/gtag-shim.ts', './src/client-modules/analyticsModule.ts'],
 
   // Even if you don't use internationalization, you can use this field to set
   // useful metadata like html lang. For example, if your site is Chinese, you
@@ -74,13 +74,6 @@ const config: Config = {
   ],
 
   plugins: [
-    [
-      '@docusaurus/plugin-google-gtag',
-      {
-        trackingID: 'G-50T925X4N9',
-        anonymizeIP: true,
-      },
-    ],
     // Note: Homepage redirect is handled by src/pages/index.* instead
     // '@docusaurus/plugin-client-redirects' removed: root redirect conflicted with trailingSlash
     [

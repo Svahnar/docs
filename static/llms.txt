@@ -93,7 +93,7 @@ This file serves as a plain-text index of the SVAHNAR documentation, optimized f
 
 ## Knowledge Repo
 
-- [KnowledgeRepository | SVAHNAR AI Developer Docs](/docs/KnowledgeRepository/Overview): Learn how SVAHNAR's KnowledgeRepository enables Retrieval-Augmented Generation (RAG) for your AI agents with semantic search.
+- [Knowledge Repository | SVAHNAR AI Developer Docs](/docs/KnowledgeRepository/Overview): Learn how SVAHNAR's KnowledgeRepository enables Retrieval-Augmented Generation (RAG) for your AI agents with semantic search.
 
 ## Connectors
 
