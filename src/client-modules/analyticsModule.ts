@@ -42,28 +42,32 @@ export function onRouteUpdate({ location, previousLocation }: { location: Locati
       // Fail silently for analytics
     });
 
-    // Also trigger Client-Side GA4 (Hybrid Tagging)
-    if (!document.getElementById('ga-script')) {
+    // Load Google Tag Manager (which contains GA4, LinkedIn, etc.)
+    if (!document.getElementById('gtm-script')) {
+      const gtmId = 'GTM-NH93HPZ8';
+      
+      // Initialize dataLayer
+      const w = window as any;
+      w.dataLayer = w.dataLayer || [];
+      w.dataLayer.push({
+        'gtm.start': new Date().getTime(),
+        event: 'gtm.js'
+      });
+      
       const s1 = document.createElement('script');
-      s1.id = 'ga-script';
-      s1.type = 'text/javascript';
+      s1.id = 'gtm-script';
       s1.async = true;
-      s1.src = 'https://www.googletagmanager.com/gtag/js?id=G-50T925X4N9';
+      s1.src = 'https://www.googletagmanager.com/gtm.js?id=' + gtmId;
       document.head.appendChild(s1);
-
-      const s2 = document.createElement('script');
-      s2.id = 'ga-init';
-      s2.type = 'text/javascript';
-      s2.innerHTML = `
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-50T925X4N9', { page_path: '${location.pathname}' });
-      `;
-      document.head.appendChild(s2);
-    } else if (typeof (window as any).gtag === 'function') {
-      (window as any).gtag('config', 'G-50T925X4N9', { page_path: location.pathname });
     }
+    
+    // Push page_view event to GTM
+    const w = window as any;
+    w.dataLayer = w.dataLayer || [];
+    w.dataLayer.push({
+      event: 'page_view',
+      page_path: location.pathname
+    });
 
   } catch (error) {
     // Fail silently
