@@ -21,12 +21,13 @@ To add an MCP server to an agent, use the `mcp_assigned` field within the `tools
 - **name**: A unique identifier for the MCP server connection.
 - **hitl**: (Boolean) If set to `true`, any tool call from this MCP server will require Human-In-The-Loop approval before execution.
 - **config**:
-  - **url**: The endpoint URL of the MCP server (e.g., `http://127.0.0.1:8007/mcp`).
+  - **url**: The endpoint URL of the MCP server (e.g., `https://mcp.example.com/sse`).
   - **transport**: The communication method. Currently, `http`, `sse`, and `streamable_http` are supported (all map to HTTP-based communication).
   - **headers**: A dictionary of HTTP headers for authentication or metadata.
     - **Authorization**: Used for Bearer tokens or API keys (e.g., `"Bearer xoxb-..."`).
     - **Accept**: Usually `"text/event-stream, application/json"` for MCP SSE connections.
   - **oauth_provider_id**: The UUID of your custom OAuth provider connection (see [Custom OAuth Clients](/docs/Connections/CustomOAuthClient)). When specified, SVAHNAR automatically fetches and silently refreshes the OAuth access token on behalf of the user, injecting it as an `Authorization: Bearer <token>` header.
+- **assigned_tools**: (Optional) A dictionary of specific tools to expose from this MCP server, along with default arguments to inject on every call. If omitted or empty, all tools are enabled with no default overrides. Default arguments can also use Key Vault placeholders (e.g., `cc: ${MY_EMAIL}`).
 
 ### Example Agent Configuration
 
@@ -50,6 +51,9 @@ create_agent_network:
         # Option A: Authenticating using a Custom OAuth Connection (Recommended)
         - name: slack-mcp
           hitl: true
+          assigned_tools:
+            slack.post_message: 
+              channel: "#general"   # Default argument injected automatically
           config:
             url: https://mcp.slack.com/mcp
             transport: sse
@@ -57,6 +61,8 @@ create_agent_network:
         # Option B: Authenticating using static headers with Key Vault secret placeholders
         - name: github-mcp
           hitl: false
+          assigned_tools:
+            github.create_issue: {} # Enable only this tool, no default args
           config:
             url: https://api.githubcopilot.com/mcp
             transport: sse
