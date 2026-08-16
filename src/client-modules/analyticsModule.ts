@@ -1,5 +1,55 @@
-import axios from 'axios';
 import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
+
+let pageStartTime = typeof Date !== 'undefined' ? Date.now() : 0;
+
+const sendEngagement = (path?: string) => {
+  if (!ExecutionEnvironment.canUseDOM) return;
+  const elapsedMs = Date.now() - pageStartTime;
+  if (elapsedMs >= 1000) {
+    const payload = {
+      event_name: 'user_engagement',
+      metadata: {
+        page_location: window.location.href,
+        page_path: path || window.location.pathname,
+        page_title: document.title,
+        engagement_time_msec: elapsedMs,
+        app: 'docs'
+      }
+    };
+
+    const apiUrl = 'https://api.svahnar.com/website/analytics/event';
+    try {
+      if (navigator.sendBeacon) {
+        const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+        navigator.sendBeacon(apiUrl, blob);
+      } else {
+        fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+          keepalive: true,
+          credentials: 'include'
+        }).catch(() => {});
+      }
+    } catch (e) {
+      // Fail silently
+    }
+  }
+  pageStartTime = Date.now();
+};
+
+if (ExecutionEnvironment.canUseDOM) {
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+      sendEngagement(window.location.pathname);
+    } else {
+      pageStartTime = Date.now();
+    }
+  });
+  window.addEventListener('pagehide', () => {
+    sendEngagement(window.location.pathname);
+  });
+}
 
 // Docusaurus exposes the route update lifecycle method here
 export function onRouteUpdate({ location, previousLocation }: { location: Location; previousLocation: Location | null }) {
@@ -7,8 +57,11 @@ export function onRouteUpdate({ location, previousLocation }: { location: Locati
     return;
   }
 
-  // Same URL as the main svahnar-website API
-  const ANALYTICS_API_URL = 'https://api.svahnar.com/website/analytics/event';
+  // Send engagement time for previous page when navigating
+  if (previousLocation && previousLocation.pathname !== location.pathname) {
+    sendEngagement(previousLocation.pathname);
+  }
+  pageStartTime = Date.now();
 
   try {
     const consentStr = localStorage.getItem('svahnar_cookie_consent_v1');
@@ -23,24 +76,6 @@ export function onRouteUpdate({ location, previousLocation }: { location: Locati
     if (previousLocation && previousLocation.pathname === location.pathname) {
       return;
     }
-
-    axios.post(
-      ANALYTICS_API_URL,
-      {
-        event_name: 'page_view',
-        metadata: {
-          page_path: location.pathname,
-          app: 'docs', // Differentiate this from the main website
-          url: window.location.href,
-        },
-      },
-      {
-        headers: { 'Content-Type': 'application/json' },
-        withCredentials: true, // IMPORTANT: send the w_user_id and user_id cookies
-      }
-    ).catch(() => {
-      // Fail silently for analytics
-    });
 
     // Load Google Tag Manager (which contains GA4, LinkedIn, etc.)
     if (!document.getElementById('gtm-script')) {
