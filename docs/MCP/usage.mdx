@@ -22,7 +22,7 @@ To add an MCP server to an agent, use the `mcp_assigned` field within the `tools
 - **hitl**: (Boolean) If set to `true`, any tool call from this MCP server will require Human-In-The-Loop approval before execution.
 - **config**:
   - **url**: The endpoint URL of the MCP server (e.g., `https://mcp.example.com/sse`).
-  - **transport**: The communication method. Currently, `http`, `sse`, and `streamable_http` are supported (all map to HTTP-based communication).
+  - **transport**: The communication method. Defaults to `streamable_http` when omitted. `streamable_http` (also accepted as `streamable-http` or `http`) and `sse` are supported. **`sse` is a legacy transport** (superseded by streamable HTTP in the MCP spec); use it only for servers that don't yet support streamable HTTP.
   - **headers**: A dictionary of HTTP headers for authentication or metadata.
     - **Authorization**: Used for Bearer tokens or API keys (e.g., `"Bearer xoxb-..."`).
     - **Accept**: Usually `"text/event-stream, application/json"` for MCP SSE connections.
@@ -56,7 +56,7 @@ create_agent_network:
               channel: "#general"   # Default argument injected automatically
           config:
             url: https://mcp.slack.com/mcp
-            transport: sse
+            transport: streamable_http
             oauth_provider_id: "21af5063-05d2-4081-9e44-c3e2573b234f"
         # Option B: Authenticating using static headers with Key Vault secret placeholders
         - name: github-mcp
@@ -65,7 +65,7 @@ create_agent_network:
             github.create_issue: {} # Enable only this tool, no default args
           config:
             url: https://api.githubcopilot.com/mcp
-            transport: sse
+            transport: streamable_http
             headers:
               Authorization: "Bearer ${GITHUB_PAT}"
     incoming_edge:
@@ -73,10 +73,64 @@ create_agent_network:
     outgoing_edge: []
 ```
 
+## Adding an MCP Server from the UI
+
+You can also add and manage MCP servers without writing YAML. Open **MCP Connections** from the sidebar and click to add a new server.
+
+### 1. Enter the server details
+Give the server a **Name** (e.g. `math-service`), an optional description, and the server **URL** (e.g. `https://mcp.stripe.com`).
+
+### 2. Check sign-in
+Click **Check Sign-in**. SVAHNAR contacts the server and tells you whether it needs you to sign in:
+
+- **No sign-in needed**: you can go straight to fetching tools.
+- **Sign-in required**: SVAHNAR shows how it can connect. If you already have a saved connection for this server, a **Link Connection** button lets you reuse it (use **Sign in** if it needs to be re-authorized). You can also pick any saved connection from the dropdown.
+
+### 3. Choose how SVAHNAR identifies itself (OAuth client)
+For servers that require sign-in, SVAHNAR lists only the options that server supports. When there is more than one, one is marked **Recommended**:
+
+| Option | What it does |
+| --- | --- |
+| **Use SVAHNAR's published identity** | The server reads SVAHNAR's client details from a URL we host. Nothing to set up. |
+| **Register automatically** | SVAHNAR registers itself with the server when you connect. Nothing to set up. |
+| **Use your own OAuth client** | Enter a Client ID (and Client Secret, if the server requires one) that you registered with the server yourself. |
+
+If you don't know where to get a Client ID or Secret, the form offers a ready-made search query you can **Copy** or open with **Search Google**.
+
+Then click **1-Click Connect** (or **Save & Connect** when using your own client) and approve access in the popup. If sign-in fails, use the **Retry sign-in** button after adjusting the settings. If something goes wrong during the popup flow you will land on an error page that explains what happened.
+
+### 4. Review the permissions
+Under **What this connection will ask for** you can see the permissions (scopes) that will be requested, and where they came from (requested by the server, listed by the server, or offered by the sign-in server). If the server doesn't say which permissions it needs, none are requested and the sign-in server uses its default.
+
+- A warning appears if a permission the server asked for has been removed, since sign-in or tool calls will likely fail without it.
+- Anything SVAHNAR configures for you automatically is listed under **Also set up for you**.
+- Open **Advanced: review or change these settings** to switch individual extra settings on or off, tick or untick permissions, or add your own with **Add another scope**.
+
+:::note
+Some sign-ins don't include long-term access. SVAHNAR shows a notice with the expiry time, and you will need to sign in again after it.
+:::
+
+### 5. Fetch tools and set per-tool permissions
+Click to fetch tools; SVAHNAR reports how many tools it found. For each tool you can:
+
+- Enable or disable it for agents.
+- Require **Human-in-the-Loop** approval before it runs.
+- Add the extra permissions that tool needs (for example `channels:read`). Type the scope and click **+ Add**, or remove it with **×**. Tools without extra needs show *No extra permissions needed for this tool*.
+
+If a tool needs a permission your connection hasn't been granted yet, you'll be prompted to sign in to the connection again to grant it.
+
+### 6. Use the server in an agent
+After saving, the **Use this server in an agent** panel offers:
+
+- **Link to this saved server** (Recommended): the agent references the saved server, so later changes apply automatically.
+- **Copy the full settings**: copies the complete YAML config into your agent.
+
+In the agent network editor, MCP servers attached to an agent can also be configured directly on the agent node, including OAuth sign-in and tool permissions.
+
 ## Security & Performance
 
 ### Disabled Transports
-For security reasons, the **`stdio` transport is intentionally disabled** for user-provided MCP configurations. All connections must be made via HTTP/SSE.
+For security reasons, the **`stdio` transport is intentionally disabled** for user-provided MCP configurations. All connections must be made via streamable HTTP (recommended) or legacy SSE.
 
 ### Retries and Timeouts
 - **Timeout**: Each connection attempt to an MCP server has a **10-second timeout** to prevent the agent from hanging if a server is unresponsive.

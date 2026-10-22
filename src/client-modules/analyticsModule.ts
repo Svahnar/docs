@@ -3,6 +3,16 @@ import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
 
 let pageStartTime = typeof Date !== 'undefined' ? Date.now() : 0;
 
+const getGaClientId = (): string => {
+  if (typeof document === 'undefined') return '';
+  const match = document.cookie.match(/(^| )_ga=([^;]+)/);
+  if (match) {
+    const parts = match[2].split('.');
+    if (parts.length >= 4) return `${parts[2]}.${parts[3]}`;
+  }
+  return '';
+};
+
 const sendEngagement = (path?: string) => {
   if (!ExecutionEnvironment.canUseDOM) return;
 
@@ -33,7 +43,8 @@ const sendEngagement = (path?: string) => {
         page_path: path || window.location.pathname,
         page_title: document.title,
         engagement_time_msec: elapsedMs,
-        app: 'docs'
+        app: 'docs',
+        ga_client_id: getGaClientId()
       }
     };
 
@@ -113,6 +124,7 @@ export function onRouteUpdate({ location, previousLocation }: { location: Locati
             page_title: document.title,
             app: 'docs', 
             url: window.location.href,
+            ga_client_id: getGaClientId(),
           },
         },
         {
@@ -125,25 +137,6 @@ export function onRouteUpdate({ location, previousLocation }: { location: Locati
     }
 
     if (allowGoogle) {
-      // Load Google Tag Manager (which contains GA4, LinkedIn, etc.)
-      if (!document.getElementById('gtm-script')) {
-        const gtmId = 'GTM-NH93HPZ8';
-        
-        // Initialize dataLayer
-        const w = window as any;
-        w.dataLayer = w.dataLayer || [];
-        w.dataLayer.push({
-          'gtm.start': new Date().getTime(),
-          event: 'gtm.js'
-        });
-        
-        const s1 = document.createElement('script');
-        s1.id = 'gtm-script';
-        s1.async = true;
-        s1.src = 'https://www.googletagmanager.com/gtm.js?id=' + gtmId;
-        document.head.appendChild(s1);
-      }
-      
       // Push page_view event to GTM
       const w = window as any;
       w.dataLayer = w.dataLayer || [];
