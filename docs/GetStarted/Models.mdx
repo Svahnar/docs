@@ -1,7 +1,7 @@
 ---
 title: "Models | SVAHNAR AI Developer Docs"
-description: "Explore the large language models (LLMs) supported by SVAHNAR, including GPT-4o, GPT-5, Llama, and Deepseek."
-keywords: ['ai models', 'llm', 'gpt-4o', 'gpt-5', 'llama', 'deepseek', 'qwen', 'svahnar models', 'svahnar', 'ai agent', 'developer documentation', 'models']
+description: "Explore the large language models (LLMs) supported by SVAHNAR, including GPT-5.6, GPT-5.4, GPT-4.1, Llama, Qwen, and Deepseek."
+keywords: ['ai models', 'llm', 'gpt-5.6', 'gpt-5.4', 'gpt-4.1', 'llama', 'deepseek', 'qwen', 'svahnar models', 'svahnar', 'ai agent', 'developer documentation', 'models']
 sidebar_label: "Models"
 ---
 import styles from './customcss/modelList.module.css';
@@ -18,7 +18,7 @@ This guide outlines the available models, their credit costs, and how consumptio
 
 ## 💎 Available Models
 
-The following models are available for immediate use in your agent configurations.
+The following models are available for immediate use in your agent configurations. You can also browse each model's context window, capabilities and credit cost at [svahnar.com/models](https://www.svahnar.com/models/).
 
 <div className="table-container">
   <table>
@@ -30,40 +30,100 @@ The following models are available for immediate use in your agent configuration
       </tr>
     </thead>
     <tbody>
-      {/* OpenAI Models */}
       <tr>
-        <td rowspan="7"><strong>OpenAI</strong></td>
-        <td><code>gpt-4o-mini</code></td>
-        <td>1</td>
+        <td rowspan="13"><strong>OpenAI</strong></td>
+        <td><code>gpt-5.6-terra</code></td>
+        <td>17</td>
       </tr>
       <tr>
-        <td><code>gpt-4o</code></td>
+        <td><code>gpt-5.6-luna</code></td>
+        <td>7</td>
+      </tr>
+      <tr>
+        <td><code>gpt-5.4</code></td>
+        <td>16</td>
+      </tr>
+      <tr>
+        <td><code>gpt-5.4-mini</code></td>
+        <td>5</td>
+      </tr>
+      <tr>
+        <td><code>gpt-5.4-nano</code></td>
+        <td>1.5</td>
+      </tr>
+      <tr>
+        <td><code>gpt-5.2</code></td>
         <td>15</td>
       </tr>
       <tr>
-        <td><code>gpt-5-nano</code></td>
-        <td>1</td>
+        <td><code>gpt-5.1</code></td>
+        <td>12</td>
+      </tr>
+      <tr>
+        <td><code>gpt-5</code></td>
+        <td>12</td>
       </tr>
       <tr>
         <td><code>gpt-5-mini</code></td>
         <td>3</td>
       </tr>
       <tr>
-        <td><code>gpt-5</code></td>
-        <td>15</td>
+        <td><code>gpt-5-nano</code></td>
+        <td>1</td>
       </tr>
       <tr>
+        <td><code>gpt-4.1</code></td>
+        <td>10</td>
+      </tr>
+      <tr>
+        <td><code>gpt-4.1-mini</code></td>
+        <td>2</td>
+      </tr>
+      <tr>
+        <td><code>gpt-4o-mini</code></td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td rowspan="2"><strong>OpenAI OSS</strong></td>
         <td><code>gpt-oss-120b</code></td>
         <td>1</td>
       </tr>
       <tr>
         <td><code>gpt-oss-20b</code></td>
+        <td>0.5</td>
+      </tr>
+      <tr>
+        <td rowspan="5"><strong>Alibaba (Qwen)</strong></td>
+        <td><code>qwen3-coder-next</code></td>
+        <td>4</td>
+      </tr>
+      <tr>
+        <td><code>qwen3-32b</code></td>
         <td>1</td>
       </tr>
-
-      {/* Meta Llama Models */}
       <tr>
-        <td rowspan="3"><strong>Meta Llama</strong></td>
+        <td><code>qwen3-coder-30b-a3b</code></td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td><code>qwen3-next-80b-a3b</code></td>
+        <td>1.5</td>
+      </tr>
+      <tr>
+        <td><code>qwen3-vl-235b-a22b</code></td>
+        <td>4</td>
+      </tr>
+      <tr>
+        <td rowspan="2"><strong>Deepseek</strong></td>
+        <td><code>deepseek.v3.2</code></td>
+        <td>3</td>
+      </tr>
+      <tr>
+        <td><code>deepseek.r1-v1:0</code></td>
+        <td>7</td>
+      </tr>
+      <tr>
+        <td rowspan="3"><strong>Meta</strong></td>
         <td><code>llama3-1-8b-instruct</code></td>
         <td>1</td>
       </tr>
@@ -75,46 +135,178 @@ The following models are available for immediate use in your agent configuration
         <td><code>llama4-maverick-17b-instruct</code></td>
         <td>2</td>
       </tr>
-      
-      {/* Deepseek Models */}
-      <tr>
-        <td rowspan="2"><strong>Deepseek</strong></td>
-        <td><code>deepseek.v3.2</code></td>
-        <td>3</td>
-      </tr>
-      <tr>
-        <td><code>deepseek.r1-v1:0</code></td>
-        <td>7</td>
-      </tr>
-
-      {/* Qwen Models */}
-      <tr>
-        <td rowspan="5"><strong>Qwen</strong></td>
-        <td><code>qwen3-32b</code></td>
-        <td>1</td>
-      </tr>
-      <tr>
-        <td><code>qwen3-coder-30b-a3b</code></td>
-        <td>1</td>
-      </tr>
-      <tr>
-        <td><code>qwen3-235b-a22b</code></td>
-        <td>4</td>
-      </tr>
-      <tr>
-        <td><code>qwen3-vl-235b-a22b</code></td>
-        <td>4</td>
-      </tr>
-      <tr>
-        <td><code>qwen3-coder-next</code></td>
-        <td>4</td>
-      </tr>
     </tbody>
   </table>
 </div>
 
 :::tip Enterprise
 **Need custom solutions?** Enterprise customers can contact sales for access to fine-tuned models or custom deployments.
+:::
+
+---
+## 🔍 Model Details
+
+Compare every model before choosing one. Credits are charged per run (see [Core Concepts](#-core-concepts)).
+
+**Specifications**
+
+- **Description**: a short summary of what the model is best at.
+- **Credits / run**: credits deducted each time an agent using this model runs.
+- **Context**: the maximum number of tokens (input plus output) the model can hold in a single run.
+- **Max output**: the maximum number of tokens the model can generate in a single response.
+- **Parameters**: the model size, where published.
+- **Input / Output**: the modalities the model accepts and produces. `text, image` models can read images you attach.
+- **Knowledge cutoff**: the date after which the model has no training data.
+- **Released**: when the model was launched.
+- **Subscription required**: whether a paid plan is needed to use the model.
+- **Model card**: the provider's official documentation for the model.
+
+**Capabilities**
+
+- **Reasoning**: the model thinks through a problem step by step before answering, which suits complex or multi-step tasks.
+- **Tool calling**: the model can call tools and MCP servers.
+- **Structured output**: the model reliably returns data in a requested schema.
+- **File / Image / Video / Audio upload**: the kinds of attachments the model can process.
+- **Open weights**: the model weights are publicly available.
+
+A dash (—) means the field is not supported or not published for that model.
+
+### OpenAI
+
+Provider license / terms: [1](https://openai.com/policies/row-terms-of-use/), [2](https://openai.com/policies/services-agreement/), [3](https://openai.com/policies/usage-policies/)
+
+**Specifications**
+
+| Model (Config ID) | Description | Credits / run | Context | Max output | Parameters | Input | Output | Knowledge cutoff | Released | Subscription required | Model card |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| `gpt-5.6-terra` | GPT-5.6 model that balances intelligence and cost | 17 | 1.05M | 128K | — | text, image | text | Feb 2026 | Jul 2026 | — | — |
+| `gpt-5.6-luna` | GPT-5.6 model optimized for cost-sensitive workloads | 7 | 1.05M | 128K | — | text, image | text | Feb 2026 | Jul 2026 | — | — |
+| `gpt-5.4` | GPT-5.4 mini brings the strengths of GPT-5.4 to a faster, more efficient model designed for high-volume workloads. | 16 | 1.05M | 128K | — | text, image | text | Aug 2025 | Mar 2026 | — | — |
+| `gpt-5.4-mini` | GPT-5.4 mini brings the strengths of GPT-5.4 to a faster, more efficient model designed for high-volume workloads. | 5 | 400K | 128K | — | text, image | text | Aug 2025 | Mar 2026 | — | — |
+| `gpt-5.4-nano` | cheapest GPT-5.4-class model for simple high-volume tasks | 1.5 | 400K | 128K | — | text, image | text | Aug 2025 | Mar 2026 | — | — |
+| `gpt-5.2` | The best model for coding and agentic tasks with configurable reasoning effort | 15 | 400K | 128K | — | text, image | text | Aug 2025 | Dec 2025 | — | — |
+| `gpt-5.1` | The best model for coding and agentic tasks with configurable reasoning effort | 12 | 400K | 128K | — | text, image | text | Sep 2024 | Nov 2025 | — | — |
+| `gpt-5` | Previous intelligent reasoning model for coding and agentic tasks with configurable reasoning effort | 12 | 400K | 128K | — | text, image | text | Sep 2024 | Aug 2025 | — | — |
+| `gpt-5-mini` | Near-frontier intelligence for cost sensitive, low latency, high volume workloads | 3 | 400K | 128K | — | text, image | text | May 2024 | Aug 2025 | — | — |
+| `gpt-5-nano` | Fastest, most cost-efficient version of GPT-5 | 1 | 400K | 128K | — | text, image | text | May 2024 | Aug 2025 | — | — |
+| `gpt-4.1` | Smartest non-reasoning model | 10 | 1.04758M | 33K | — | text, image | text | Jun 2024 | Apr 2025 | — | — |
+| `gpt-4.1-mini` | Smaller, faster version of GPT-4.1 | 2 | 1.04758M | 33K | — | text, image | text | Jun 2024 | Apr 2025 | — | — |
+| `gpt-4o-mini` | Fast, affordable small model for focused tasks | 1 | 128K | 16K | — | text, image | text | Oct 2023 | Jul 2024 | — | — |
+
+**Capabilities**
+
+| Model (Config ID) | Reasoning | Tool calling | Structured output | File upload | Image upload | Video upload | Audio upload | Open weights |
+|---|---|---|---|---|---|---|---|---|
+| `gpt-5.6-terra` | ✅ | ✅ | ✅ | ✅ | ✅ | — | — | — |
+| `gpt-5.6-luna` | ✅ | ✅ | ✅ | ✅ | ✅ | — | — | — |
+| `gpt-5.4` | ✅ | ✅ | ✅ | ✅ | ✅ | — | — | — |
+| `gpt-5.4-mini` | ✅ | ✅ | ✅ | ✅ | ✅ | — | — | — |
+| `gpt-5.4-nano` | ✅ | ✅ | ✅ | ✅ | ✅ | — | — | — |
+| `gpt-5.2` | ✅ | ✅ | ✅ | ✅ | ✅ | — | — | — |
+| `gpt-5.1` | ✅ | ✅ | ✅ | ✅ | ✅ | — | — | — |
+| `gpt-5` | ✅ | ✅ | ✅ | ✅ | ✅ | — | — | — |
+| `gpt-5-mini` | ✅ | ✅ | ✅ | ✅ | ✅ | — | — | — |
+| `gpt-5-nano` | ✅ | ✅ | ✅ | ✅ | ✅ | — | — | — |
+| `gpt-4.1` | — | ✅ | ✅ | ✅ | ✅ | — | — | — |
+| `gpt-4.1-mini` | — | ✅ | ✅ | ✅ | ✅ | — | — | — |
+| `gpt-4o-mini` | — | ✅ | ✅ | ✅ | ✅ | — | — | — |
+
+### OpenAI OSS
+
+Provider license / terms: [1](https://huggingface.co/openai/gpt-oss-120b/blob/main/LICENSE)
+
+**Specifications**
+
+| Model (Config ID) | Description | Credits / run | Context | Max output | Parameters | Input | Output | Knowledge cutoff | Released | Subscription required | Model card |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| `gpt-oss-120b` | OpenAI's 120-billion parameter open-source general-purpose model for text generation, coding, and reasoning tasks. | 1 | 128K | 16K | 120B | text | text | Jun 2024 | Aug 2025 | — | [Link](https://cdn.openai.com/pdf/419b6906-9da6-406c-a19d-1bb078ac7637/oai_gpt-oss_model_card.pdf) |
+| `gpt-oss-20b` | Medium-sized open-weight model for low latency | 0.5 | 128K | 16K | 20B | text | text | Jun 2024 | Aug 2025 | — | [Link](https://cdn.openai.com/pdf/419b6906-9da6-406c-a19d-1bb078ac7637/oai_gpt-oss_model_card.pdf) |
+
+**Capabilities**
+
+| Model (Config ID) | Reasoning | Tool calling | Structured output | File upload | Image upload | Video upload | Audio upload | Open weights |
+|---|---|---|---|---|---|---|---|---|
+| `gpt-oss-120b` | ✅ | ✅ | ✅ | — | — | — | — | ✅ |
+| `gpt-oss-20b` | ✅ | ✅ | ✅ | — | — | — | — | ✅ |
+
+### Alibaba
+
+Provider license / terms: [1](https://github.com/QwenLM/Qwen3-VL/blob/main/LICENSE)
+
+**Specifications**
+
+| Model (Config ID) | Description | Credits / run | Context | Max output | Parameters | Input | Output | Knowledge cutoff | Released | Subscription required | Model card |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| `qwen3-coder-next` | — | 4 | 256K | 16K | 80B | text | text | Sep 2025 | Feb 2026 | — | [Link](https://qwen.ai/blog?id=qwen3) |
+| `qwen3-32b` | — | 1 | 32K | 8K | 32B | text | text | Mar 2025 | Apr 2025 | — | [Link](https://qwen.ai/blog?id=qwen3) |
+| `qwen3-coder-30b-a3b` | — | 1 | 256K | 16K | 30B | text | text | Mar 2025 | Jul 2025 | — | [Link](https://qwen.ai/blog?id=qwen3) |
+| `qwen3-next-80b-a3b` | — | 1.5 | 256K | 8K | 80B | text | text | Sep 2025 | Sep 2025 | — | [Link](https://qwen.ai/blog?id=qwen3) |
+| `qwen3-vl-235b-a22b` | — | 4 | 256K | 8K | 235B | text, image | text | Mar 2025 | Jul 2025 | — | [Link](https://qwen.ai/blog?id=qwen3) |
+
+**Capabilities**
+
+| Model (Config ID) | Reasoning | Tool calling | Structured output | File upload | Image upload | Video upload | Audio upload | Open weights |
+|---|---|---|---|---|---|---|---|---|
+| `qwen3-coder-next` | — | ✅ | ✅ | — | — | — | — | ✅ |
+| `qwen3-32b` | ✅ | ✅ | ✅ | — | — | — | — | ✅ |
+| `qwen3-coder-30b-a3b` | — | ✅ | ✅ | — | — | — | — | — |
+| `qwen3-next-80b-a3b` | ✅ | ✅ | ✅ | — | — | — | — | ✅ |
+| `qwen3-vl-235b-a22b` | ✅ | ✅ | ✅ | — | ✅ | — | — | — |
+
+### Deepseek
+
+Provider license / terms: [1](https://huggingface.co/deepseek-ai/DeepSeek-V3.2/blob/main/LICENSE), [2](https://huggingface.co/deepseek-ai/DeepSeek-R1/blob/main/LICENSE), [3](https://huggingface.co/deepseek-ai/DeepSeek-V3.1/blob/main/LICENSE)
+
+**Specifications**
+
+| Model (Config ID) | Description | Credits / run | Context | Max output | Parameters | Input | Output | Knowledge cutoff | Released | Subscription required | Model card |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| `deepseek.v3.2` | — | 3 | 164K | 8K | 685B | text | text | Mar 2025 | Dec 2025 | — | [Link](https://api-docs.deepseek.com/news/news251201) |
+| `deepseek.r1-v1:0` | — | 7 | 128K | 8K | 671B | text | text | Jul 2024 | Jan 2025 | — | [Link](https://api-docs.deepseek.com/news/news250120) |
+
+**Capabilities**
+
+| Model (Config ID) | Reasoning | Tool calling | Structured output | File upload | Image upload | Video upload | Audio upload | Open weights |
+|---|---|---|---|---|---|---|---|---|
+| `deepseek.v3.2` | ✅ | ✅ | ✅ | — | — | — | — | ✅ |
+| `deepseek.r1-v1:0` | ✅ | ✅ | — | — | — | — | — | — |
+
+### Meta
+
+**Specifications**
+
+| Model (Config ID) | Description | Credits / run | Context | Max output | Parameters | Input | Output | Knowledge cutoff | Released | Subscription required | Model card |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| `llama3-1-8b-instruct` | — | 1 | 128K | 4K | 8B | text | text | Dec 2023 | Jul 2024 | — | — |
+| `llama3-3-70b-instruct` | — | 2 | 128K | 4K | 70B | text | text | Dec 2023 | Dec 2024 | — | — |
+| `llama4-maverick-17b-instruct` | — | 2 | 128K | 16K | 17B | text, image | text | Aug 2024 | Apr 2025 | — | — |
+
+**Capabilities**
+
+| Model (Config ID) | Reasoning | Tool calling | Structured output | File upload | Image upload | Video upload | Audio upload | Open weights |
+|---|---|---|---|---|---|---|---|---|
+| `llama3-1-8b-instruct` | — | ✅ | — | ✅ | — | — | — | ✅ |
+| `llama3-3-70b-instruct` | ✅ | ✅ | — | ✅ | — | — | — | ✅ |
+| `llama4-maverick-17b-instruct` | ✅ | ✅ | — | ✅ | ✅ | — | — | ✅ |
+
+:::info Always up to date
+This page is a snapshot. The live list, with a page for every model, is available at [svahnar.com/models](https://www.svahnar.com/models/). You can also see model cards, context sizes and credit costs when picking a model in the SVAHNAR platform.
+:::
+
+## 🧭 Choosing a Model
+
+| If you need... | Consider |
+|---|---|
+| The lowest cost for simple, high-volume steps (routing, classification, short replies) | `gpt-oss-20b` (0.5 credits), or any 1-credit model such as `gpt-5-nano`, `gpt-4o-mini`, `qwen3-32b` or `llama3-1-8b-instruct` |
+| A balance of quality and cost | `gpt-5.4-mini`, `gpt-5-mini`, `gpt-4.1-mini` or `llama3-3-70b-instruct` |
+| The strongest reasoning for complex agents | `gpt-5.6-terra`, `gpt-5.4`, `gpt-5.2` or `deepseek.r1-v1:0` |
+| Very long documents | `gpt-5.6-terra`, `gpt-5.6-luna`, `gpt-5.4` and `gpt-4.1` (about 1M tokens of context) |
+| Image input | Models listing `image` under Input, such as the GPT-5 family, `qwen3-vl-235b-a22b` and `llama4-maverick-17b-instruct` |
+| Code generation | `qwen3-coder-next`, `qwen3-coder-30b-a3b` or the GPT-5 family |
+| Open-weight models | `gpt-oss-120b`, `gpt-oss-20b`, `qwen3-32b`, `deepseek.v3.2` and the Llama models |
+
+:::tip Mix models in one network
+Each agent in a network has its own `LLM_config`. Use a low-credit model for simple agents and a stronger one only for the agent that needs it, to keep the total run cost down.
 :::
 
 ---
@@ -134,7 +326,7 @@ create_agent_network:
     LLM_config:
         params:
           # Paste the Model Name here
-          model: gpt-4o-mini
+          model: gpt-5-nano
     tools: []
     agent_function:
       - Reply to the user's greeting.
@@ -150,9 +342,17 @@ A **Run** occurs whenever an agent is triggered to perform a task or participate
 
 ### 2. How are credits consumed?
 Credits are deducted strictly on a **pay-per-run** basis.
-* If an agent uses **gpt-4o-mini**, 1 credit is deducted for that turn.
-* If an agent uses **gpt-5**, 15 credits are deducted for that turn.
+* If an agent uses **gpt-5-nano**, 1 credit is deducted for that turn.
+* If an agent uses **gpt-5.4**, 16 credits are deducted for that turn.
 
 :::info
 In a complex workflow where multiple agents interact, the total cost is the sum of the credits required for each agent's individual participation.
 :::
+
+### 3. Worked example
+
+A network has a supervisor on `gpt-5.4-mini` (5 credits) and two worker agents on `gpt-5-nano` (1 credit each). A single request in which the supervisor and both workers each participate once consumes:
+
+`5 + 1 + 1 = 7 credits`
+
+Credit costs can be fractional (for example `gpt-oss-20b` is 0.5 credits and `gpt-5.4-nano` is 1.5). The credits used by each agent in a request are reported in the `usage` section of the [Run Agent](../Agents/run_agent.mdx) response, together with the total.
