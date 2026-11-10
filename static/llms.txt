@@ -7,7 +7,7 @@ This file serves as a plain-text index of the SVAHNAR documentation, optimized f
 
 - [Overview | SVAHNAR AI Developer Docs](/docs/GetStarted/Overview): Get an overview of SVAHNAR, the AI agent platform for building, deploying, and managing intelligent agents at scale.
 - [Quickstart | SVAHNAR AI Developer Docs](/docs/GetStarted/Quickstart): Start building with SVAHNAR in minutes. Follow this quickstart to create, configure, and run your first AI agent.
-- [Models | SVAHNAR AI Developer Docs](/docs/GetStarted/Models): Explore the large language models (LLMs) supported by SVAHNAR, including GPT-4o, GPT-5, Llama, and Deepseek.
+- [Models | SVAHNAR AI Developer Docs](/docs/GetStarted/Models): Explore the large language models (LLMs) supported by SVAHNAR, including GPT-5.6, GPT-5.4, GPT-4.1, Llama, Qwen, and Deepseek.
 
 ## AI Framework
 
