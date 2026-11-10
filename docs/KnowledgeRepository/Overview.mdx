@@ -152,8 +152,8 @@ create_vertical_agent_network:
   * Check for any accidental spaces in your YAML file.
 
 * **"You do not have permission to access..."**
-  * This happens if the `k_repo_id` belongs to another organization and isn't marked as `is_global`.
-  * **Private Repositories:** Only the creator and authorized organization members have access. Double-check who owns the repository.
+  * This happens if the `k_repo_id` (or the repository containing your `doc_id`) belongs to another user and isn't marked as `is_global`.
+  * **Private Repositories:** Only the creator has access. Double-check who owns the repository.
 
 * **Poor Search Results**
   * Check if your documents have finished **Indexing**. Large PDFs, especially those requiring OCR, can take a while to process.
